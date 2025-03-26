@@ -1,19 +1,25 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, chr, start, end){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, chr, start, end){
 
      #### prepare data for plotting when needed:
-  # For bigwigs that has to be compared using t he same scale we should calculate the max scale to set
-  maxScore <- max(c(readBigwig(bw.file[1])$score, 
-                    readBigwig(bw.file[2])$score))
-  
-  print(paste("Scale for bigwig files has been set to:", maxScore-300))
+  # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
+  maxScore <- c()
+  for (i in 1:length(bw.file)){
+    maxScore <- c(maxScore, max(readBigwig(bw.file[i])$score))
+  }
+  maxScore <- max(maxScore)
+
+    print(paste("Scale for bigwig files has been set to:", maxScore-300))
 
   # To avoid loading too heavy data just read a specific chrom region
-  hicDataChromRegion <- readHic(file = hic.file,
-      chrom = as.numeric(chr), assembly = "hg38",
-      chromstart = start, chromend = end,
-      resolution = 25000, res_scale = "BP", norm = "KR"
-  ) 
+    hicDataChromRegion <- list()
+   for (i in 1:length(hic.file)){
+     hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
+       chrom = as.numeric(chr), assembly = "hg38",
+       chromstart = start, chromend = end,
+       resolution = 25000, res_scale = "BP", norm = "KR"
+        ) 
+    }
   
   # generate the plot
   
@@ -21,7 +27,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
 params <- pgParams(
     chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end,
     assembly = "hg38",
-    x = 0.5, just = c("left", "bottom"),
+    x = 3, just = c("left", "bottom"),
     width = 16, length = 16, default.units = "cm",
     range = c(0, maxScore-300) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
 )
@@ -36,67 +42,69 @@ pageCreate(
 
 
 ## Plot Hi-C data in region
+for (i in 1:length(hicDataChromRegion)){
  plotHicTriangle(
-    data = hicDataChromRegion,
+    data = hicDataChromRegion[[i]],
   params = params,
-    y = 3,  height = 3,
-)
+    y = 3,  height = 3)
+  
+  ## Add text labels
+  plotText(
+    label = hic.names[i], fonsize = 10, fontcolor = "black",
+    x = 2.5, y = "-1b", just = c("right", "bottom"),
+    params = params)
+  }
 
-## Plot signal track data bw file1
- plotSignal(
-    data = bw.file[1],
-    params = params,
-    y = "1.5b", height = 1.5
-)
-## Add text labels
-plotText(
-    label = "Kidney cortex 12", fonsize = 10, fontcolor = "#37a7db",
-    x = 0, y = "-1b", just = c("right", "bottom"),
-    params = params
-)
-## Plot signal track data bw file2
-plotSignal(
-    data = bw.file[2],
-    params = params,
-    y = "1.5b", height = 1.5,
-    linecolor = "#7ecdbb",
-)
+## Plot signal and text track data bw files
+ for (i in 1:length(bw.file)){
+   # Bw signal
+   plotSignal(
+     data = bw.file[i],
+     linecolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+     fill = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+     params = params,
+     y = "1.5b", height = 1.5)
+   
+   ## Add text labels
+   plotText(
+     label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+     x = 2.5, y = "-1b", just = c("right", "bottom"),
+     params = params)
+   
+ }
 
-plotText(
-    label = "Kidney cortex 15", fonsize = 10, fontcolor = "#7ecdbb",
-     x = 0, y = "-1b", just = c("right", "bottom"),
-    params = params
-)
 
 ## Plot bed files
+ for (i in 1:length(bed.file)){
+   # bed signal
 plotRanges(
-  data = bed.file,
+  data = bed.file[i],
   collapse = T,
-  fill = "purple",
+  fill = as.character(paletteer_d("ggthemes::excel_Ion_Boardroom")[i]),
   y = "0.5b", height = 0.5,
-  params = params
-)
-
+  params = params)
+   
+   ## Add text labels
 plotText(
-    label = "ATAC peak", fonsize = 10, fontcolor = "purple",
-    x = 0, y = "0b", just = c("right", "bottom"),
-    params = params
-)
-
+    label = bed.names, fonsize = 10, fontcolor = paletteer_d("ggthemes::excel_Ion_Boardroom")[i],
+    x = 2.5, y = "0b", just = c("right", "bottom"),
+    params = params)
+ }
 
 ## Plot loop annotations
-plotPairsArches(
-    data = bedpe.file,
+ for (i in 1:length(bedpe.file)){
+  plotPairsArches(
+    data = bedpe.file[i],
     y = "1b", height = 1,
     fill = "black", linecolor = "black", flip = TRUE,
     params = params
-)
-plotText(
-    label = "HiC arches", fonsize = 10, fontcolor = "black",
-    x = 0, y = "0b", just = c("right", "bottom"),
+  )
+  plotText(
+    label = bedpe.names, fonsize = 10, fontcolor = "black",
+    x = 2.5, y = "0b", just = c("right", "bottom"),
     params = params
-)
-
+  )
+  }
 
 ## Plot gene track
 plotGenes(
@@ -105,7 +113,7 @@ plotGenes(
 )
 plotText(
     label = "Gene", fonsize = 10, fontcolor = "black",
-    x = 0, y = "0b", just = c("right", "bottom"),
+    x = 2.5, y = "0b", just = c("right", "bottom"),
     params = params
 )
 

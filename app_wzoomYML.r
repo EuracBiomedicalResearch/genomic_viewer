@@ -5,6 +5,7 @@ library(shiny)
 library(bslib)
 library(svglite)
 library(svgPanZoom)
+library(paletteer)
 # Load server libraries
 library(plotgardener)
 library(org.Hs.eg.db)
@@ -12,24 +13,22 @@ library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(AnnotationHub)
 
 # Source script
-setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML")
+setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps")
 source("plotgardener_shiny_wzoomYML.r")
 
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/Shiny_wzoom_config.yml")
+config <- config::get(file = "C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/Shiny_wzoom_config.yml")
 
-# Read data
-# Select a BigWig file
+## Read data
+# Set a BigWig file
 bw.file <- dir(paste(config$data.dir, config$bw.dir, sep=""), full.names = TRUE, pattern = config$bw.ext)
-
-# Select a bed or bedpe file
+# Set a bed file
 bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), full.names = TRUE, pattern = config$bedpe.ext)
-
+# Set a bedpe file
 bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), full.names = TRUE, pattern = config$bed.ext)
-
-# Select hiC data file
+# Set hiC data file
 hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRUE, pattern = config$hic.ext)
 
 ######----------------------------------------------------------- SHINY
@@ -67,18 +66,30 @@ ui <- page_sidebar(
   # Submit button
     submitButton("Submit"),
    ),
-   card( card_header(
+  # Card
+   card(card_header(
      class = "bg-dark",
-     "Selected genomic region"
-   ), bootstrapPage(
-     svgPanZoomOutput(outputId = "res")))
+     "Selected genomic region"),
+     
+   card_body(class = "p-0",
+             svgPanZoomOutput(outputId = "res")))
   )
 
 # Define server logic ----
 server <- function(input, output){
 
   output$res <- renderSvgPanZoom({
-    svgPanZoom( svglite:::inlineSVG(plotgardener.shiny.function(bw.file = bw.file, hic.file = hic.file, bed.file = bed.file, bedpe.file = bedpe.file, chr = input$chr, start = input$chrstart, end = input$chrend)
+    svgPanZoom(svglite:::inlineSVG(plotgardener.shiny.function(bw.file = bw.file, 
+                                                                hic.file = hic.file, 
+                                                                bed.file = bed.file, 
+                                                                bedpe.file = bedpe.file,
+                                                                bw.names = config$bw.names,
+                                                                hic.names = config$hic.names,
+                                                                bed.names = config$bed.names,
+                                                                bedpe.names = config$bedpe.names,
+                                                                chr = input$chr, 
+                                                                start = input$chrstart, 
+                                                                end = input$chrend)
     ))
     
   })
