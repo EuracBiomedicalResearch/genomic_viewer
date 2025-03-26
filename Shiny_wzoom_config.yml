@@ -1,0 +1,19 @@
+---
+
+default:
+
+    # Set here the parameters related to the input files path and extensions
+  # Data directory
+  data.dir: "C:/Users/sarlago/Documents/R scripts/Shiny/ShinyTest/data/"
+  # bigWig directory and files final pattern or complete name (can correspond to one or more tracks)
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.ext: "treat_pileup.bw"
+  # bedpe directory and files final pattern
+  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
+  bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2.bedpe"
+  # bed directory and files final pattern
+  bed.dir: "GSE212908_ATAC_peaks"
+  bed.ext: "GSE212908_RAM012_013_015_peak_masterlist.bed"
+  # hic directory and files final pattern
+  hic.dir: "GSE212910_RAW_HiC"
+  hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM.hic"
