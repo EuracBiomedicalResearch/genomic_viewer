@@ -31,6 +31,9 @@ bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), full.names = TRU
 # Set hiC data file
 hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRUE, pattern = config$hic.ext)
 
+## Seto options for bw file plotting mode:
+bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
+
 ######----------------------------------------------------------- SHINY
 # Define UI ----
 ui <- page_sidebar(
@@ -59,10 +62,13 @@ ui <- page_sidebar(
     numericInput( 
       "chrend", 
       "End coordinate", 
-      value = 30300000, 
+      value = 30000000, 
       min = 2, 
       max = NA 
     ), 
+    # Select mode for bigwig plotting
+    selectInput('bw.mode', 'Select bigWig plots mode', bw.mode, selectize=FALSE),
+    
   # Submit button
     submitButton("Submit"),
    ),
@@ -71,7 +77,7 @@ ui <- page_sidebar(
      class = "bg-dark",
      "Selected genomic region"),
      
-   card_body(class = "p-0",
+   card_body(class = "p-3 border-0",
              svgPanZoomOutput(outputId = "res")))
   )
 
@@ -89,7 +95,8 @@ server <- function(input, output){
                                                                 bedpe.names = config$bedpe.names,
                                                                 chr = input$chr, 
                                                                 start = input$chrstart, 
-                                                                end = input$chrend)
+                                                                end = input$chrend,
+                                                                bw.mode = input$bw.mode)
     ))
     
   })

@@ -1,15 +1,25 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, chr, start, end){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, chr, start, end, bw.mode){
 
      #### prepare data for plotting when needed:
   # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
   maxScore <- c()
   for (i in 1:length(bw.file)){
-    maxScore <- c(maxScore, max(readBigwig(bw.file[i])$score))
+    maxScore <- c(maxScore, max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
   }
   maxScore <- max(maxScore)
 
-    print(paste("Scale for bigwig files has been set to:", maxScore-300))
+    print(paste("Scale for bigwig files has been set to:", maxScore))
+    
+  # Add colors based on bigwig score to be used in the Heatmap version of bigwig tracks
+    ## Map score column to a vector of colors
+    hm.colors <- list()
+    for (i in 1:length(bw.file)){
+      bwScore <- c(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
+      hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+    }
+      
+   
 
   # To avoid loading too heavy data just read a specific chrom region
     hicDataChromRegion <- list()
@@ -29,7 +39,7 @@ params <- pgParams(
     assembly = "hg38",
     x = 3, just = c("left", "bottom"),
     width = 16, length = 16, default.units = "cm",
-    range = c(0, maxScore-300) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
+    range = c(0, maxScore) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
 )
 
 
@@ -56,22 +66,49 @@ for (i in 1:length(hicDataChromRegion)){
   }
 
 ## Plot signal and text track data bw files
- for (i in 1:length(bw.file)){
-   # Bw signal
-   plotSignal(
-     data = bw.file[i],
-     linecolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
-     fill = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
-     params = params,
-     y = "1.5b", height = 1.5)
+if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
+  for (i in 1:length(bw.file)){
+    # Bw signal
+     plotSignal(
+       data = bw.file[i],
+      linecolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+      fill = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+       params = params,
+       y = "1.5b", 
+       height = 1.5)
    
-   ## Add text labels
-   plotText(
-     label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
-     x = 2.5, y = "-1b", just = c("right", "bottom"),
-     params = params)
-   
+     ## Add text labels
+     plotText(
+      label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+      x = 2.5, y = "-1b", just = c("right", "bottom"),
+       params = params)
+  }
  }
+
+## Plot bigwig as heatmap
+  if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
+   for (i in 1:length(bw.file)){
+    # bed signal
+    hm.plot <- plotRanges(
+      data = bw.file[i],
+      collapse = T,
+      fill = hm.colors[[i]],
+      y = "0.5b", height = 0.5,
+      params = params)
+    
+    ## Add text labels
+      plotText(
+       label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+        x = 2.5, y = "0b", just = c("right", "bottom"),
+        params = params)
+   }
+    ## Add heatmap legend just once
+    annoHeatmapLegend(
+      plot = hm.plot, fontcolor = "black",
+      x = 7.75, y = "-0.9b", just = c("right", "top"),
+      width = 0.10, height = 0.5, fontsize = 10
+    )
+  }
 
 
 ## Plot bed files
