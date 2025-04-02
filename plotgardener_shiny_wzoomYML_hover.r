@@ -1,0 +1,223 @@
+
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, chr, start, end, bw.mode){
+
+     #### prepare data for plotting when needed:
+  # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
+  maxScore <- c()
+  for (i in 1:length(bw.file)){
+    maxScore <- c(maxScore, max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
+  }
+  maxScore <- max(maxScore)
+
+    print(paste("Scale for bigwig files has been set to:", maxScore))
+    
+  # Add colors based on bigwig score to be used in the Heatmap version of bigwig tracks
+    ## Map score column to a vector of colors
+    hm.colors <- list()
+    for (i in 1:length(bw.file)){
+      bwScore <- c(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
+      hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+    }
+      
+   
+
+  # To avoid loading too heavy data just read a specific chrom region
+    hicDataChromRegion <- list()
+   for (i in 1:length(hic.file)){
+     hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
+       chrom = as.numeric(chr), assembly = "hg38",
+       chromstart = start, chromend = end,
+       resolution = 25000, res_scale = "BP", norm = "KR"
+        ) 
+   }
+    
+    ## Get sizes of chromosomes to scale their sizes, used for genomic annotation tracks
+    tx_db <- TxDb.Hsapiens.UCSC.hg38.knownGene
+    chromSizes <- GenomeInfoDb::seqlengths(tx_db)
+    maxChromSize <- max(chromSizes)
+  
+  # generate the plot
+  
+
+  ## Set parameters regarding the region that we would like to visualize. Those can be imported from every plot that we want to add.
+params <- pgParams(
+    chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end,
+    assembly = "hg38",
+    x = 0, just = c("left", "bottom"),
+    width = 16, length = 16, default.units = "cm",
+    range = c(0, maxScore) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
+)
+
+# Define counter for y coordinate:
+  y.coord <- 0
+
+## Create a plotgardener page
+pageCreate(
+    width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*3), default.units = "cm",
+    showGuides = F, xgrid = 0, ygrid = 0
+)
+
+
+## Plot Hi-C data in region
+for (i in 1:length(hicDataChromRegion)){
+ plotHicTriangle(
+    data = hicDataChromRegion[[i]],
+  params = params,
+    y = 3,  height = 3)
+  
+  ## Add text labels
+  plotText(
+    label = hic.names[i], fonsize = 10, fontcolor = "black",
+    x = -0.5, y = "-1b", just = c("right", "bottom"),
+    params = params)
+  
+  ## Increment y coord
+  y.coord <- y.coord+3
+  }
+
+## Plot signal and text track data bw files
+if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
+  for (i in 1:length(bw.file)){
+    # Bw signal
+     plotSignal(
+       data = bw.file[i],
+      linecolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+      fill = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+       params = params,
+       y = "1.5b", 
+       height = 1.5)
+   
+     ## Add text labels
+     plotText(
+      label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+      x = -0.5, y = "-1b", just = c("right", "bottom"),
+       params = params)
+     
+     ## Increment y coord
+     y.coord <- y.coord+1.5
+  }
+ }
+
+## Plot bigwig as heatmap
+  if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
+   for (i in 1:length(bw.file)){
+    # bed signal
+    hm.plot <- plotRanges(
+      data = bw.file[i],
+      collapse = T,
+      fill = hm.colors[[i]],
+      y = "0.5b", height = 0.5,
+      params = params)
+    
+    ## Add text labels
+      plotText(
+       label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+        x = -0.5, y = "0b", just = c("right", "bottom"),
+        params = params)
+      
+      ## Increment y coord
+      y.coord <- y.coord+0.5
+   }
+    ## Add heatmap legend just once
+    annoHeatmapLegend(
+      plot = hm.plot, fontcolor = "black",
+      x = 6.75, y = "-0.9b", just = c("right", "top"),
+      width = 0.10, height = 0.5, fontsize = 10
+    )
+  }
+
+
+## Plot bed files
+ for (i in 1:length(bed.file)){
+   # bed signal
+plotRanges(
+  data = bed.file[i],
+  collapse = T,
+  fill = as.character(paletteer_d("ggthemes::excel_Ion_Boardroom")[i]),
+  y = "0.5b", height = 0.5,
+  params = params)
+   
+   ## Add text labels
+plotText(
+    label = bed.names, fonsize = 10, fontcolor = paletteer_d("ggthemes::excel_Ion_Boardroom")[i],
+    x = -0.5, y = "0b", just = c("right", "bottom"),
+    params = params)
+
+## Increment y coord
+y.coord <- y.coord+0.5
+ }
+
+## Plot loop annotations
+ for (i in 1:length(bedpe.file)){
+  plotPairsArches(
+    data = bedpe.file[i],
+    y = "1b", height = 1,
+    fill = "black", linecolor = "black", flip = TRUE,
+    params = params
+  )
+  plotText(
+    label = bedpe.names, fonsize = 10, fontcolor = "black",
+    x = -0.5, y = "0b", just = c("right", "bottom"),
+    params = params
+  )
+  
+  ## Increment y coord
+  y.coord <- y.coord+1
+  }
+
+## Plot gene track
+plotGenes(
+    y = "1.75b", height = 1.25,
+    params = params
+)
+plotText(
+    label = "Gene", fonsize = 10, fontcolor = "black",
+    x = -0.5, y = "0b", just = c("right", "bottom"),
+    params = params
+)
+
+## Plot genome label
+plotGenomeLabel(
+     params = params,
+       y = "1b", scale = "Mb"
+)
+
+
+
+# Plot chromosome ideogram:
+
+## Plot and place ideogram
+ideogramPlot <- plotIdeogram(
+  chrom = paste("chr", chr, sep=""), assembly = "hg38",
+  x = 0.75, y = "1.5b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.7,
+  just = c("left", "top"),
+  default.units = "cm"
+)
+## Increment y coord
+y.coord <- y.coord+1.75+1+1.5
+
+## Plot chromosome name
+plotText(
+  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
+  x = 4.5, y = "0.5b", just = "right")
+
+## Add highlight region
+region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
+annoHighlight(
+  plot = ideogramPlot, params = region,
+  fill = "darkred",
+  y = "-0.8b", height = 0.9, just = c("left", "top"), default.units = "cm"
+)
+## Add zoom-in lines
+annoZoomLines(
+  plot = ideogramPlot, params = region,
+  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+1, default.units = "cm"
+)
+}
+
+
+#plotgardener.shiny.function(bw.file = bw.file, hic.file = hic.file, bedpe.file = bedpe.file, chr = chr, start = chrstart, end = chrend)
+
+#chr <- "1"
+#start <- 28000000
+#end <- 30300000
