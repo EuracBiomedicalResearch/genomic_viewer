@@ -21,3 +21,5 @@ default:
   hic.dir: "GSE212910_RAW_HiC"
   hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM.hic"
   hic.names: ["HiC cortex"]
+  # file with chromosomes and centromeres coordinates
+  chrom.cen: "chrom_centromeres_hg38.txt"

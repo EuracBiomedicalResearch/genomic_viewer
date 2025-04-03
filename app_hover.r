@@ -12,6 +12,8 @@ library(org.Hs.eg.db)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(AnnotationHub)
 library(ggplot2)
+# for chromosomes plot
+library(ggchicklet) 
 
 # Source script
 #setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps")
@@ -31,12 +33,14 @@ bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), full.names =
 bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), full.names = TRUE, pattern = config$bed.ext)
 # Set hiC data file
 hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRUE, pattern = config$hic.ext)
+### For chromosomes plotting
+chrom.cen.df <- read.table(config$chrom.cen, header = T, sep="\t")
 
-## Seto options for bw file plotting mode:
+## Set options for bw file plotting mode:
 bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 
 ######----------------------------------------------------------- SHINY
-# Define UI ----
+# Define UI -----------------------------------------------------
 ui <- page_sidebar(
   title = "Genomic viewer",
   sidebar = sidebar(
@@ -64,26 +68,55 @@ ui <- page_sidebar(
     # Select mode for bigwig plotting
     selectInput('bw.mode', 'Select bigWig plots mode', bw.mode, selectize=FALSE),
     
-  # Submit button
-    submitButton("Submit")
+  # GO button
+  actionButton("go", "Go")
    ),
   
   # Card
-   card(card_header(
-     class = "bg-dark",
-     "Selected genomic region"),
-     
-   card_body(class = "gap-2 p-3 border-0 align-items-center",
-             svgPanZoomOutput(outputId = "res"),
-             plotOutput("plot", click = "plot_click", brush = "plot_brush", inline = T, width = "600px", height = "10%"), 
-             verbatimTextOutput("click_info"))
-  
-  )
-  )
+  page_fillable(
+    layout_columns(
+       card(card_header(
+            class = "bg-dark",
+            "Selected genomic region"),
+              card_body(class = "gap-2 p-3 border-0 align-items-center",
+                        svgPanZoomOutput(outputId = "res"),
+                        plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"))), 
+                        verbatimTextOutput("click_info")
+                        )
+                        
+              ),
+       card(card_header("Choose chromosome"),
+            card_body(class = "border-0 align-items-right",
+                      plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F)))
+                ),
+       col_widths = c(9, 3)
+              )
 
-# Define server logic ----
-server <- function(input, output){
-  # Output genomic view plot.
+              )
+   
+
+)
+
+# Define SERVER logic ---------------------------------------------------
+server <- function(input, output, session){
+  
+  ##---------------------- Establish reactive events
+    ## Chr
+  reactiveChr <- eventReactive(input$go, {
+    print(input$chr)
+  })
+    ## Chr start
+  reactiveChrstart <- eventReactive(input$go, {
+    print(input$chrstart)
+  })
+  ## Chr end
+  reactiveChrend <- eventReactive(input$go, {
+    print(input$chrend)
+  })
+  
+  
+  ##---------------------- Output genomic view plot:
+  
   output$res <- renderSvgPanZoom({
     svgPanZoom(svglite:::inlineSVG(plotgardener.shiny.function(bw.file = bw.file, 
                                                                 hic.file = hic.file, 
@@ -93,48 +126,89 @@ server <- function(input, output){
                                                                 hic.names = config$hic.names,
                                                                 bed.names = config$bed.names,
                                                                 bedpe.names = config$bedpe.names,
-                                                                chr = input$chr, 
-                                                                start = input$chrstart, 
-                                                                end = input$chrend,
+                                                                chr = reactiveChr(), #input$chr, 
+                                                                start = reactiveChrstart(), #input$chrstart, 
+                                                                end = reactiveChrend(), #input$chrend,
                                                                 bw.mode = input$bw.mode)
     ), panEnabled = F, width = "600px", height = "600px", controlIconsEnabled = T)
     
   })
 
+  ##-------------------- Output zooming region plot:
+  
   output$plot <- renderPlot({
+    x.ext <- (input$chrend - input$chrstart)*25/100
    p <- ggplot() + 
-      geom_rect(aes(xmin = input$chrstart, xmax = input$chrend, ymin = 10, ymax = 11, fill = "lightblue")) +
+      geom_rect(aes(xmin = input$chrstart - x.ext, xmax = input$chrend + x.ext, ymin = 10, ymax = 11), fill = "grey") +
+      geom_rect(aes(xmin = input$chrstart, xmax = input$chrend, ymin = 10, ymax = 11), fill = "salmon", colour = "darkred") +
+     xlab("Select a region to ZOOM") +
       theme_void() +
-      theme(axis.text.x = element_text(),
+      theme(axis.text.x = element_text(size = 12),
             axis.ticks.x = element_line(),
-            legend.position = "none")
+            legend.position = "none",
+            axis.title.x = element_text(face = "bold", size=15),
+            plot.margin = unit(c(0,0,0.25,0), "cm")) 
     p
   },
-  width = 800,
-  height = 25) 
+  width = "auto",
+  height = 50
+ ) 
 
-  output$click_info <- renderText({
-    xy_range_str <- function(e) {
-      if(is.null(e)) return("NULL\n")
-      paste0("From=", round(e$xmin, 0), " To=", round(e$xmax, 0))
-    }
-    
-    paste0(
-      "Genomic range: ", xy_range_str(input$plot_brush)
-    )
-  })
+  ##--------------------- Output_click info deleted because by resetting the brush with every session it will not output
+ # output$click_info <- renderText({
+ #   xy_range_str <- function(e) {
+ #     if(is.null(e)) return("NULL\n")
+  #    paste0("From=", round(e$xmin, 0), " To=", round(e$xmax, 0))
+  #  }
+#    paste0("Genomic range: ", xy_range_str(input$plot_brush))
+ # })
   
-  ## Update chr start end upon click
+  ##-------------------- Update chr start end upon click on zoomed range
   observeEvent(input$plot_brush, {
-    # We'll use the input$controller variable multiple times, so save it as x
-    # for convenience.
+    # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x <- input$plot_brush
     
     updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = round(x$xmin, 0))
     
     updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = round(x$xmax, 0))
+    
+    session$resetBrush("plot_brush")
   })
+  
+  ##--------------------- Chromosome plot
+  output$chr.plot <- renderPlot({
+    ggplot(chrom.cen.df) +
+      ggchicklet:::geom_rrect(aes(xmin = order - 0.25,
+                                  xmax = order + 0.25,
+                                  ymin = cen.start,
+                                  ymax = chr.len,
+                                  fill = chr)) +
+      ggchicklet:::geom_rrect(aes(xmin = order - 0.25,
+                                  xmax = order + 0.25,
+                                  ymin = 0,
+                                  ymax = cen.end,
+                                  fill = chr)) +
+      scale_x_continuous(breaks = c(1:24), labels = factor(chrom.cen.df$chr, levels = chrom.cen.df$chr)) +
+      theme_void() +
+      theme(legend.position = "none",
+            axis.ticks.x = element_line(size = 2, linetype = 2),
+            axis.text.x = element_text(angle = 90, face = "bold"))
+  }, height = 150, width = "auto")
+  
+  ##------------------------ Update chr start end upon click on zoomed range
+  observeEvent(input$chr.click, {
+    # We'll use the input$controller variable multiple times, so save it as x for convenience.
+    x2 <- input$chr.click
+    
+    updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", chrom.cen.df$chr[x2$x]))
+    
+    updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
+    
+    updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])])
+  })
+  
+  
 }
 
-# Run the app ----
+# Run the app -------------------------------------------------------
 shinyApp(ui = ui, server = server)
