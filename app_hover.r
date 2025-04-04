@@ -13,7 +13,8 @@ library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(AnnotationHub)
 library(ggplot2)
 # for chromosomes plot
-library(ggchicklet) 
+library(ggchicklet)
+
 
 # Source script
 #setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps")
@@ -78,16 +79,18 @@ ui <- page_sidebar(
        card(card_header(
             class = "bg-dark",
             "Selected genomic region"),
-              card_body(class = "gap-2 p-3 border-0 align-items-center",
+            
+              card_body(class = "gap-2 p-3 border-0 align-items-top",
                         svgPanZoomOutput(outputId = "res"),
-                        plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"))), 
+                        plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
                         verbatimTextOutput("click_info")
                         )
                         
               ),
        card(card_header("Choose chromosome"),
-            card_body(class = "border-0 align-items-right",
-                      plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F)))
+            card_body(#class = "border-0 gap-1 align-items-bottom",
+                      plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F), hover = "chr.hover"),
+                      verbatimTextOutput("chr.info"))
                 ),
        col_widths = c(9, 3)
               )
@@ -130,7 +133,7 @@ server <- function(input, output, session){
                                                                 start = reactiveChrstart(), #input$chrstart, 
                                                                 end = reactiveChrend(), #input$chrend,
                                                                 bw.mode = input$bw.mode)
-    ), panEnabled = F, width = "600px", height = "600px", controlIconsEnabled = T)
+    ), panEnabled = F, width = "auto", height = "auto", controlIconsEnabled = T)
     
   })
 
@@ -176,8 +179,9 @@ server <- function(input, output, session){
   })
   
   ##--------------------- Chromosome plot
+    ## Plot
   output$chr.plot <- renderPlot({
-    ggplot(chrom.cen.df) +
+     ggplot(chrom.cen.df) +
       ggchicklet:::geom_rrect(aes(xmin = order - 0.25,
                                   xmax = order + 0.25,
                                   ymin = cen.start,
@@ -193,10 +197,21 @@ server <- function(input, output, session){
       theme(legend.position = "none",
             axis.ticks.x = element_line(size = 2, linetype = 2),
             axis.text.x = element_text(angle = 90, face = "bold"))
+    
   }, height = 150, width = "auto")
+    
+    ## Hover output
+
+  output$chr.info <- renderText({
+    if(!is.null(input$chr.hover)){
+      hover=input$chr.hover
+      paste0(chrom.cen.df$chr[round(as.numeric(hover[1],0))], ": click to select")
+    }
+    
+  })
   
   ##------------------------ Update chr start end upon click on zoomed range
-  observeEvent(input$chr.click, {
+    observeEvent(input$chr.click, {
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x2 <- input$chr.click
     
