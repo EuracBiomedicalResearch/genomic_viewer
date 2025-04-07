@@ -3,6 +3,9 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
 
      #### prepare data for plotting when needed:
   # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
+  
+  # read bw file to use later
+
   maxScore <- c()
   for (i in 1:length(bw.file)){
     maxScore <- c(maxScore, max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
@@ -12,23 +15,81 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     print(paste("Scale for bigwig files has been set to:", maxScore))
     
   # Add colors based on bigwig score to be used in the Heatmap version of bigwig tracks
-    ## Map score column to a vector of colors
-    hm.colors <- list()
-    for (i in 1:length(bw.file)){
-      bwScore <- c(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
-      hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+    ## Conditional binsize
+    if ((end - start) <= 10e+05){
+      binsize = NA
+    } else if ((end - start) >= 10e+05 & (end - start) < 5e+06){
+      binsize = 5000
+    } else if ((end - start) >= 5e+06 & (end - start) < 50e+06){
+      binsize = 50000
+    } else if ((end - start) >= 50e+06 & (end - start) < 200e+06){
+      binsize = 500000
+    } else {
+      binsize = 1000000
     }
-      
+    print(paste0("Bigwigs binsize = ", binsize))
+    
+    
+    ################ FARE ANCHE QUI UN ALTRO IF CHE FA ANDARE IL CHUNK SEGUENTE SOLO SE LA MODALITÁ É HEATMAP  ##################
+    ################################## INIZIO TENTATIVO DI ALLEGGERIRE IL CODICE ####################
+    
+    ## Define binning of the selected region
+    if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
+      if(!is.na(binsize)){
+       bin <- seq(from = start, to = end, by = binsize)
+       print(paste("Generating ", length(bin), " bins of lenght: ", binsize))
+    ## Subset the bw file based on the new binning and assign score for colouring
+       score.new <- c()
+        start.new <- c()
+        end.new <- c()
+        bw.list <- list()
+       hm.colors <- list()
+        for (i in 1:length(bw.file)){
+          bw <- readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
+          for (b in 1:length(bin)){
+             score.new <- c(score.new, mean(bw$score[which(bw$start >= bin[b] & bw$end <= (bin[b]+binsize))])) 
+             start.new <- c(start.new, bin[b])
+            end.new <- c(end.new, bin[b]+binsize)
+           }
+    
+        bw.new <- data.frame(chr=paste("chr",chr, sep=""),
+                         start=start.new,
+                         end=end.new,
+                         score=score.new)
+         bw.list[[i]] <- bw.new
+         print("Assigning colors to bins")
+          hm.colors[[i]] <- mapColors(vector = score.new, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+        }
+       } else {
+         hm.colors <- list()
+           for (i in 1:length(bw.file)){
+             bwScore <- c(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
+              hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+         }
+       }
+      print("Binning colour assigned")
+    }
+  
    
+   ################################## FINE TENTATIVO DI ALLEGGERIRE IL CODICE ####################
 
   # To avoid loading too heavy data just read a specific chrom region
     hicDataChromRegion <- list()
    for (i in 1:length(hic.file)){
+     # Conditional resolution based on plotting region size
+     if ((end - start) <= 10e+05){
+       resolution = 25000 } else if ((end - start) > 10e+05 & (end - start) <= 5e+06){
+       resolution = 100000
+     } else {
+       resolution = 1000000
+     }
+     
      hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
        chrom = as.numeric(chr), assembly = "hg38",
        chromstart = start, chromend = end,
-       resolution = 25000, res_scale = "BP", norm = "KR"
+       resolution = resolution, res_scale = "BP", norm = "KR"
         ) 
+     
    }
     
     ## Get sizes of chromosomes to scale their sizes, used for genomic annotation tracks
@@ -36,8 +97,8 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     chromSizes <- GenomeInfoDb::seqlengths(tx_db)
     maxChromSize <- max(chromSizes)
   
-  # generate the plot
-  
+  #--------------------------------------------------------- generate the plot
+  #####------------------------------------------------ PAGE
 
   ## Set parameters regarding the region that we would like to visualize. Those can be imported from every plot that we want to add.
 params <- pgParams(
@@ -57,7 +118,7 @@ pageCreate(
     showGuides = F, xgrid = 0, ygrid = 0
 )
 
-
+#####------------------------------------------------ HiC Matrix
 ## Plot Hi-C data in region
 for (i in 1:length(hicDataChromRegion)){
  plotHicTriangle(
@@ -75,12 +136,21 @@ for (i in 1:length(hicDataChromRegion)){
   y.coord <- y.coord+3
   }
 
+#####------------------------------------------------ BIGWIGS
+
+  ## COnditional binsie applied as defined in rows 15 to 24 (Conditional binsize9)
+  
+  
+  
 ## Plot signal and text track data bw files
+
 if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   for (i in 1:length(bw.file)){
     # Bw signal
      plotSignal(
        data = bw.file[i],
+       binSize = binsize,
+       binCap = F,
       linecolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
       fill = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
        params = params,
@@ -102,12 +172,20 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
    for (i in 1:length(bw.file)){
     # bed signal
-    hm.plot <- plotRanges(
-      data = bw.file[i],
-      collapse = T,
-      fill = hm.colors[[i]],
-      y = "0.5b", height = 0.5,
-      params = params)
+     # bed signal
+     if(!is.na(binsize)){
+       hm.plot <- plotRanges(
+         data = bw.list[[i]],
+         collapse = T,
+         fill = hm.colors[[i]],
+         y = "0.5b", height = 0.5,
+         params = params)} else {
+           hm.plot <- plotRanges(
+             data = bw.file[i],
+             collapse = T,
+             fill = hm.colors[[i]],
+             y = "0.5b", height = 0.5,
+             params = params)}
     
     ## Add text labels
       plotText(
@@ -126,7 +204,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     )
   }
 
-
+#####------------------------------------------------ BED
 ## Plot bed files
  for (i in 1:length(bed.file)){
    # bed signal
@@ -147,6 +225,7 @@ plotText(
 y.coord <- y.coord+0.5
  }
 
+#####------------------------------------------------ HiC LOOPS
 ## Plot loop annotations
  for (i in 1:length(bedpe.file)){
   plotPairsArches(
@@ -165,6 +244,7 @@ y.coord <- y.coord+0.5
   y.coord <- y.coord+1
   }
 
+#####------------------------------------------------ GENE and GENOME TRACKS
 ## Plot gene track
 plotGenes(
     y = "1.75b", height = 1.25,
@@ -183,7 +263,7 @@ plotGenomeLabel(
 )
 
 
-
+#####------------------------------------------------ CHROMOSOME IDEAGRAM
 # Plot chromosome ideogram:
 
 ## Plot and place ideogram
