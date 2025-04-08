@@ -1,6 +1,10 @@
 
 plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, chr, start, end, bw.mode){
-
+  
+  
+  
+  ################################## INIZIO PREPROCESSING OF FILES ####################
+  
      #### prepare data for plotting when needed:
   # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
   
@@ -28,10 +32,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
       binsize = 1000000
     }
     print(paste0("Bigwigs binsize = ", binsize))
-    
-    
-    ################ FARE ANCHE QUI UN ALTRO IF CHE FA ANDARE IL CHUNK SEGUENTE SOLO SE LA MODALITÁ É HEATMAP  ##################
-    ################################## INIZIO TENTATIVO DI ALLEGGERIRE IL CODICE ####################
     
     ## Define binning of the selected region
     if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
@@ -70,8 +70,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
       print("Binning colour assigned")
     }
   
-   
-   ################################## FINE TENTATIVO DI ALLEGGERIRE IL CODICE ####################
 
   # To avoid loading too heavy data just read a specific chrom region
     hicDataChromRegion <- list()
@@ -96,6 +94,8 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     tx_db <- TxDb.Hsapiens.UCSC.hg38.knownGene
     chromSizes <- GenomeInfoDb::seqlengths(tx_db)
     maxChromSize <- max(chromSizes)
+    
+    ################################## FINE PREPROCESSING OF FILES ####################
   
   #--------------------------------------------------------- generate the plot
   #####------------------------------------------------ PAGE
@@ -112,22 +112,25 @@ params <- pgParams(
 # Define counter for y coordinate:
   y.coord <- 0
 
+
 ## Create a plotgardener page
-pageCreate(
+    pageCreate(
     width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*3), default.units = "cm",
     showGuides = F, xgrid = 0, ygrid = 0
 )
 
+    
 #####------------------------------------------------ HiC Matrix
 ## Plot Hi-C data in region
+
 for (i in 1:length(hicDataChromRegion)){
- plotHicTriangle(
+    plotHicTriangle(
     data = hicDataChromRegion[[i]],
   params = params,
     y = 3,  height = 3)
   
   ## Add text labels
-  plotText(
+    plotText(
     label = hic.names[i], fonsize = 10, fontcolor = "black",
     x = -0.5, y = "-1b", just = c("right", "bottom"),
     params = params)
@@ -293,6 +296,7 @@ annoZoomLines(
   plot = ideogramPlot, params = region,
   y0 = y.coord, x1 = c(0, 16), y1 = y.coord+1, default.units = "cm"
 )
+
 }
 
 

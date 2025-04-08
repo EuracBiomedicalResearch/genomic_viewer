@@ -12,6 +12,7 @@ library(org.Hs.eg.db)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(AnnotationHub)
 library(ggplot2)
+library(openair)
 # for chromosomes plot
 library(ggchicklet)
 
@@ -46,7 +47,7 @@ ui <- page_sidebar(
   title = "Genomic viewer",
   sidebar = sidebar(
     # text input to choose genomic coordinates:
-    helpText("Choose the genomic range to be visualized."),
+    helpText("Choose the genomic range to be visualized, then press GO."),
       # Chr
     textInput("chr", "Choose chromosome:", value = "1"),
       # coordinates
@@ -70,7 +71,10 @@ ui <- page_sidebar(
     selectInput('bw.mode', 'Select bigWig plots mode', bw.mode, selectize=FALSE),
     
   # GO button
-  actionButton("go", "Go")
+  actionButton("go", "Go"),
+  
+  # Download button 
+  downloadButton('plot_save', "Save")
    ),
   
   # Card
@@ -120,21 +124,27 @@ server <- function(input, output, session){
   
   ##---------------------- Output genomic view plot:
   
-  output$res <- renderSvgPanZoom({
-    svgPanZoom(svglite:::inlineSVG(plotgardener.shiny.function(bw.file = bw.file, 
-                                                                hic.file = hic.file, 
-                                                                bed.file = bed.file, 
-                                                                bedpe.file = bedpe.file,
-                                                                bw.names = config$bw.names,
-                                                                hic.names = config$hic.names,
-                                                                bed.names = config$bed.names,
-                                                                bedpe.names = config$bedpe.names,
-                                                                chr = reactiveChr(), #input$chr, 
-                                                                start = reactiveChrstart(), #input$chrstart, 
-                                                                end = reactiveChrend(), #input$chrend,
-                                                                bw.mode = input$bw.mode)
-    ), panEnabled = F, width = "auto", height = "auto", controlIconsEnabled = T)
+  
+    tracks <- reactive({
+      plotgardener.shiny.function(bw.file = bw.file, 
+                                                                          hic.file = hic.file, 
+                                                                          bed.file = bed.file, 
+                                                                          bedpe.file = bedpe.file,
+                                                                          bw.names = config$bw.names,
+                                                                          hic.names = config$hic.names,
+                                                                          bed.names = config$bed.names,
+                                                                          bedpe.names = config$bedpe.names,
+                                                                          chr = reactiveChr(), #input$chr, 
+                                                                          start = reactiveChrstart(), #input$chrstart, 
+                                                                          end = reactiveChrend(), #input$chrend,
+                                                                          bw.mode = input$bw.mode)
     
+     
+    })
+  
+  output$res <- renderSvgPanZoom({
+    svgPanZoom(svglite:::inlineSVG(tracks()), 
+               panEnabled = F, width = "auto", height = "auto", controlIconsEnabled = T)
   })
 
   ##-------------------- Output zooming region plot:
@@ -223,6 +233,27 @@ server <- function(input, output, session){
   })
   
   
+    ##------------------------ Save plot as PDF
+    
+    output$plot_save <- downloadHandler(
+      filename = function() { "output.pdf" },
+      content = function(file) {
+      pdf(file, width = 10, height = 8 )
+        plotgardener.shiny.function(bw.file = bw.file, 
+                                    hic.file = hic.file, 
+                                    bed.file = bed.file, 
+                                    bedpe.file = bedpe.file,
+                                    bw.names = config$bw.names,
+                                    hic.names = config$hic.names,
+                                    bed.names = config$bed.names,
+                                    bedpe.names = config$bedpe.names,
+                                    chr = reactiveChr(), #input$chr, 
+                                    start = reactiveChrstart(), #input$chrstart, 
+                                    end = reactiveChrend(), #input$chrend,
+                                    bw.mode = input$bw.mode)
+         dev.off()
+      
+      })
 }
 
 # Run the app -------------------------------------------------------
