@@ -12,7 +12,8 @@ library(org.Hs.eg.db)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(AnnotationHub)
 library(ggplot2)
-library(openair)
+library(DT)
+library(dplyr)
 # for chromosomes plot
 library(ggchicklet)
 
@@ -20,6 +21,7 @@ library(ggchicklet)
 # Source script
 #setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps")
 source("plotgardener_shiny_wzoomYML_hover.r")
+source("shiny_read_table_function.r")
 
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
@@ -80,16 +82,23 @@ ui <- page_sidebar(
   # Card
   page_fillable(
     layout_columns(
-       card(card_header(
-            class = "bg-dark",
-            "Selected genomic region"),
-            
-              card_body(class = "gap-2 p-3 border-0 align-items-top",
+      navset_card_underline(
+            title = "Selected genomic region",
+              # Panel with plot ----
+              nav_panel("Plot", class = "gap-2 p-3 border-0 align-items-top",
                         svgPanZoomOutput(outputId = "res"),
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
                         verbatimTextOutput("click_info")
+                        ),
+            # Panel with Table of data ----
+            nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
+                      # print table preview and download button: bed
+                      uiOutput("view_bed"),
+                      uiOutput("bed_save"),
+                      # print table preview and download button: bedpe
+                      uiOutput("view_bedpe"),
+                      uiOutput('bedpe_save')
                         )
-                        
               ),
        card(card_header("Choose chromosome"),
             card_body(#class = "border-0 gap-1 align-items-bottom",
@@ -121,7 +130,7 @@ server <- function(input, output, session){
     print(input$chrend)
   })
   
-  
+  ########################## CARD PLOT
   ##---------------------- Output genomic view plot:
   
   
@@ -167,14 +176,7 @@ server <- function(input, output, session){
   height = 50
  ) 
 
-  ##--------------------- Output_click info deleted because by resetting the brush with every session it will not output
- # output$click_info <- renderText({
- #   xy_range_str <- function(e) {
- #     if(is.null(e)) return("NULL\n")
-  #    paste0("From=", round(e$xmin, 0), " To=", round(e$xmax, 0))
-  #  }
-#    paste0("Genomic range: ", xy_range_str(input$plot_brush))
- # })
+
   
   ##-------------------- Update chr start end upon click on zoomed range
   observeEvent(input$plot_brush, {
@@ -187,6 +189,100 @@ server <- function(input, output, session){
     
     session$resetBrush("plot_brush")
   })
+  
+  
+  ########################## CARD DATA
+  datasetBed <- reactive({
+                bed.table <- shiny_read_table_function(bed.file = bed.file,
+                                         bedpe.file = bedpe.file,
+                                         bed.names = config$bed.names,
+                                         bedpe.names = config$bedpe.names,
+                                         chr = reactiveChr(),
+                                         start = reactiveChrstart(),
+                                         end = reactiveChrend())
+                
+                bed.table
+    
+
+  })
+  
+  ###### Bed file table view
+  
+  # Rendering tables dependent on user input.
+  observeEvent(length(bed.file), {
+    lapply(1:length(bed.file), function(i) {
+      output[[paste0('bed', i)]] <- renderTable({
+        head(datasetBed()[[1]][[i]], n = 15)
+      }, caption = config$bed.names[i],
+      caption.placement = getOption("xtable.caption.placement", "top"))
+    })
+  })
+  
+  # Rendering UI and outputtign tables dependent on user input.
+  output$view_bed <- renderUI({
+    lapply(1:length(bed.file), function(i) {
+      uiOutput(paste0('bed', i))
+      })
+  })
+  
+  
+  # Download peaks
+  observeEvent(length(bed.file),{
+    lapply(1:length(bed.file), function(i) {
+      output[[paste0("downloadBed", i)]] <- downloadHandler(
+        filename = function(){paste0(config$bed.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".bed")},
+        content = function(file){
+          write.table(datasetBed()[[1]][[i]], file, row.names = F, quote = F, sep = "\t")
+        })
+    })
+  })
+  
+  output$bed_save <- renderUI({
+    lapply(1:length(bed.file), function(i) {
+      downloadButton(paste0("downloadBed", i), paste0("Download ", config$bed.names[i]))
+    })
+  })
+  
+        
+  
+  ###### Bedpe file table view
+  
+  # Rendering tables dependent on user input.
+  observeEvent(length(bedpe.file), {
+    lapply(1:length(bedpe.file), function(i) {
+      output[[paste0('bedpe', i)]] <- renderTable({
+        head(datasetBed()[[2]][[i]], n = 15)
+      }, caption = config$bedpe.names[i],
+      caption.placement = getOption("xtable.caption.placement", "top"))
+    })
+  })
+  
+  # Rendering UI and outputting tables dependent on user input.
+  output$view_bedpe <- renderUI({
+    lapply(1:length(bed.file), function(i) {
+      uiOutput(paste0('bedpe', i))
+    })
+  })
+  
+  
+  # Download arches
+  observeEvent(length(bedpe.file),{
+    lapply(1:length(bedpe.file), function(i) {
+      output[[paste0("downloadBedpe", i)]] <- downloadHandler(
+        filename = function(){paste0(config$bedpe.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".bedpe")},
+        content = function(file){
+          write.table(datasetBed()[[2]][[i]], file, row.names = F, quote = F, sep = "\t")
+        })
+    })
+  })
+  
+  output$bedpe_save <- renderUI({
+    lapply(1:length(bedpe.file), function(i) {
+      downloadButton(paste0("downloadBedpe", i), paste0("Download ", config$bedpe.names[i]))
+    })
+  })
+
+  
   
   ##--------------------- Chromosome plot
     ## Plot
