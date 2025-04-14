@@ -12,8 +12,12 @@ library(org.Hs.eg.db)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(AnnotationHub)
 library(ggplot2)
-library(DT)
+library(ChIPpeakAnno)
+library(rtracklayer)
+library(spiky)
+library(ComplexUpset)
 library(dplyr)
+library(ggpubr)
 # for chromosomes plot
 library(ggchicklet)
 
@@ -22,6 +26,7 @@ library(ggchicklet)
 #setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps")
 source("plotgardener_shiny_wzoomYML_hover.r")
 source("shiny_read_table_function.r")
+source("basic_statistics_genome_tracks_function.r")
 
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
@@ -90,16 +95,25 @@ ui <- page_sidebar(
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
                         verbatimTextOutput("click_info")
                         ),
-            # Panel with Table of data ----
-            nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
+              # Panel with Table of data ----
+              nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
                       # print table preview and download button: bed
                       uiOutput("view_bed"),
                       uiOutput("bed_save"),
                       # print table preview and download button: bedpe
                       uiOutput("view_bedpe"),
                       uiOutput('bedpe_save')
-                        )
-              ),
+                        ),
+               # Panel with Basic Statistics of data ----
+              nav_panel("Stats", class = "gap-2 p-3 border-0 align-items-top",
+                # print plots of peaks numbers
+                fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200)),
+                column(width = 6, plotOutput("arches.nr", height = 200))),
+                # print upset plot for peaks intersections
+                fluidRow(plotOutput("upset", height = 300)),
+                # print piechart with peaks annotation
+                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200)),
+                  )),
        card(card_header("Choose chromosome"),
             card_body(#class = "border-0 gap-1 align-items-bottom",
                       plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F), hover = "chr.hover"),
@@ -192,6 +206,7 @@ server <- function(input, output, session){
   
   
   ########################## CARD DATA
+  ######################################################## PLOT TAB
   datasetBed <- reactive({
                 bed.table <- shiny_read_table_function(bed.file = bed.file,
                                          bedpe.file = bedpe.file,
@@ -206,6 +221,7 @@ server <- function(input, output, session){
 
   })
   
+  ######################################################## DATA TAB
   ###### Bed file table view
   
   # Rendering tables dependent on user input.
@@ -281,6 +297,41 @@ server <- function(input, output, session){
       downloadButton(paste0("downloadBedpe", i), paste0("Download ", config$bedpe.names[i]))
     })
   })
+  
+  ######################################################## STATS TAB
+  ## For bed files
+    output$peak.nr <- renderPlot({
+      basic_statistics_genome_tracks(bed.file = bed.file, 
+                                     bed.names = config$bed.names,
+                                     chr = reactiveChr(),  
+                                     start = reactiveChrstart(), 
+                                     end = reactiveChrend(),
+                                     filetype = "bed")
+    })
+  ## For bedpe files
+    output$arches.nr <- renderPlot({
+      basic_statistics_genome_tracks(bed.file = bedpe.file, 
+                                   bed.names = config$bedpe.names,
+                                   chr = reactiveChr(),  
+                                   start = reactiveChrstart(), 
+                                   end = reactiveChrend(),
+                                   filetype = "bedpe")
+    })
+  ## For upset plot
+    output$upset <- renderPlot({
+      peaks_intersection_venn_function(bed.file = bed.file, 
+                                       bed.names = config$bed.names, 
+                                       bedpe.file = bedpe.file, 
+                                       bedpe.names = config$bedpe.names, 
+                                       chr = reactiveChr(), 
+                                       start = reactiveChrstart(), 
+                                       end = reactiveChrend())
+    })
+  ## For annotation plot
+    output$annotation <- renderPlot({
+      peaks.annotation.function(bed.file = bed.file, 
+                                       bed.names = config$bed.names)
+    })
 
   
   
