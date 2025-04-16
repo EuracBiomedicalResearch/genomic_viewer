@@ -23,3 +23,6 @@ default:
   hic.names: ["HiC cortex"]
   # file with chromosomes and centromeres coordinates
   chrom.cen: "chrom_centromeres_hg38.txt"
+  # categorical bed file
+  cat.file: "regulatory_elements_hg38.bed"
+  cat.names: ["Regulatory Elements"]

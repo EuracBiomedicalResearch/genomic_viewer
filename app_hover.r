@@ -44,6 +44,8 @@ bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), full.names = TRU
 hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRUE, pattern = config$hic.ext)
 ### For chromosomes plotting
 chrom.cen.df <- read.table(config$chrom.cen, header = T, sep="\t")
+# Categorical bed file
+cat.file <- dir(full.names = TRUE, pattern = config$cat.file)
 
 ## Set options for bw file plotting mode:
 bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
@@ -117,7 +119,9 @@ ui <- page_sidebar(
        card(card_header("Choose chromosome"),
             card_body(#class = "border-0 gap-1 align-items-bottom",
                       plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F), hover = "chr.hover"),
-                      verbatimTextOutput("chr.info"))
+                      verbatimTextOutput("chr.info"),
+                      # Select mode for bigwig plotting
+                      selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T))
                 ),
        col_widths = c(9, 3)
               )
@@ -143,6 +147,11 @@ server <- function(input, output, session){
   reactiveChrend <- eventReactive(input$go, {
     print(input$chrend)
   })
+  ## Categories to expand
+  reactiveCat <- reactive({
+    exp.cat <- c(!config$cat.names %in% input$cat.mode)
+  })
+
   
   ########################## CARD PLOT
   ##---------------------- Output genomic view plot:
@@ -157,6 +166,9 @@ server <- function(input, output, session){
                                                                           hic.names = config$hic.names,
                                                                           bed.names = config$bed.names,
                                                                           bedpe.names = config$bedpe.names,
+                                                                          cat.file = cat.file,
+                                                                          cat.names = config$cat.names,
+                                                                          cat.collapse = reactiveCat(),
                                                                           chr = reactiveChr(), #input$chr, 
                                                                           start = reactiveChrstart(), #input$chrstart, 
                                                                           end = reactiveChrend(), #input$chrend,
@@ -214,7 +226,7 @@ server <- function(input, output, session){
                                          bedpe.names = config$bedpe.names,
                                          chr = reactiveChr(),
                                          start = reactiveChrstart(),
-                                         end = reactiveChrend())
+                                           end = reactiveChrend())
                 
                 bed.table
     
@@ -335,7 +347,7 @@ server <- function(input, output, session){
 
   
   
-  ##--------------------- Chromosome plot
+  ##--------------------- Chromosome plot and additional options
     ## Plot
   output$chr.plot <- renderPlot({
      ggplot(chrom.cen.df) +
@@ -367,6 +379,9 @@ server <- function(input, output, session){
     
   })
   
+    ## Category tracks expand/collapse
+  
+  
   ##------------------------ Update chr start end upon click on zoomed range
     observeEvent(input$chr.click, {
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
@@ -394,6 +409,9 @@ server <- function(input, output, session){
                                     hic.names = config$hic.names,
                                     bed.names = config$bed.names,
                                     bedpe.names = config$bedpe.names,
+                                    cat.file = cat.file,
+                                    cat.nams = config$cat.names,
+                                    cat.collapse = reactiveCat(),
                                     chr = reactiveChr(), #input$chr, 
                                     start = reactiveChrstart(), #input$chrstart, 
                                     end = reactiveChrend(), #input$chrend,

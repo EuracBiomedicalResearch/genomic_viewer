@@ -1,5 +1,5 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, chr, start, end, bw.mode){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode){
   
   
   
@@ -70,7 +70,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
       print("Binning colour assigned")
     }
   
-
+    
   # To avoid loading too heavy data just read a specific chrom region
     hicDataChromRegion <- list()
    for (i in 1:length(hic.file)){
@@ -141,7 +141,7 @@ for (i in 1:length(hicDataChromRegion)){
 
 #####------------------------------------------------ BIGWIGS
 
-  ## COnditional binsie applied as defined in rows 15 to 24 (Conditional binsize9)
+  ## COnditional binsize applied as defined in rows 15 to 24 (Conditional binsize9)
   
   
   
@@ -202,7 +202,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     ## Add heatmap legend just once
     annoHeatmapLegend(
       plot = hm.plot, fontcolor = "black",
-      x = 6.75, y = "-0.9b", just = c("right", "top"),
+      x = 6.5, y = "-0.9b", just = c("left", "top"),
       width = 0.10, height = 0.5, fontsize = 10
     )
   }
@@ -220,13 +220,48 @@ plotRanges(
    
    ## Add text labels
 plotText(
-    label = bed.names, fonsize = 10, fontcolor = paletteer_d("ggthemes::excel_Ion_Boardroom")[i],
+    label = bed.names[i], fonsize = 10, fontcolor = paletteer_d("ggthemes::excel_Ion_Boardroom")[i],
     x = -0.5, y = "0b", just = c("right", "bottom"),
     params = params)
 
 ## Increment y coord
 y.coord <- y.coord+0.5
  }
+    
+#####------------------------------------------------ CATEGORICAL BED  
+  ## Plot categorical bed files
+    for (i in 1:length(cat.file)){
+      # bed positions
+      plotRanges(
+        data = cat.file[i],
+        collapse = cat.collapse[i],
+        fill = colorby("category", palette =  colorRampPalette(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
+        y = "0.5b", height = 0.5,
+        params = params)
+      
+      ## Add text labels
+      plotText(
+        label = cat.names[i], fonsize = 10, fontcolor = "black",
+        x = -0.5, y = "0b", just = c("right", "bottom"),
+        params = params)
+      
+      ## Increment y coord
+      y.coord <- y.coord+0.5
+    
+    
+    plotLegend(
+      legend = c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)),
+      fill = as.character(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
+      border = FALSE,
+      x = 6.25, y = "1b", width = 1.5, height = 0.7,
+      just = c("left", "bottom"),
+      default.units = "inches"
+    )
+    
+    ## Increment y coord
+    y.coord <- y.coord+1
+    
+    }
 
 #####------------------------------------------------ HiC LOOPS
 ## Plot loop annotations
