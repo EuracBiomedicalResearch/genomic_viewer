@@ -1,0 +1,51 @@
+---
+title: "Generate categorical bed"
+author: "Sara Lago"
+date: "2025-04-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+####################################### GENERATE A CATEGORICAL BED FROM UCSC DATA ##############################################
+
+The following script aims at merging sevaral information retrieved from UCSC Table Browser (hg38 specific) about regulatory elements.
+These files have been downloaded as .bed format and contain:
+- TSS peaks
+- CpG Islands
+- VISTA enhancers (https://enhancer.lbl.gov/vista/)
+
+So, as a first step we will load these data:
+
+```{r load bed data}
+# Read files in to a unique list
+setwd("C:/Users/sarlago/Documents/R scripts/hg38_regulatory_elements_UCSC")
+files <- list.files(pattern = ".bed", full.names = T)
+files.list <- lapply(files, read.table, header = F, sep = "\t")
+# Rename list elements based on file names
+names(files.list) <- gsub("./|.bed", "", files)
+```
+
+Once we have the list of all files in data.frame format we will generate a unique table that containes just the genomic positions (chr, start, end) and a 4th column with the category name:
+
+```{r add cat name}
+# Merge the data frames in the list by row and by selecting just the first three columns which corespond to V1 = chr, V2 = start, V3 = end
+merged.cat.bed <- dplyr::bind_rows(lapply(files.list[], `[`, 1:3), .id = "category")
+# Since with this function the category name will be the first column, we need to move it as last and rename the other three appropriately:
+merged.cat.bed <- merged.cat.bed[,c(2,3,4,1)]
+names(merged.cat.bed)[1:3] <- c("chr", "start", "end")
+```
+
+Finally we export the file:
+
+```{r write file output}
+write.table(x = merged.cat.bed, file = "regulatory_elements_hg38.bed", sep = "\t", quote = F, row.names = F, col.names = T)
+```
+
+
+```{r sessionInfo}
+sessionInfo()
+```
+
