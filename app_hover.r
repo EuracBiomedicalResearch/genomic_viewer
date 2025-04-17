@@ -42,6 +42,8 @@ bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), full.names =
 bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), full.names = TRUE, pattern = config$bed.ext)
 # Set hiC data file
 hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRUE, pattern = config$hic.ext)
+# Set GWAS data file
+gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext)
 ### For chromosomes plotting
 chrom.cen.df <- read.table(config$chrom.cen, header = T, sep="\t")
 # Categorical bed file
@@ -91,22 +93,25 @@ ui <- page_sidebar(
     layout_columns(
       navset_card_underline(
             title = "Selected genomic region",
-              # Panel with plot ----
+              # Panel with plot ----------------------------------------------------------------------------------
               nav_panel("Plot", class = "gap-2 p-3 border-0 align-items-top",
                         svgPanZoomOutput(outputId = "res"),
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
                         verbatimTextOutput("click_info")
                         ),
-              # Panel with Table of data ----
+              # Panel with Table of data -------------------------------------------------------------------------
               nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
                       # print table preview and download button: bed
                       uiOutput("view_bed"),
                       uiOutput("bed_save"),
                       # print table preview and download button: bedpe
                       uiOutput("view_bedpe"),
-                      uiOutput('bedpe_save')
+                      uiOutput("bedpe_save"),
+                      # print table preview and download button: gwas
+                      uiOutput("view_gwas"),
+                      uiOutput("gwas_save")
                         ),
-               # Panel with Basic Statistics of data ----
+               # Panel with Basic Statistics of data ------------------------------------------------------------
               nav_panel("Stats", class = "gap-2 p-3 border-0 align-items-top",
                 # print plots of peaks numbers
                 fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200)),
@@ -166,6 +171,8 @@ server <- function(input, output, session){
                                                                           hic.names = config$hic.names,
                                                                           bed.names = config$bed.names,
                                                                           bedpe.names = config$bedpe.names,
+                                                                          gwas.file = gwas.file,
+                                                                          gwas.names = config$gwas.names,
                                                                           cat.file = cat.file,
                                                                           cat.names = config$cat.names,
                                                                           cat.collapse = reactiveCat(),
@@ -219,16 +226,15 @@ server <- function(input, output, session){
   
   ########################## CARD DATA
   ######################################################## PLOT TAB
-  datasetBed <- reactive({
-                bed.table <- shiny_read_table_function(bed.file = bed.file,
+  datasetTables <- reactive({
+                data.table <- shiny_read_table_function(bed.file = bed.file,
                                          bedpe.file = bedpe.file,
-                                         bed.names = config$bed.names,
-                                         bedpe.names = config$bedpe.names,
+                                         gwas.file = gwas.file,
                                          chr = reactiveChr(),
                                          start = reactiveChrstart(),
                                            end = reactiveChrend())
                 
-                bed.table
+                data.table
     
 
   })
@@ -240,7 +246,7 @@ server <- function(input, output, session){
   observeEvent(length(bed.file), {
     lapply(1:length(bed.file), function(i) {
       output[[paste0('bed', i)]] <- renderTable({
-        head(datasetBed()[[1]][[i]], n = 15)
+        head(datasetTables()[[1]][[i]], n = 15)
       }, caption = config$bed.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -260,7 +266,7 @@ server <- function(input, output, session){
       output[[paste0("downloadBed", i)]] <- downloadHandler(
         filename = function(){paste0(config$bed.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".bed")},
         content = function(file){
-          write.table(datasetBed()[[1]][[i]], file, row.names = F, quote = F, sep = "\t")
+          write.table(datasetTables()[[1]][[i]], file, row.names = F, quote = F, sep = "\t")
         })
     })
   })
@@ -279,7 +285,7 @@ server <- function(input, output, session){
   observeEvent(length(bedpe.file), {
     lapply(1:length(bedpe.file), function(i) {
       output[[paste0('bedpe', i)]] <- renderTable({
-        head(datasetBed()[[2]][[i]], n = 15)
+        head(datasetTables()[[2]][[i]], n = 15)
       }, caption = config$bedpe.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -287,7 +293,7 @@ server <- function(input, output, session){
   
   # Rendering UI and outputting tables dependent on user input.
   output$view_bedpe <- renderUI({
-    lapply(1:length(bed.file), function(i) {
+    lapply(1:length(bedpe.file), function(i) {
       uiOutput(paste0('bedpe', i))
     })
   })
@@ -299,7 +305,7 @@ server <- function(input, output, session){
       output[[paste0("downloadBedpe", i)]] <- downloadHandler(
         filename = function(){paste0(config$bedpe.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".bedpe")},
         content = function(file){
-          write.table(datasetBed()[[2]][[i]], file, row.names = F, quote = F, sep = "\t")
+          write.table(datasetTables()[[2]][[i]], file, row.names = F, quote = F, sep = "\t")
         })
     })
   })
@@ -307,6 +313,43 @@ server <- function(input, output, session){
   output$bedpe_save <- renderUI({
     lapply(1:length(bedpe.file), function(i) {
       downloadButton(paste0("downloadBedpe", i), paste0("Download ", config$bedpe.names[i]))
+    })
+  })
+  
+  ###### GWAS file table view
+  
+  # Rendering tables dependent on user input.
+  observeEvent(length(gwas.file), {
+    lapply(1:length(gwas.file), function(i) {
+      output[[paste0('gwas', i)]] <- renderTable({
+        head(datasetTables()[[3]][[i]], n = 15)
+      }, caption = config$gwas.names[i],
+      caption.placement = getOption("xtable.caption.placement", "top"))
+    })
+  })
+  
+  # Rendering UI and outputting tables dependent on user input.
+  output$view_gwas <- renderUI({
+    lapply(1:length(gwas.file), function(i) {
+      uiOutput(paste0('gwas', i))
+    })
+  })
+  
+  
+  # Download GWAS
+  observeEvent(length(gwas.file),{
+    lapply(1:length(gwas.file), function(i) {
+      output[[paste0("downloadgwas", i)]] <- downloadHandler(
+        filename = function(){paste0(config$gwas.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".gwas")},
+        content = function(file){
+          write.table(datasetTables()[[3]][[i]], file, row.names = F, quote = F, sep = "\t")
+        })
+    })
+  })
+  
+  output$gwas_save <- renderUI({
+    lapply(1:length(gwas.file), function(i) {
+      downloadButton(paste0("downloadgwas", i), paste0("Download ", config$gwas.names[i]))
     })
   })
   
@@ -409,8 +452,10 @@ server <- function(input, output, session){
                                     hic.names = config$hic.names,
                                     bed.names = config$bed.names,
                                     bedpe.names = config$bedpe.names,
+                                    gwas.file = gwas.file,
+                                    gwas.names = config$gwas.names,
                                     cat.file = cat.file,
-                                    cat.nams = config$cat.names,
+                                    cat.names = config$cat.names,
                                     cat.collapse = reactiveCat(),
                                     chr = reactiveChr(), #input$chr, 
                                     start = reactiveChrstart(), #input$chrstart, 

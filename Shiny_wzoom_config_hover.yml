@@ -21,6 +21,10 @@ default:
   hic.dir: "GSE212910_RAW_HiC"
   hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM.hic"
   hic.names: ["HiC cortex"]
+  # GWAS directory and files final pattern, ordered file name to visualize
+  gwas.dir: "GWAScatalog_KidneyDisease"
+  gwas.ext: "selectedCol.tsv.gz"
+  gwas.names: ["GWAS chronic kidney disease"]
   # file with chromosomes and centromeres coordinates
   chrom.cen: "chrom_centromeres_hg38.txt"
   # categorical bed file

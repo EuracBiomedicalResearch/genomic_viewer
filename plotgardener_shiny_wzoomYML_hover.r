@@ -1,5 +1,5 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode){
   
   
   
@@ -115,7 +115,7 @@ params <- pgParams(
 
 ## Create a plotgardener page
     pageCreate(
-    width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*3), default.units = "cm",
+    width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*4)+length(cat.names)+length(gwas.file)*3, default.units = "cm",
     showGuides = F, xgrid = 0, ygrid = 0
 )
 
@@ -274,13 +274,56 @@ y.coord <- y.coord+0.5
   )
   plotText(
     label = bedpe.names, fonsize = 10, fontcolor = "black",
-    x = -0.5, y = "0b", just = c("right", "bottom"),
+    x = -0.5, y = "-0.5b", just = c("right", "bottom"),
     params = params
   )
   
   ## Increment y coord
   y.coord <- y.coord+1
-  }
+ }
+    
+#####------------------------------------------------ GWAS Manhattan
+## Plot Manhattan for GWAS
+    for (i in 1:length(gwas.file)){
+     man.plot <-  plotManhattan(
+                  data = gwas.file[i], 
+                  params = params,
+                  fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
+                  trans = "-log10",
+                  sigLine = TRUE, col = "grey",
+                  lty = 2, range = c(0, 10),
+                  y = "0b",
+                  height = 1.5,
+                  just = c("left", "top")
+                  )
+      ## Annotate y-axis
+      annoYaxis(
+        plot = man.plot,
+        at = c(seq(0, 10, by = 10)),
+        axisLine = F, fontsize = 8
+      )
+      ## Plot y-axis label
+      plotText(
+        label = "-log10(p)", x = -1, y = "0b", rot = 90,
+        fontsize = 9, fontface = "bold", just = c("left, top"),
+        params = params
+      )
+      ## Add text labels
+      plotText(
+        label = gwas.names[i], fonsize = 8, fontface = "bold", fontcolor = "black",
+        x = -1.25, y = "0b", just = c("right", "center"),
+        params = params
+        )
+      ## Increment y coord
+      y.coord <- y.coord+1.25
+    }
+    
+    ## Add heatmap legend just once
+    annoHeatmapLegend(
+      plot = man.plot, fontcolor = "black",
+      x = 6.5, y = "-0.9b", just = c("left", "top"),
+      width = 0.10, height = 0.5, fontsize = 10, digits = 1, scientific = T
+    )
 
 #####------------------------------------------------ GENE and GENOME TRACKS
 ## Plot gene track
@@ -301,7 +344,7 @@ plotGenomeLabel(
 )
 
 
-#####------------------------------------------------ CHROMOSOME IDEAGRAM
+#####------------------------------------------------ CHROMOSOME IDEOGRAM
 # Plot chromosome ideogram:
 
 ## Plot and place ideogram

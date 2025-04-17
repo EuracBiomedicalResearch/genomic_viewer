@@ -2,7 +2,7 @@
 ## Function for reading data tables and visualize them in the "Data" tabset of plotgardenere Shiny app:
 
 library(dplyr)
-shiny_read_table_function <- function(bed.file, bedpe.file, bed.names, bedpe.names, chr, start, end){
+shiny_read_table_function <- function(bed.file, bedpe.file, gwas.file, chr, start, end){
   
   chrom <- paste0("chr", chr)
   
@@ -24,7 +24,15 @@ shiny_read_table_function <- function(bed.file, bedpe.file, bed.names, bedpe.nam
     bedpe.tab.list[[i]] <- bedpe.tab
   }
   
-  out.list <- list(bed.tab.list, bedpe.tab.list)
+  # Read gwas files
+  gwas.tab.list <- list()
+  for (i in 1:length(gwas.file)){
+    gwas.tab <- read.table(gwas.file[i], header = T, sep= "\t")
+    gwas.tab <- dplyr::filter(gwas.tab, chrom == chrom & pos >= start & pos <= end) # This way all the SNPs in the selected range will be kept.
+    gwas.tab.list[[i]] <- gwas.tab
+  }
+  
+  out.list <- list(bed.tab.list, bedpe.tab.list, gwas.tab.list)
   
   return(out.list)
 }
