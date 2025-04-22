@@ -93,6 +93,7 @@ ui <- page_sidebar(
     layout_columns(
       navset_card_underline(
             title = "Selected genomic region",
+            header = h6(textOutput("sel.coord"), style = "font-size:14px; padding:0px 0px;"), 
               # Panel with plot ----------------------------------------------------------------------------------
               nav_panel("Plot", class = "gap-2 p-3 border-0 align-items-top",
                         svgPanZoomOutput(outputId = "res"),
@@ -161,8 +162,6 @@ server <- function(input, output, session){
   ## Chr end
   reactiveChrend <- eventReactive(input$go, {
     if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
-      #} 
-    #if ((input$chrend - input$chrstart) < 500) {print(input$chrstart + 500)
       } else print(input$chrend)
   })
   ## Categories to expand
@@ -172,6 +171,8 @@ server <- function(input, output, session){
 
   
   ########################## CARD PLOT
+  ##---------------------- Output selected coordinates text:
+  output$sel.coord <- renderText({paste("chr", reactiveChr(), ": ", reactiveChrstart(), "-", reactiveChrend(), sep="")})
   ##---------------------- Output genomic view plot:
   
   
