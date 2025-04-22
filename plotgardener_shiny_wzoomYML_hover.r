@@ -72,10 +72,14 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
   
     
   # To avoid loading too heavy data just read a specific chrom region
+    # Do this only if the region to be plotted is larger than the hiC map resolution
     hicDataChromRegion <- list()
+    if((end - start >= 15000)){
    for (i in 1:length(hic.file)){
      # Conditional resolution based on plotting region size
-     if ((end - start) <= 10e+05){
+     if ((end - start) <= 25000){
+       resolution = 15000
+     } else if ((end - start) > 25000 & (end - start) <= 10e+05){
        resolution = 25000 } else if ((end - start) > 10e+05 & (end - start) <= 5e+06){
        resolution = 100000
      } else {
@@ -87,7 +91,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
        chromstart = start, chromend = end,
        resolution = resolution, res_scale = "BP", norm = "KR"
         ) 
-     
+    } 
    }
     
     ## Get sizes of chromosomes to scale their sizes, used for genomic annotation tracks
@@ -119,15 +123,22 @@ params <- pgParams(
     showGuides = F, xgrid = 0, ygrid = 0
 )
 
+#####------------------------------------------------ Plot a segment to have the starting point for whatever other graph
+    ## Plot fictitious range
+    plotRanges(data = data.frame(chr = paste("chr", chr, sep=""), start = start, end = end),
+               params = params,
+               fill = "#7ecdbb",
+               linecolor = NA,
+               y = y.coord, height = 0.1)
     
 #####------------------------------------------------ HiC Matrix
 ## Plot Hi-C data in region
-
+    if(isEmpty(hicDataChromRegion)){} else {
 for (i in 1:length(hicDataChromRegion)){
     plotHicTriangle(
     data = hicDataChromRegion[[i]],
   params = params,
-    y = 3,  height = 3)
+    y = 3.2,  height = 3)
   
   ## Add text labels
     plotText(
@@ -136,12 +147,13 @@ for (i in 1:length(hicDataChromRegion)){
     params = params)
   
   ## Increment y coord
-  y.coord <- y.coord+3
+  y.coord <- y.coord+3.2
+    }
   }
 
 #####------------------------------------------------ BIGWIGS
 
-  ## COnditional binsize applied as defined in rows 15 to 24 (Conditional binsize9)
+  ## Conditional binsize applied as defined in rows 15 to 24 (Conditional binsize)
   
   
   
@@ -355,7 +367,7 @@ ideogramPlot <- plotIdeogram(
   default.units = "cm"
 )
 ## Increment y coord
-y.coord <- y.coord+1.75+1+1.5
+y.coord <- y.coord+1.75+1+1.5+0.5
 
 ## Plot chromosome name
 plotText(

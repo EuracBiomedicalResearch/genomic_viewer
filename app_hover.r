@@ -66,14 +66,14 @@ ui <- page_sidebar(
       "chrstart", 
       "Start coordinate", 
       value = 28000000, 
-      min = 1, 
+      min = NA, 
       max = NA 
     ), 
     numericInput( 
       "chrend", 
       "End coordinate", 
       value = 28500000, 
-      min = 2, 
+      min = NA, 
       max = NA 
     ), 
 
@@ -155,11 +155,15 @@ server <- function(input, output, session){
   })
     ## Chr start
   reactiveChrstart <- eventReactive(input$go, {
-    print(input$chrstart)
+    if (input$chrstart <= 0) {print(1)} else {
+    print(input$chrstart)}
   })
   ## Chr end
   reactiveChrend <- eventReactive(input$go, {
-    print(input$chrend)
+    if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      #} 
+    #if ((input$chrend - input$chrstart) < 500) {print(input$chrstart + 500)
+      } else print(input$chrend)
   })
   ## Categories to expand
   reactiveCat <- reactive({
@@ -230,8 +234,7 @@ server <- function(input, output, session){
         s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
       if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
         e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
-      s
-      e }) %>%  bindEvent(input$z1out)
+      }) %>%  bindEvent(input$z1out)
    ## Zoom out 5x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
@@ -242,8 +245,7 @@ server <- function(input, output, session){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
-     s
-     e }) %>%  bindEvent(input$z5out)
+     }) %>%  bindEvent(input$z5out)
    ## Zoom out 10x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/2)*10, 0)
@@ -254,8 +256,7 @@ server <- function(input, output, session){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
-     s
-     e }) %>%  bindEvent(input$z10out)
+     }) %>%  bindEvent(input$z10out)
    ########## ZOOM-IN
    ## Zoom out 1x
    observe({
@@ -266,8 +267,7 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
-     s
-     e }) %>%  bindEvent(input$z1in)
+     }) %>%  bindEvent(input$z1in)
    ## Zoom out 5x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
@@ -277,8 +277,7 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
-     s
-     e }) %>%  bindEvent(input$z5in)
+     }) %>%  bindEvent(input$z5in)
    ## Zoom out 10x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/2)*10, 0)
@@ -288,8 +287,7 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
-     s
-     e }) %>%  bindEvent(input$z10in)
+     }) %>%  bindEvent(input$z10in)
 
 
   
@@ -297,10 +295,18 @@ server <- function(input, output, session){
   observeEvent(input$plot_brush, {
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x <- input$plot_brush
-    
-    updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = round(x$xmin, 0))
-    
-    updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = round(x$xmax, 0))
+    # Define START min
+    s <- updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = round(x$xmin, 0))
+    if (x$xmin <= 0){ 
+      s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
+    # Define END max
+    e <- updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = round(x$xmax, 0))
+    if ( x$xmax > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])}
+    # Define SMALLER RANGE
+    if ((x$xmax - x$xmin) <= 500){ 
+      s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
     
     session$resetBrush("plot_brush")
   })
