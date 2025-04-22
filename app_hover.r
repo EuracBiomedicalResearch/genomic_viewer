@@ -97,7 +97,16 @@ ui <- page_sidebar(
               nav_panel("Plot", class = "gap-2 p-3 border-0 align-items-top",
                         svgPanZoomOutput(outputId = "res"),
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
-                        verbatimTextOutput("click_info")
+                        verbatimTextOutput("click_info"),
+                        fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
+                        column(width = 1, actionButton("z1out", "1x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                        column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                        column(width = 1,actionButton("z10out", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
+                        column(width = 2, h6(tags$b("Zoom-in:")), style = "padding: 3px 5px; text-align:right"),
+                        column(width = 1,actionButton("z1in", "1x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                        column(width = 1,actionButton("z5in", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                        column(width = 1,actionButton("z10in", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px")
+              )
                         ),
               # Panel with Table of data -------------------------------------------------------------------------
               nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
@@ -208,6 +217,79 @@ server <- function(input, output, session){
   width = "auto",
   height = 50
  ) 
+  
+  ##-------------------- Zooming when click on zoom buttons:
+  ########## ZOOM-OUT
+   ## Zoom out 1x
+   observe({
+      zoom <- round((input$chrend - input$chrstart)/2, 0)
+      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
+      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
+      # Modify if values exceed chr size
+      if (input$chrstart - zoom <= 0){ 
+        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
+      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
+      s
+      e }) %>%  bindEvent(input$z1out)
+   ## Zoom out 5x
+   observe({
+     zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
+     # Modify if values exceed chr size
+     if (input$chrstart - zoom <= 0){ 
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
+     if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
+     s
+     e }) %>%  bindEvent(input$z5out)
+   ## Zoom out 10x
+   observe({
+     zoom <- round(((input$chrend - input$chrstart)/2)*10, 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
+     # Modify if values exceed chr size
+     if (input$chrstart - zoom <= 0){ 
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
+     if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
+     s
+     e }) %>%  bindEvent(input$z10out)
+   ########## ZOOM-IN
+   ## Zoom out 1x
+   observe({
+     zoom <- round((input$chrend - input$chrstart)/2, 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - zoom)
+     # Modify if values exceed chr size
+     if ((input$chrend - input$chrstart) <= 500){ 
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+     s
+     e }) %>%  bindEvent(input$z1in)
+   ## Zoom out 5x
+   observe({
+     zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - zoom)
+     # Modify if values exceed chr size
+     if ((input$chrend - input$chrstart) <= 500){ 
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+     s
+     e }) %>%  bindEvent(input$z5in)
+   ## Zoom out 10x
+   observe({
+     zoom <- round(((input$chrend - input$chrstart)/2)*10, 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - zoom)
+     # Modify if values of chr size is too low
+     if ((input$chrend - input$chrstart) <= 500){ 
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+     s
+     e }) %>%  bindEvent(input$z10in)
 
 
   
