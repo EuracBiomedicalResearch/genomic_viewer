@@ -25,8 +25,10 @@ default:
   gwas.dir: "GWAScatalog_KidneyDisease"
   gwas.ext: "selectedCol.tsv.gz"
   gwas.names: ["GWAS chronic kidney disease"]
-  # file with chromosomes and centromeres coordinates
-  chrom.cen: "chrom_centromeres_hg38.txt"
   # categorical bed file
   cat.file: "regulatory_elements_hg38.bed"
   cat.names: ["Regulatory Elements"]
+  # file with chromosomes and centromeres coordinates
+  chrom.cen: "chrom_centromeres_hg38.txt"
+  # file with desired genome genes hgnc symbol and coordinates
+  genes.hgnc: "hg38_hgnc_symbol_cleaned.bed"

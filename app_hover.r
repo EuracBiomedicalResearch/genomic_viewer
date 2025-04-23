@@ -46,6 +46,8 @@ hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRU
 gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext)
 ### For chromosomes plotting
 chrom.cen.df <- read.table(config$chrom.cen, header = T, sep="\t")
+# Genes hgnc symbol
+genes.hgnc <- read.table(config$genes.hgnc, header = T, sep = "\t")
 # Categorical bed file
 cat.file <- dir(full.names = TRUE, pattern = config$cat.file)
 
@@ -131,11 +133,15 @@ ui <- page_sidebar(
                 # print piechart with peaks annotation
                 fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200)),
                   )),
+      ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
             card_body(#class = "border-0 gap-1 align-items-bottom",
                       plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F), hover = "chr.hover"),
                       verbatimTextOutput("chr.info"),
-                      # Select mode for bigwig plotting
+                      # Search by gene
+                      selectizeInput('gene.search', 'Search by gene', choices = character(0)),
+                      textOutput('sel.gene'),
+                      # Select mode for categories plotting
                       selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T))
                 ),
        col_widths = c(9, 3)
@@ -366,8 +372,7 @@ server <- function(input, output, session){
     })
   })
   
-        
-  
+
   ###### Bedpe file table view
   
   # Rendering tables dependent on user input.
@@ -511,18 +516,31 @@ server <- function(input, output, session){
     
   })
   
-    ## Category tracks expand/collapse
+  ##------------------------ Search by gene
   
+  
+  gene.names <- reactive({
+    genes.hgnc
+  })
+  
+  observeEvent(gene.names(),{
+    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", choices = genes.hgnc$hgnc_symbol, options = list(maxOptions = 5), server = TRUE)
+  })
+  
+  output$sel.gene <- renderText({input$gene.search})
+
+  observeEvent(input$gene.search,{
+    updateTextInput(session = getDefaultReactiveDomain(), "chr", value = genes.hgnc$chromosome_name[which(genes.hgnc$hgnc_symbol == input$gene.search)])
+    updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = genes.hgnc$start_position[which(genes.hgnc$hgnc_symbol == input$gene.search)])
+    updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = genes.hgnc$end_position[which(genes.hgnc$hgnc_symbol == input$gene.search)])
+  })
   
   ##------------------------ Update chr start end upon click on zoomed range
     observeEvent(input$chr.click, {
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x2 <- input$chr.click
-    
     updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", chrom.cen.df$chr[x2$x]))
-    
     updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
-    
     updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])])
   })
   
