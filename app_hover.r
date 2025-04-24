@@ -6,6 +6,7 @@ library(bslib)
 library(svglite)
 library(svgPanZoom)
 library(paletteer)
+library(shinycssloaders)
 # Load server libraries
 library(plotgardener)
 library(org.Hs.eg.db)
@@ -98,7 +99,7 @@ ui <- page_sidebar(
             header = h6(textOutput("sel.coord"), style = "font-size:14px; padding:0px 0px;"), 
               # Panel with plot ----------------------------------------------------------------------------------
               nav_panel("Plot", class = "gap-2 p-3 border-0 align-items-top",
-                        svgPanZoomOutput(outputId = "res"),
+                        svgPanZoomOutput(outputId = "res") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
                         verbatimTextOutput("click_info"),
                         fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
@@ -114,24 +115,24 @@ ui <- page_sidebar(
               # Panel with Table of data -------------------------------------------------------------------------
               nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
                       # print table preview and download button: bed
-                      uiOutput("view_bed"),
+                      uiOutput("view_bed") %>% withSpinner(type = 3, color.background = "white"),
                       uiOutput("bed_save"),
                       # print table preview and download button: bedpe
-                      uiOutput("view_bedpe"),
+                      uiOutput("view_bedpe") %>% withSpinner(type = 3, color.background = "white"),
                       uiOutput("bedpe_save"),
                       # print table preview and download button: gwas
-                      uiOutput("view_gwas"),
+                      uiOutput("view_gwas") %>% withSpinner(type = 3, color.background = "white"),
                       uiOutput("gwas_save")
                         ),
                # Panel with Basic Statistics of data ------------------------------------------------------------
               nav_panel("Stats", class = "gap-2 p-3 border-0 align-items-top",
                 # print plots of peaks numbers
-                fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200)),
-                column(width = 6, plotOutput("arches.nr", height = 200))),
+                fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200) %>% withSpinner()),
+                column(width = 6, plotOutput("arches.nr", height = 200) %>% withSpinner())),
                 # print upset plot for peaks intersections
-                fluidRow(plotOutput("upset", height = 300)),
+                fluidRow(plotOutput("upset", height = 300) %>% withSpinner()),
                 # print piechart with peaks annotation
-                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200)),
+                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner()),
                   )),
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
@@ -206,7 +207,7 @@ server <- function(input, output, session){
   
   output$res <- renderSvgPanZoom({
     svgPanZoom(svglite:::inlineSVG(tracks()), 
-               panEnabled = F, width = "auto", height = "auto", controlIconsEnabled = T)
+               panEnabled = F, width = "auto", height = "auto", controlIconsEnabled = T) 
   })
 
   ##-------------------- Output zooming region plot:
