@@ -14,7 +14,10 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
   for (i in 1:length(bw.file)){
     maxScore <- c(maxScore, max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
   }
-  maxScore <- max(maxScore)
+  if (!max(maxScore) == 0){
+    maxScore <- max(maxScore) } else {
+      maxScore <- 10
+    }
 
     print(paste("Scale for bigwig files has been set to:", maxScore))
     
@@ -69,7 +72,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
        }
       print("Binning colour assigned")
     }
-  
+ 
     
   # To avoid loading too heavy data just read a specific chrom region
     # Do this only if the region to be plotted is larger than the hiC map resolution
@@ -99,7 +102,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     chromSizes <- GenomeInfoDb::seqlengths(tx_db)
     maxChromSize <- max(chromSizes)
     
-    ################################## FINE PREPROCESSING OF FILES ####################
+    ################################## END PREPROCESSING OF FILES ####################
   
   #--------------------------------------------------------- generate the plot
   #####------------------------------------------------ PAGE
@@ -132,24 +135,26 @@ params <- pgParams(
                y = y.coord, height = 0.1)
     
 #####------------------------------------------------ HiC Matrix
-## Plot Hi-C data in region
+    ## Plot Hi-C data in region
     if(isEmpty(hicDataChromRegion)){} else {
-for (i in 1:length(hicDataChromRegion)){
-    plotHicTriangle(
-    data = hicDataChromRegion[[i]],
-  params = params,
-    y = 3.2,  height = 3)
-  
-  ## Add text labels
-    plotText(
-    label = hic.names[i], fonsize = 10, fontcolor = "black",
-    x = -0.5, y = "-1b", just = c("right", "bottom"),
-    params = params)
-  
-  ## Increment y coord
-  y.coord <- y.coord+3.2
+      for (i in 1:length(hicDataChromRegion)){
+        if(nrow(hicDataChromRegion[[i]][1]) <= 1){} else {
+          plotHicTriangle(
+            data = hicDataChromRegion[[i]],
+            params = params,
+            y = 3.2,  height = 3)
+          
+          ## Add text labels
+          plotText(
+            label = hic.names[i], fonsize = 10, fontcolor = "black",
+            x = -0.5, y = "-1b", just = c("right", "bottom"),
+            params = params)
+          
+          ## Increment y coord
+          y.coord <- y.coord+3.2
+        }
+      }
     }
-  }
 
 #####------------------------------------------------ BIGWIGS
 

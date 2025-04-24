@@ -136,10 +136,10 @@ ui <- page_sidebar(
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
             card_body(#class = "border-0 gap-1 align-items-bottom",
-                      plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = F), hover = "chr.hover"),
+                      plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = T), hover = "chr.hover"),
                       verbatimTextOutput("chr.info"),
                       # Search by gene
-                      selectizeInput('gene.search', 'Search by gene', choices = character(0)),
+                      selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
                       textOutput('sel.gene'),
                       # Select mode for categories plotting
                       selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T))
@@ -267,9 +267,10 @@ server <- function(input, output, session){
    ########## ZOOM-IN
    ## Zoom out 1x
    observe({
-     zoom <- round((input$chrend - input$chrstart)/2, 0)
-     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + zoom)
-     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - zoom)
+     zoom <- round(((input$chrend - input$chrstart)/2)/2, 0)
+     mid.region <- input$chrstart + round(((input$chrend - input$chrstart)/2), 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = mid.region + zoom)
      # Modify if values exceed chr size
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
@@ -277,9 +278,10 @@ server <- function(input, output, session){
      }) %>%  bindEvent(input$z1in)
    ## Zoom out 5x
    observe({
-     zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
-     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + zoom)
-     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - zoom)
+     zoom <- round(((input$chrend - input$chrstart)/5)/2, 0)
+     mid.region <- round(input$chrstart + ((input$chrend - input$chrstart)/2), 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = mid.region + zoom)
      # Modify if values exceed chr size
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
@@ -287,10 +289,11 @@ server <- function(input, output, session){
      }) %>%  bindEvent(input$z5in)
    ## Zoom out 10x
    observe({
-     zoom <- round(((input$chrend - input$chrstart)/2)*10, 0)
-     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + zoom)
-     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - zoom)
-     # Modify if values of chr size is too low
+     zoom <- round(((input$chrend - input$chrstart)/10)/2, 0)
+     mid.region <- round(input$chrstart + ((input$chrend - input$chrstart)/2), 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = mid.region + zoom)
+     # Modify if values exceed chr size
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
@@ -520,22 +523,26 @@ server <- function(input, output, session){
   
   
   gene.names <- reactive({
-    genes.hgnc
+    if (!input$gene.search == ""){
+    sel.gene <- input$gene.search
+    }
   })
   
-  observeEvent(gene.names(),{
-    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", choices = genes.hgnc$hgnc_symbol, options = list(maxOptions = 5), server = TRUE)
+  observeEvent(genes.hgnc, {
+    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$hgnc_symbol, options = list(maxOptions = 12), server = TRUE)
   })
   
   output$sel.gene <- renderText({input$gene.search})
 
-  observeEvent(input$gene.search,{
+  observeEvent(gene.names(),{
+    if (!input$gene.search == ""){
     updateTextInput(session = getDefaultReactiveDomain(), "chr", value = genes.hgnc$chromosome_name[which(genes.hgnc$hgnc_symbol == input$gene.search)])
     updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = genes.hgnc$start_position[which(genes.hgnc$hgnc_symbol == input$gene.search)])
     updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = genes.hgnc$end_position[which(genes.hgnc$hgnc_symbol == input$gene.search)])
+    }
   })
   
-  ##------------------------ Update chr start end upon click on zoomed range
+  ##------------------------ Update chr start end upon click on chr plot
     observeEvent(input$chr.click, {
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x2 <- input$chr.click
