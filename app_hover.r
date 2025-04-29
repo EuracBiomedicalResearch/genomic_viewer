@@ -143,7 +143,9 @@ ui <- page_sidebar(
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
                       textOutput('sel.gene'),
                       # Select mode for categories plotting
-                      selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T))
+                      selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T),
+                      # Expand transcript track option
+                      checkboxInput("checkbox", "Expand transcripts", FALSE))
                 ),
        col_widths = c(9, 3)
               )
@@ -200,7 +202,8 @@ server <- function(input, output, session){
                                                                           chr = reactiveChr(), #input$chr, 
                                                                           start = reactiveChrstart(), #input$chrstart, 
                                                                           end = reactiveChrend(), #input$chrend,
-                                                                          bw.mode = input$bw.mode)
+                                                                          bw.mode = input$bw.mode,
+                                                                          expand.transcripts = reactiveTranscript())
     
      
     })
@@ -543,6 +546,12 @@ server <- function(input, output, session){
     }
   })
   
+  
+  ##------------------------ Expand transcripts checkbox
+  reactiveTranscript <- eventReactive(input$checkbox, {
+    print(input$checkbox)
+  })
+  
   ##------------------------ Update chr start end upon click on chr plot
     observeEvent(input$chr.click, {
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
@@ -575,7 +584,8 @@ server <- function(input, output, session){
                                     chr = reactiveChr(), #input$chr, 
                                     start = reactiveChrstart(), #input$chrstart, 
                                     end = reactiveChrend(), #input$chrend,
-                                    bw.mode = input$bw.mode)
+                                    bw.mode = input$bw.mode,
+                                    expand.transcripts = reactiveTranscript())
          dev.off()
       
       })

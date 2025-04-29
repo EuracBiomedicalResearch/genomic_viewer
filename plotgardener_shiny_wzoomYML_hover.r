@@ -1,5 +1,5 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, expand.transcripts){
   
   
   
@@ -122,7 +122,7 @@ params <- pgParams(
 
 ## Create a plotgardener page
     pageCreate(
-    width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*4)+length(cat.names)+length(gwas.file)*3, default.units = "cm",
+    width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*4)+length(cat.names)+length(gwas.file)*3+5, default.units = "cm",
     showGuides = F, xgrid = 0, ygrid = 0
 )
 
@@ -344,21 +344,36 @@ y.coord <- y.coord+0.5
 
 #####------------------------------------------------ GENE and GENOME TRACKS
 ## Plot gene track
-plotGenes(
-    y = "1.75b", height = 1.25,
-    params = params
-)
-plotText(
-    label = "Gene", fonsize = 10, fontcolor = "black",
-    x = -0.5, y = "0b", just = c("right", "bottom"),
-    params = params
-)
+    if(!expand.transcripts == TRUE){
+      plotGenes(
+        y = "1.75b", height = 1.25,
+        params = params
+      )
+      plotText(
+        label = "Gene", fonsize = 10, fontcolor = "black",
+        x = -0.5, y = "0b", just = c("right", "bottom"),
+        params = params
+      )
+      y.coord = y.coord + 1.75} else { 
+        plotTranscripts(
+          y = "5b", height = 5,
+          params = params, labels = "gene"
+        )
+        plotText(
+          label = "Transcripts", fonsize = 10, fontcolor = "black",
+          x = -0.5, y = "0b", just = c("right", "bottom"),
+          params = params
+        )
+        y.coord = y.coord + 5
+      }
+
+
 
 ## Plot genome label
-plotGenomeLabel(
+  plotGenomeLabel(
      params = params,
        y = "1b", scale = "Mb"
-)
+  )
 
 
 #####------------------------------------------------ CHROMOSOME IDEOGRAM
@@ -372,7 +387,7 @@ ideogramPlot <- plotIdeogram(
   default.units = "cm"
 )
 ## Increment y coord
-y.coord <- y.coord+1.75+1+1.5+0.5
+y.coord <- y.coord+1+1.5+0.5
 
 ## Plot chromosome name
 plotText(
