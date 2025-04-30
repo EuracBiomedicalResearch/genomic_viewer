@@ -1,5 +1,5 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, expand.transcripts){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, expand.transcripts, genes.hgnc){
   
   
   
@@ -343,28 +343,53 @@ y.coord <- y.coord+0.5
     )
 
 #####------------------------------------------------ GENE and GENOME TRACKS
-## Plot gene track
-    if(!expand.transcripts == TRUE){
-      plotGenes(
-        y = "1.75b", height = 1.25,
-        params = params
-      )
-      plotText(
-        label = "Gene", fonsize = 10, fontcolor = "black",
-        x = -0.5, y = "0b", just = c("right", "bottom"),
-        params = params
-      )
-      y.coord = y.coord + 1.75} else { 
-        plotTranscripts(
-          y = "5b", height = 5,
-          params = params, labels = "gene"
+
+    # If the genomic region to be plotted is shorted than 10 Mb plot genes or transcript tracks, otherwise plot just genes density
+    if(end - start <= 10e+6){
+    ## Plot gene track
+     if(!expand.transcripts == TRUE){
+        plotGenes(
+          y = "1.75b", height = 1.25,
+          params = params
         )
-        plotText(
-          label = "Transcripts", fonsize = 10, fontcolor = "black",
+       plotText(
+          label = "Gene", fonsize = 10, fontcolor = "black",
           x = -0.5, y = "0b", just = c("right", "bottom"),
           params = params
         )
-        y.coord = y.coord + 5
+        y.coord = y.coord + 1.75} else { 
+         plotTranscripts(
+            y = "5b", height = 5,
+           params = params, labels = "gene"
+         )
+          plotText(
+           label = "Transcripts", fonsize = 10, fontcolor = "black",
+           x = -0.5, y = "0b", just = c("right", "bottom"),
+            params = params
+          )
+          y.coord = y.coord + 5
+        }
+      } else {
+        gene.density.plot <- ggplot(filter(genes.hgnc, chromosome_name == chr), aes(x = start_position)) +
+          geom_density(fill = "skyblue", alpha = 0.7, bw = 100000, color = "skyblue") +
+          xlim(start, end) +
+          theme_void() +
+          theme(plot.margin = grid::unit(c(0,0,0,0), "mm"),
+               # panel.border = element_rect(color = "black", 
+                #                            fill = NA, 
+                #                            size = 2)
+               )
+        
+        plotGG(gene.density.plot,
+               x = -0.7, y = "1.75b", height = 1.25, width = 17.4,
+               params = params
+               )
+        plotText(
+          label = "Gene density", fonsize = 10, fontcolor = "black",
+          x = -0.5, y = "0b", just = c("right", "bottom"),
+          params = params
+        )
+        y.coord = y.coord + 1.75
       }
 
 

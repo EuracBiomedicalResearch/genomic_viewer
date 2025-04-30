@@ -203,7 +203,8 @@ server <- function(input, output, session){
                                                                           start = reactiveChrstart(), #input$chrstart, 
                                                                           end = reactiveChrend(), #input$chrend,
                                                                           bw.mode = input$bw.mode,
-                                                                          expand.transcripts = reactiveTranscript())
+                                                                          expand.transcripts = reactiveTranscript(),
+                                                                          genes.hgnc = genes.hgnc)
     
      
     })
@@ -585,7 +586,8 @@ server <- function(input, output, session){
                                     start = reactiveChrstart(), #input$chrstart, 
                                     end = reactiveChrend(), #input$chrend,
                                     bw.mode = input$bw.mode,
-                                    expand.transcripts = reactiveTranscript())
+                                    expand.transcripts = reactiveTranscript(),
+                                    genes.hgnc = genes.hgnc)
          dev.off()
       
       })
