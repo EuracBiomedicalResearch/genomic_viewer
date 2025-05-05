@@ -133,6 +133,8 @@ ui <- page_sidebar(
                 fluidRow(plotOutput("upset", height = 300) %>% withSpinner()),
                 # print piechart with peaks annotation
                 fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner()),
+                # print manhattan plot with whole chr and zoom-in
+                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 400) %>% withSpinner()),
                   )),
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
@@ -488,6 +490,16 @@ server <- function(input, output, session){
     output$annotation <- renderPlot({
       peaks.annotation.function(bed.file = bed.file, 
                                        bed.names = config$bed.names)
+    })
+    ## For Manhattan plot
+    output$manhattan <- renderPlot({
+      manhattan.plot.function(gwas.file = gwas.file, 
+                              chr = reactiveChr(), 
+                              start = reactiveChrstart(), 
+                              end = reactiveChrend(), 
+                              sign.p = 5e-6,
+                              chr.len.df = chrom.cen.df,
+                              gwas.names =config$gwas.names)
     })
 
   

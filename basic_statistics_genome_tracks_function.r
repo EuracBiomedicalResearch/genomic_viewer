@@ -251,4 +251,225 @@ ggpubr::ggarrange(plotlist = anno.plot.list, nrow = ceiling(length(anno.plot.lis
 }
 
 
+########################################## FUNCTION TO GENERATE A MANHATTAN PLOT ON THE SELECTED CHROMOSOME AND ZOOM-IN REGION WITH SNPs NAMES
 
+manhattan.plot.function <- function(gwas.file, chr, start, end, sign.p, chr.len.df, gwas.names){
+  ## required libraries:
+  # library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+  # library(plotgardener)
+  # library(paletteer)
+  # library(dplyr)
+  
+  ## Specifiy complete chromosome name
+  chr = paste("chr", chr, sep = "")
+  ## Retrieve chromosome length for plotting
+  chr.len <- chr.len.df$chr.len[chr.len.df$chr == chr]
+  ## Define page height
+  h <- 6*length(gwas.file)*2
+  
+  ## Define plotting parameters for whole chromosome
+  params <- pgParams(
+    chrom = chr, chromstart = 1, chromend = chr.len,
+    assembly = "hg38",
+    x = 0, just = c("left", "bottom"),
+    width = 12, length = 12, height = 6, default.units = "cm"
+  )
+  
+  ## Define plotting parameter for zoom-in region
+  region <- pgParams(
+    chrom = chr, chromstart = start, chromend = end,
+    assembly = "hg38",
+    x = 0, just = c("left", "bottom"),
+    width = 12, length = 12, height = 6, default.units = "cm"
+  )
+  
+  ################# WHOLE CHROMOSOME MANHATTAN
+  ## Create page
+  pageCreate(width = 12, height = h, default.units = "cm", showGuides = F) 
+  
+  ## Define starting y coordinate
+  y.coord <- h
+  
+  ## Loop over every GWAS of input
+  for (i in 1:length(gwas.file)){
+    man.data.t <- read.table(gwas.file[i], sep = "\t", header = T)
+    
+    ## Define lead SNPs to be plotted wit their name specified
+    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p)
+    
+    ## Plot fictitious segment
+    plotRanges(data = data.frame(chr = chr, start = 1, end = chr.len),
+               params = params,
+               fill = "#7ecdbb",
+               linecolor = NA,
+               y = y.coord, height = 0.1)
+  
+    ## Create Manhattan plot of the selected chromosome
+    mp <- plotManhattan(
+      data = man.data.t,
+      fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
+      trans = "-log10",
+      sigVal = sign.p, sigLine = TRUE, sigCol = "#7ecdbb",  col = "grey",
+      lty = 2, range = c(0, 14),
+      y = "0b",
+      default.units = "cm",
+      params = params
+    )
+    ## Annotate signifcant SNPs
+    plotText(label = leadSNP$snp, 
+             x = leadSNP$pos*(12/chr.len) + 0.2 , 
+             y = y.coord-(-log10(leadSNP$p)*(6/14)), 
+             check.overlap = T, 
+             params = params,
+             rot = 35)
+  
+    ## Highlight genomic region on signal plot
+    annoHighlight(
+     plot = mp,
+      y = "0b",
+      alpha = 0.3,
+     params = region
+    )
+    
+    ## Plot graph title
+    plotText(
+      label = gwas.names[i],
+      x = 12, y = "-6b",
+      fontsize = 8, fontface = "bold", just = "right",
+      params = params
+    )
+    
+    y.coord <- y.coord + 6
+  
+    }
+  
+  ### Annotations once for every input dataset
+  ## Annotate genome label
+  annoGenomeLabel(
+    plot = mp, 
+    y = "0.5b",
+    fontsize = 8, 
+    scale = "Mb",
+    params = params
+  )
+  #> genomeLabel[genomeLabel2]
+  
+  ## Annotate y-axis
+  annoYaxis(
+    plot = mp,
+    at = c(0, 2, 4, 12, 8, 10, 12, 14),
+    axisLine = TRUE, fontsize = 8
+  )
+  #> yaxis[yaxis2]
+  
+  ## Plot y-axis label
+  plotText(
+    label = "-log10(p-value)", x = -1, y = "-2.5b", rot = 90,
+    fontsize = 8, fontface = "bold", just = "center",
+    params = params
+  )
+  
+  ## Color legend
+  ## Add heatmap legend just once
+  annoHeatmapLegend(
+    plot = mp, fontcolor = "black",
+    x = 12.5, y = "-2.5b",
+    width = 0.3, height = 1.5, fontsize = 8, digits = 1, scientific = T,
+    params = params
+  )
+  
+  ################### ZOOM-IN MANHATTAN
+  
+  # Run zoom-in just if the selected region is smaller than the whole chromosome
+  
+  if (end < chr.len){
+  ## Add zoom-in inset of the user selected region
+  annoZoomLines(
+    chrom = chr,
+    plot = mp,
+    prams = params,
+    chromstart = start,
+    chromend = end,
+    y0 = 6, y1 = 5.5,
+    x1 = c(0, 12),
+    default.units = "cm"
+  )
+  
+  ## Define starting y coord for zoom panels
+  y.coord.z <- 5
+  
+  ## Loop over every GWAS of input
+  for (i in 1:length(gwas.file)){
+    man.data.t <- read.table(gwas.file[i], sep = "\t", header = T)
+    
+    ## Define lead SNPs to be plotted wit their name specified
+    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p)
+    
+    ## Create Manhattan plot of the selected chromosome
+    mp2 <- plotManhattan(
+      data = man.data.t,
+      fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
+      trans = "-log10",
+      sigVal = sign.p, sigLine = TRUE, sigCol = "#7ecdbb",  col = "grey",
+      lty = 2, range = c(0, 14),
+      y = y.coord.z,
+      default.units = "cm",
+      params = region,
+      label = "zoom"
+    )
+    ## Annotate significant SNPs
+    plotText(label = leadSNP$snp, 
+             x = (leadSNP$pos-start)*(12/(end - (start-1))) + 0.2 , 
+             y = y.coord.z-(-log10(leadSNP$p)*(6/14)), 
+             check.overlap = T, 
+             params = region,
+             rot = 35)
+    y.coord.z <- y.coord.z - 6 
+    
+    ## Plot graph title
+    plotText(
+      label = paste("Zoom-in: ", gwas.names[i], sep=""),
+      x = 6, y = "-6b",
+      fontsize = 8, fontface = "bold", just = "center",
+      params = region
+    )
+    
+  }
+  
+  ### Annotations once for every input dataset
+  ## Annotate genome label
+  annoGenomeLabel(
+    plot = mp2, 
+    y = "0.5b",
+    fontsize = 8, 
+    scale = "Mb",
+    params = region
+  )
+  #> genomeLabel[genomeLabel2]
+  
+  ## Annotate y-axis
+  annoYaxis(
+    plot = mp2,
+    at = c(0, 2, 4, 6, 8, 10, 12, 14),
+    axisLine = TRUE, fontsize = 8
+  )
+  #> yaxis[yaxis2]
+  
+  ## Plot y-axis label
+  plotText(
+    label = "-log10(p-value)", x = -1, y = y.coord.z+2.5, rot = 90,
+    fontsize = 8, fontface = "bold", just = "center",
+    params = region
+  )
+  }
+  
+}
+
+# TEST FUNCTION
+#manhattan.plot.function(gwas.file = dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext), 
+#                        chr = 11, 
+#                        start = 40000000, 
+#                        end = 50000000, 
+#                        sign.p = 5e-6,
+#                        chr.len.df = chrom.cen.df,
+#                        gwas.names =config$gwas.names)
