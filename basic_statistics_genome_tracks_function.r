@@ -4,7 +4,6 @@
 ########################################## Barplot of total and selected region peaks number (bed)
 
 basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, start, end, filetype){
-  
   chrom <- paste0("chr", chr)
 
   # Read bed files and peaks nr

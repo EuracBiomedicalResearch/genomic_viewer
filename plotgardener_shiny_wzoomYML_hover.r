@@ -9,8 +9,9 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
   # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
   
   # read bw file to use later
-
-  maxScore <- c()
+  maxScore <- 10
+  if(length(bw.file) > 0){
+    maxScore <- c()
   for (i in 1:length(bw.file)){
     maxScore <- c(maxScore, max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
   }
@@ -72,30 +73,32 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
        }
       print("Binning colour assigned")
     }
- 
+  }
     
   # To avoid loading too heavy data just read a specific chrom region
     # Do this only if the region to be plotted is larger than the hiC map resolution
     hicDataChromRegion <- list()
-    if((end - start >= 15000)){
-   for (i in 1:length(hic.file)){
-     # Conditional resolution based on plotting region size
-     if ((end - start) <= 25000){
-       resolution = 15000
-     } else if ((end - start) > 25000 & (end - start) <= 10e+05){
-       resolution = 25000 } else if ((end - start) > 10e+05 & (end - start) <= 5e+06){
-       resolution = 100000
-     } else {
-       resolution = 1000000
-     }
+    if(length(hic.file) > 0){
+      if((end - start >= 15000)){
+       for (i in 1:length(hic.file)){
+       # Conditional resolution based on plotting region size
+         if ((end - start) <= 25000){
+         resolution = 15000
+         } else if ((end - start) > 25000 & (end - start) <= 10e+05){
+            resolution = 25000 } else if ((end - start) > 10e+05 & (end - start) <= 5e+06){
+            resolution = 100000
+         } else {
+            resolution = 1000000
+          }
      
-     hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
-       chrom = as.numeric(chr), assembly = "hg38",
-       chromstart = start, chromend = end,
-       resolution = resolution, res_scale = "BP", norm = "KR"
-        ) 
-    } 
-   }
+      hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
+         chrom = as.numeric(chr), assembly = "hg38",
+         chromstart = start, chromend = end,
+        resolution = resolution, res_scale = "BP", norm = "KR"
+          ) 
+        } 
+      }
+    }
     
     ## Get sizes of chromosomes to scale their sizes, used for genomic annotation tracks
     tx_db <- TxDb.Hsapiens.UCSC.hg38.knownGene
@@ -163,7 +166,7 @@ params <- pgParams(
   
   
 ## Plot signal and text track data bw files
-
+if(length(bw.file) > 0){
 if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   for (i in 1:length(bw.file)){
     # Bw signal
@@ -223,65 +226,71 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
       width = 0.10, height = 0.5, fontsize = 10
     )
   }
+}
 
 #####------------------------------------------------ BED
 ## Plot bed files
- for (i in 1:length(bed.file)){
+    if(length(bed.file) > 0){
+  for (i in 1:length(bed.file)){
    # bed signal
-plotRanges(
-  data = bed.file[i],
-  collapse = T,
-  fill = as.character(paletteer_d("ggthemes::excel_Ion_Boardroom")[i]),
-  y = "0.5b", height = 0.5,
-  params = params)
+  plotRanges(
+    data = bed.file[i],
+   collapse = T,
+   fill = as.character(paletteer_d("ggthemes::excel_Ion_Boardroom")[i]),
+   y = "0.5b", height = 0.5,
+   params = params)
    
    ## Add text labels
-plotText(
+  plotText(
     label = bed.names[i], fonsize = 10, fontcolor = paletteer_d("ggthemes::excel_Ion_Boardroom")[i],
     x = -0.5, y = "0b", just = c("right", "bottom"),
     params = params)
 
-## Increment y coord
-y.coord <- y.coord+0.5
- }
+  ## Increment y coord
+  y.coord <- y.coord+0.5
+      }
+    }
+  
     
 #####------------------------------------------------ CATEGORICAL BED  
   ## Plot categorical bed files
-    for (i in 1:length(cat.file)){
-      # bed positions
-      plotRanges(
-        data = cat.file[i],
-        collapse = cat.collapse[i],
-        fill = colorby("category", palette =  colorRampPalette(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
-        y = "0.5b", height = 0.5,
-        params = params)
+    if(length(cat.file) > 0){
+     for (i in 1:length(cat.file)){
+        # bed positions
+        plotRanges(
+         data = cat.file[i],
+         collapse = cat.collapse[i],
+          fill = colorby("category", palette =  colorRampPalette(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
+          y = "0.5b", height = 0.5,
+          params = params)
       
-      ## Add text labels
-      plotText(
-        label = cat.names[i], fonsize = 10, fontcolor = "black",
-        x = -0.5, y = "0b", just = c("right", "bottom"),
-        params = params)
+        ## Add text labels
+        plotText(
+         label = cat.names[i], fonsize = 10, fontcolor = "black",
+         x = -0.5, y = "0b", just = c("right", "bottom"),
+         params = params)
       
+        ## Increment y coord
+        y.coord <- y.coord+0.5
+    
+    
+     plotLegend(
+       legend = c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)),
+       fill = as.character(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
+        border = FALSE,
+       x = 6.25, y = "1b", width = 1.5, height = 0.7,
+       just = c("left", "bottom"),
+        default.units = "inches"
+      )
+    
       ## Increment y coord
-      y.coord <- y.coord+0.5
-    
-    
-    plotLegend(
-      legend = c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)),
-      fill = as.character(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
-      border = FALSE,
-      x = 6.25, y = "1b", width = 1.5, height = 0.7,
-      just = c("left", "bottom"),
-      default.units = "inches"
-    )
-    
-    ## Increment y coord
-    y.coord <- y.coord+1
-    
+      y.coord <- y.coord+1
+       }
     }
 
 #####------------------------------------------------ HiC LOOPS
 ## Plot loop annotations
+  if(length(bedpe.file) > 0){
  for (i in 1:length(bedpe.file)){
   plotPairsArches(
     data = bedpe.file[i],
@@ -297,10 +306,12 @@ y.coord <- y.coord+0.5
   
   ## Increment y coord
   y.coord <- y.coord+1
- }
+     }
+  }
     
 #####------------------------------------------------ GWAS Manhattan
 ## Plot Manhattan for GWAS
+    if(length(gwas.file) > 0){
     for (i in 1:length(gwas.file)){
      man.plot <-  plotManhattan(
                   data = gwas.file[i], 
@@ -333,6 +344,7 @@ y.coord <- y.coord+0.5
         )
       ## Increment y coord
       y.coord <- y.coord+1.25
+      
     }
     
     ## Add heatmap legend just once
@@ -341,6 +353,7 @@ y.coord <- y.coord+0.5
       x = 6.5, y = "-0.9b", just = c("left", "top"),
       width = 0.10, height = 0.5, fontsize = 10, digits = 1, scientific = T
     )
+    }
 
 #####------------------------------------------------ GENE and GENOME TRACKS
 

@@ -32,7 +32,7 @@ source("basic_statistics_genome_tracks_function.r")
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "Shiny_wzoom_config_hover.yml")
+config <- config::get(file = "Shiny_wzoom_config_hover_prova.yml")
 
 ## Read data
 # Set a BigWig file
@@ -349,7 +349,8 @@ server <- function(input, output, session){
   
   # Rendering tables dependent on user input.
   observeEvent(length(bed.file), {
-    lapply(1:length(bed.file), function(i) {
+    x <- c(1:length(bed.file))
+    lapply(x[!x == 0], function(i) {
       output[[paste0('bed', i)]] <- renderTable({
         head(datasetTables()[[1]][[i]], n = 15)
       }, caption = config$bed.names[i],
@@ -359,7 +360,8 @@ server <- function(input, output, session){
   
   # Rendering UI and outputtign tables dependent on user input.
   output$view_bed <- renderUI({
-    lapply(1:length(bed.file), function(i) {
+    x <- c(1:length(bed.file))
+    lapply(x[!x == 0], function(i) {
       uiOutput(paste0('bed', i))
       })
   })
@@ -367,7 +369,8 @@ server <- function(input, output, session){
   
   # Download peaks
   observeEvent(length(bed.file),{
-    lapply(1:length(bed.file), function(i) {
+    x <- c(1:length(bed.file))
+    lapply(x[!x == 0], function(i) {
       output[[paste0("downloadBed", i)]] <- downloadHandler(
         filename = function(){paste0(config$bed.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".bed")},
         content = function(file){
@@ -377,7 +380,8 @@ server <- function(input, output, session){
   })
   
   output$bed_save <- renderUI({
-    lapply(1:length(bed.file), function(i) {
+    x <- c(1:length(bed.file))
+    lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadBed", i), paste0("Download ", config$bed.names[i]))
     })
   })
@@ -387,7 +391,8 @@ server <- function(input, output, session){
   
   # Rendering tables dependent on user input.
   observeEvent(length(bedpe.file), {
-    lapply(1:length(bedpe.file), function(i) {
+    x <- c(1:length(bedpe.file))
+    lapply(x[!x == 0], function(i) {
       output[[paste0('bedpe', i)]] <- renderTable({
         head(datasetTables()[[2]][[i]], n = 15)
       }, caption = config$bedpe.names[i],
@@ -397,7 +402,8 @@ server <- function(input, output, session){
   
   # Rendering UI and outputting tables dependent on user input.
   output$view_bedpe <- renderUI({
-    lapply(1:length(bedpe.file), function(i) {
+    x <- c(1:length(bedpe.file))
+    lapply(x[!x == 0], function(i) {
       uiOutput(paste0('bedpe', i))
     })
   })
@@ -405,7 +411,8 @@ server <- function(input, output, session){
   
   # Download arches
   observeEvent(length(bedpe.file),{
-    lapply(1:length(bedpe.file), function(i) {
+    x <- c(1:length(bedpe.file))
+    lapply(x[!x == 0], function(i) {
       output[[paste0("downloadBedpe", i)]] <- downloadHandler(
         filename = function(){paste0(config$bedpe.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".bedpe")},
         content = function(file){
@@ -415,7 +422,8 @@ server <- function(input, output, session){
   })
   
   output$bedpe_save <- renderUI({
-    lapply(1:length(bedpe.file), function(i) {
+    x <- c(1:length(bedpe.file))
+    lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadBedpe", i), paste0("Download ", config$bedpe.names[i]))
     })
   })
@@ -424,7 +432,8 @@ server <- function(input, output, session){
   
   # Rendering tables dependent on user input.
   observeEvent(length(gwas.file), {
-    lapply(1:length(gwas.file), function(i) {
+    x <- c(1:length(gwas.file))
+    lapply(x[!x == 0], function(i) {
       output[[paste0('gwas', i)]] <- renderTable({
         head(datasetTables()[[3]][[i]], n = 15)
       }, caption = config$gwas.names[i],
@@ -434,7 +443,8 @@ server <- function(input, output, session){
   
   # Rendering UI and outputting tables dependent on user input.
   output$view_gwas <- renderUI({
-    lapply(1:length(gwas.file), function(i) {
+    x <- c(1:length(gwas.file))
+    lapply(x[!x == 0], function(i) {
       uiOutput(paste0('gwas', i))
     })
   })
@@ -442,7 +452,8 @@ server <- function(input, output, session){
   
   # Download GWAS
   observeEvent(length(gwas.file),{
-    lapply(1:length(gwas.file), function(i) {
+    x <- c(1:length(gwas.file))
+    lapply(x[!x == 0], function(i) {
       output[[paste0("downloadgwas", i)]] <- downloadHandler(
         filename = function(){paste0(config$gwas.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".gwas")},
         content = function(file){
@@ -452,7 +463,8 @@ server <- function(input, output, session){
   })
   
   output$gwas_save <- renderUI({
-    lapply(1:length(gwas.file), function(i) {
+    x <- c(1:length(gwas.file))
+    lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadgwas", i), paste0("Download ", config$gwas.names[i]))
     })
   })
@@ -460,7 +472,7 @@ server <- function(input, output, session){
   ######################################################## STATS TAB
   ## For bed files
     output$peak.nr <- renderPlot({
-      if(!is.null(bed.file)){
+      if(!is.null(bed.file) & length(bed.file) > 0){
         basic_statistics_genome_tracks(bed.file = bed.file, 
                                      bed.names = config$bed.names,
                                      chr = reactiveChr(),  
@@ -471,7 +483,7 @@ server <- function(input, output, session){
     })
   ## For bedpe files
     output$arches.nr <- renderPlot({
-      if(!is.null(bedpe.file)){
+      if(!is.null(bedpe.file) & length(bedpe.file) > 0){
        basic_statistics_genome_tracks(bed.file = bedpe.file, 
                                    bed.names = config$bedpe.names,
                                    chr = reactiveChr(),  
@@ -482,7 +494,7 @@ server <- function(input, output, session){
     })
   ## For upset plot
     output$upset <- renderPlot({
-      if(!is.null(bed.file) & !is.null(bedpe.file)){
+      if(!is.null(bed.file) & !is.null(bedpe.file) & length(bed.file) > 0 & length(bedpe.file) > 0){
         peaks_intersection_venn_function(bed.file = bed.file, 
                                        bed.names = config$bed.names, 
                                        bedpe.file = bedpe.file, 
@@ -492,16 +504,17 @@ server <- function(input, output, session){
                                        end = reactiveChrend())
       }
     })
+
   ## For annotation plot
     output$annotation <- renderPlot({
-      if(!is.null(bed.file)){
+      if(!is.null(bed.file) & length(bed.file) > 0){
         peaks.annotation.function(bed.file = bed.file, 
                                        bed.names = config$bed.names)
       }
     })
     ## For Manhattan plot
     output$manhattan <- renderPlot({
-      if(!is.null(gwas.file)){
+      if(!is.null(gwas.file) & length(gwas.file) > 0){
         manhattan.plot.function(gwas.file = gwas.file, 
                               Chr = reactiveChr(), 
                               start = reactiveChrstart(), 
