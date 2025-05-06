@@ -134,7 +134,7 @@ ui <- page_sidebar(
                 # print piechart with peaks annotation
                 fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner()),
                 # print manhattan plot with whole chr and zoom-in
-                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 400) %>% withSpinner()),
+                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 450) %>% withSpinner()),
                   )),
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
@@ -460,46 +460,56 @@ server <- function(input, output, session){
   ######################################################## STATS TAB
   ## For bed files
     output$peak.nr <- renderPlot({
-      basic_statistics_genome_tracks(bed.file = bed.file, 
+      if(!is.null(bed.file)){
+        basic_statistics_genome_tracks(bed.file = bed.file, 
                                      bed.names = config$bed.names,
                                      chr = reactiveChr(),  
                                      start = reactiveChrstart(), 
                                      end = reactiveChrend(),
                                      filetype = "bed")
+      }
     })
   ## For bedpe files
     output$arches.nr <- renderPlot({
-      basic_statistics_genome_tracks(bed.file = bedpe.file, 
+      if(!is.null(bedpe.file)){
+       basic_statistics_genome_tracks(bed.file = bedpe.file, 
                                    bed.names = config$bedpe.names,
                                    chr = reactiveChr(),  
                                    start = reactiveChrstart(), 
                                    end = reactiveChrend(),
                                    filetype = "bedpe")
+      }
     })
   ## For upset plot
     output$upset <- renderPlot({
-      peaks_intersection_venn_function(bed.file = bed.file, 
+      if(!is.null(bed.file) & !is.null(bedpe.file)){
+        peaks_intersection_venn_function(bed.file = bed.file, 
                                        bed.names = config$bed.names, 
                                        bedpe.file = bedpe.file, 
                                        bedpe.names = config$bedpe.names, 
                                        chr = reactiveChr(), 
                                        start = reactiveChrstart(), 
                                        end = reactiveChrend())
+      }
     })
   ## For annotation plot
     output$annotation <- renderPlot({
-      peaks.annotation.function(bed.file = bed.file, 
+      if(!is.null(bed.file)){
+        peaks.annotation.function(bed.file = bed.file, 
                                        bed.names = config$bed.names)
+      }
     })
     ## For Manhattan plot
     output$manhattan <- renderPlot({
-      manhattan.plot.function(gwas.file = gwas.file, 
-                              chr = reactiveChr(), 
+      if(!is.null(gwas.file)){
+        manhattan.plot.function(gwas.file = gwas.file, 
+                              Chr = reactiveChr(), 
                               start = reactiveChrstart(), 
                               end = reactiveChrend(), 
                               sign.p = 5e-6,
                               chr.len.df = chrom.cen.df,
                               gwas.names =config$gwas.names)
+      }
     })
 
   
