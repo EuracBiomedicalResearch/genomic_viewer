@@ -227,10 +227,16 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
 
   peaklist2 <- c(bed.peaks.list.s, bedpe.peaks.list.s)
   names(peaklist2) <-c(bed.names, bedpe.names)
-  ups2 <- overlap_upset_plot(peaklist = peaklist2, verbose = T)
+  peaklist2 <- Filter(function(x) length(x) > 0, peaklist2) # remove empty sublists
+  if (length(peaklist2) > 1){
+    ups2 <- overlap_upset_plot(peaklist = unlist(peaklist2), verbose = T)
+   }
   
-  ggpubr::ggarrange(ups$plot, ups2$plot, ncol = 2, nrow=1, labels = c("total", "selected"))
-  
+  if(length(peaklist) > 1 & length(peaklist2) > 1){
+      ggpubr::ggarrange(ups$plot, ups2$plot, ncol = 2, nrow=1, labels = c("total", "selected"))
+  } else if(length(peaklist) > 1 & length(peaklist2) <=1){
+    ggpubr::ggarrange(ups$plot, ncol = 2, nrow=1, labels = c("total"))
+  }
   # End of function
 }
 
@@ -253,7 +259,7 @@ ggpubr::ggarrange(plotlist = anno.plot.list, nrow = ceiling(length(anno.plot.lis
 
 ########################################## FUNCTION TO GENERATE A MANHATTAN PLOT ON THE SELECTED CHROMOSOME AND ZOOM-IN REGION WITH SNPs NAMES
 
-manhattan.plot.function <- function(gwas.file, chr, start, end, sign.p, chr.len.df, gwas.names){
+manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.df, gwas.names){
   ## required libraries:
   # library(TxDb.Hsapiens.UCSC.hg38.knownGene)
   # library(plotgardener)
@@ -261,7 +267,7 @@ manhattan.plot.function <- function(gwas.file, chr, start, end, sign.p, chr.len.
   # library(dplyr)
   
   ## Specifiy complete chromosome name
-  chr = paste("chr", chr, sep = "")
+  chr = paste("chr", Chr, sep = "")
   ## Retrieve chromosome length for plotting
   chr.len <- chr.len.df$chr.len[chr.len.df$chr == chr]
   ## Define page height
@@ -316,12 +322,14 @@ manhattan.plot.function <- function(gwas.file, chr, start, end, sign.p, chr.len.
       params = params
     )
     ## Annotate signifcant SNPs
+    if(nrow(leadSNP) > 0){
     plotText(label = leadSNP$snp, 
              x = leadSNP$pos*(12/chr.len) + 0.2 , 
              y = y.coord-(-log10(leadSNP$p)*(6/14)), 
              check.overlap = T, 
              params = params,
              rot = 35)
+    }
   
     ## Highlight genomic region on signal plot
     annoHighlight(
@@ -418,12 +426,15 @@ manhattan.plot.function <- function(gwas.file, chr, start, end, sign.p, chr.len.
       label = "zoom"
     )
     ## Annotate significant SNPs
+    if(nrow(leadSNP > 0)){
     plotText(label = leadSNP$snp, 
              x = (leadSNP$pos-start)*(12/(end - (start-1))) + 0.2 , 
              y = y.coord.z-(-log10(leadSNP$p)*(6/14)), 
              check.overlap = T, 
              params = region,
              rot = 35)
+    }
+    
     y.coord.z <- y.coord.z - 6 
     
     ## Plot graph title
@@ -467,9 +478,9 @@ manhattan.plot.function <- function(gwas.file, chr, start, end, sign.p, chr.len.
 
 # TEST FUNCTION
 #manhattan.plot.function(gwas.file = dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext), 
-#                        chr = 11, 
-#                        start = 40000000, 
-#                        end = 50000000, 
-#                        sign.p = 5e-6,
-#                        chr.len.df = chrom.cen.df,
-#                        gwas.names =config$gwas.names)
+ #                       Chr = 20, 
+  #                      start = 45841721, 
+   #                     end = 45857405, 
+    #                    sign.p = 5e-6,
+     #                   chr.len.df = chrom.cen.df,
+      #                  gwas.names =config$gwas.names)
