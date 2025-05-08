@@ -32,7 +32,7 @@ source("basic_statistics_genome_tracks_function.r")
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "Shiny_wzoom_config_hover_prova.yml")
+config <- config::get(file = "Shiny_wzoom_config_hover.yml")
 
 ## Read data
 # Set a BigWig file
@@ -332,15 +332,15 @@ server <- function(input, output, session){
   ########################## CARD DATA
   ######################################################## PLOT TAB
   datasetTables <- reactive({
+
                 data.table <- shiny_read_table_function(bed.file = bed.file,
                                          bedpe.file = bedpe.file,
                                          gwas.file = gwas.file,
                                          chr = reactiveChr(),
                                          start = reactiveChrstart(),
-                                           end = reactiveChrend())
+                                         end = reactiveChrend())
                 
                 data.table
-    
 
   })
   

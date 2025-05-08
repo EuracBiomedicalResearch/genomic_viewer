@@ -23,7 +23,7 @@ default:
   hic.names: ["HiC cortex"]
   # GWAS directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
   gwas.dir: "GWAScatalog_KidneyDisease"
-  gwas.ext: "selectedCol.tsv.gz"
+  gwas.ext: "relocatedCol.tsv.gz"
   gwas.names: ["GWAS chronic kidney disease"]
   # categorical bed file.If empty type " " or [""] in names.
   cat.file: "regulatory_elements_hg38.bed"
