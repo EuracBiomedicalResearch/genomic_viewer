@@ -212,7 +212,7 @@ When the app is opened the main panel will display. The main panel is divided in
 
 - **Expand transcripts**: the lowermost option available from the right navigation panel allows to take action on the genome annotation track relative to the active reference genome. In the default visualization *Gene tracks* are collapsed. By checking the *Expand transcript* box genes annotations relative to the visualize genomic range will be expanded to visualize all the annotated transcripts.
 
-![[expand_transcript.jpg | center]]
+![expand_transript.jpg](Genomic viewer Documentation/expand_transcript.jpg)
 
 
 ## Usage
