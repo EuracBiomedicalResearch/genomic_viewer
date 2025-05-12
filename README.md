@@ -115,14 +115,105 @@ i) a **short version** with just the minimal required columns;
 ii) an **extended version** with the minimal required columns correctly names, plus all the other original fields.
 ### How to provide input datasets
 
-The following section will describe how 
-Configuration file
+The following section will describe how to provide the desired input datasets for being plotted in the **Genomic viewer**.
+#### Configuration file
+To allow users to provide locally saved dataset to the **genomic viewer** without an heavy graphical interface, an **[[R configuration files (YAML)]]** has been set up. The configuration file (*[Shiny_wzoom_config_hover.yml](<file:///C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover/Shiny_wzoom_config_hover.yml>)*) is structured as shown below and allows the user to load any number of datasets for all the accepted data types. Note that when some of the specified entries is absent the corresponding field must be filled with an empty string " " or vector '[""]' as specified in the file comments.
+
+```yml
+---
+
+default:
+
+    # Set here the parameters related to the input files path and extensions
+  # Data directory
+  data.dir: "local/path/to/files/folder/"
+  # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type " " or [""] in names.
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.ext: "treat_pileup.bw"
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
+  # bedpe directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
+  bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2.bedpe"
+  bedpe.names: ["HiC arches"]
+  # bed directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  bed.dir: "GSE212908_ATAC_peaks"
+  bed.ext: "GSE212908_RAM012_013_015_peak_masterlist.bed"
+  bed.names: ["ATAC peaks"]
+  # hic directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  hic.dir: "GSE212910_RAW_HiC"
+  hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM.hic"
+  hic.names: ["HiC cortex"]
+  # GWAS directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  gwas.dir: "GWAScatalog_KidneyDisease"
+  gwas.ext: "relocatedCol.tsv.gz"
+  gwas.names: ["GWAS chronic kidney disease"]
+  # categorical bed file.If empty type " " or [""] in names.
+  cat.file: "regulatory_elements_hg38.bed"
+  cat.names: ["Regulatory Elements"]
+  # file with chromosomes and centromeres coordinates
+  chrom.cen: "chrom_centromeres_hg38.txt"
+  # file with desired genome genes hgnc symbol and coordinates
+  genes.hgnc: "hg38_hgnc_symbol_cleaned.bed"
+```
+
+
 
 ## Output results
 
 
 ## Structure of the Genomic viewer interface
-### Main panel
+
+In the following section the different panels of **Genomic viewer** tool are described. 
+
+### Main panel overview
+When the app is opened the main panel will display. The main panel is divided into **three navigation bars**. 
+
+![[main_panel_wSections.jpg]]
+
+
+1. **Left sidebar**: the left sidebar allows the user to set different options for the genomic region to be visualized: 
+
+	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [[#^f30e7c|right navigation bar]], or by zooming-in and out from the [[#^af61fe|central panel]].
+	 ^f6fb72
+	- **Select bigWig plots mode**: when there are bigWig tracks among the data files loaded by the user, one can choose if plotting bigWig signal as *Profile*, *Heatmap* or both *Profile and Heatmap* by choosing the desired option from the drop down menu.
+	
+	![[select_bigwig_mode.jpg | center ]]
+	
+	- **GO button**: allows the user to initialize the plot with the selected options.
+	 ^dbc4a3
+	- **Save button**: the *Save* button allows the user to download the displayed plot relative to the visualized genomic region in pdf format. This is only working for the genomic view plot and not for the plots displayed in the *[[#Visualize basic statistics analysis for the loaded data|Stats tab]]*.
+	
+2. . **Central panel with plots and data**: the central panel is the most important. It allows the user to navigate across three different tabs: **Plot**, **Data** and **Stats**. ^af61fe
+
+	![[navigation_tabs 5.jpg]]
+	
+	- **[[#Plot]]**: here is where the main output of the app is shown. All the data that were loaded by the user through the *[[#Configuration file]]* are plotted for the selected genomic region and according to the provided options. On the top left of the window, the exact coordinates of the displayed genomic regions are reported, and can be copy-pasted for external usage. The lowermost part of the window shows instead several options to **[[#Zoom-in and out]]**. 
+	 - ![[Plot_tab_wSections.jpg]]
+	 - 
+	- **[[#Visualize raw data for the selected genomic range|Data]]**: 
+	 - 
+	- **[[#Visualize basic statistics analysis for the loaded data|Stats]]**:
+	 - 
+	 - 
+
+3. **Right navigation bar**: this panel provides options for the automatic update of the genomic coordinates to visualize, as well as options to change the visualization mode for *[[#Categorical bed]] files* and the *[[#Required files for genome annotation|Gene annotation track]]*. 
+
+	- **Choose chromosome hover**: the top of the panel displays an overview of all the chromosomes relative to the active reference genome (**[GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)** in the default case). This allows the user to easily select the coordinates of a whole chromosome for visualization of the loaded data tracks. By mouse hovering to single chromosomes in the plot a text is displayed below the graph indicating the corresponding chromosome name. By clicking on the chromosome in the plot the coordinates displayed in the [[#^f6fb72|left sidebar]] will automatically update and the **[[#Plot, Data and Stats tab|Plot tab]]** in the central window will update upon clicking the *[[#^dbc4a3|GO button]]*. ^f30e7c
+	
+![[choose_chromosome_hover.jpg]]
+
+- **Search by gene**: the bottom of the panel displays a search menu in which the user can type gene names. The search box allows for autofill of the typed text with the matching gene names which the used can select from the displaying drop-down menu. By clicking on the corresponding gene name or typing in the complete name the coordinates displayed in the [[#^f6fb72|left sidebar]] will automatically update and the **[[#Plot, Data and Stats tab|Plot tab]]** in the central window will update upon clicking the *[[#^dbc4a3|GO button]]*. 
+
+![[search_by_gene.jpg]]
+
+- **Select categories to expand**: the bottom of the panel displays a selection menu relative to eventual *[[#Categorical bed]]* files loaded by the user. In this field options will be available in the case when categorical bed files are loaded. By selecting one or more of the available file names from this menu, the user will select to expand the view of the categories belonging to the corresponding track in the central plot. Categories expansion can be relevant when genomic ranges annotated to different categories overlap. In this case the can be plotted on different lines and separated through the categories expansion option.
+
+![[expand_categories.jpg | center]]
+
+- **Expand transcripts**: the lowermost option available from the right navigation panel allows to take action on the genome annotation track relative to the active reference genome. In the default visualization *Gene tracks* are collapsed. By checking the *Expand transcript* box genes annotations relative to the visualize genomic range will be expanded to visualize all the annotated transcripts.
+
+![[expand_transcript.jpg | center]]
+
 
 ## Usage
 
@@ -131,5 +222,17 @@ Configuration file
 #### Search by gene
 
 #### Zoom-in and out
+
+### Plot, Data and Stats tab
+#### Plot
+describe the behavior with the different types of tracks, i.e. gene tracks are plotted as density plots when regions larger than 10Mb are displayed to improve computing time and image readability. Binning resolution of matrix data is increased when too large region (how large) are displayed to improve computing speed, avoid too heavy images. On the contrary, when the visualize regions has high zoom which exceeds the minimum resolution of (x kb) the matrix will not be visualized because would have no sense to see just one pixel. For bigwigs and heatmaps the binning is as well increase (how much?) when regions larger than (X) are displayed for speed reasons and image manipulation. 
+
+#### Genomic view plot of the selected genomic range
+
+descrivere anche le opzioni che si hanno per modificare le tracce e.g. bigwig mode, categories expand and expand transcripts.
+
+#### Visualize raw data for the selected genomic range
+
+#### Visualize basic statistics analysis for the loaded data
 
 ### Downloading plots and data
