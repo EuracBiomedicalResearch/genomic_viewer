@@ -24,7 +24,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     
   # Add colors based on bigwig score to be used in the Heatmap version of bigwig tracks
     ## Conditional binsize
-    if ((end - start) <= 10e+05){
+    if ((end - start) < 10e+05){
       binsize = NA
     } else if ((end - start) >= 10e+05 & (end - start) < 5e+06){
       binsize = 5000
@@ -88,7 +88,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
             resolution = 25000 } else if ((end - start) > 10e+05 & (end - start) <= 5e+06){
             resolution = 100000
          } else {
-            resolution = 1000000
+            resolution = 500000
           }
      
       hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
