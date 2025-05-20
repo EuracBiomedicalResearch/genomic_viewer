@@ -3,7 +3,7 @@
 
 ########################################## Barplot of total and selected region peaks number (bed)
 
-basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, start, end, filetype){
+basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End, filetype){
   chrom <- paste0("chr", chr)
 
   # Read bed files and peaks nr
@@ -16,11 +16,11 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, start, end,
     # For bed files or bedpe files
     if(filetype == "bed"){
     colnames(bed.tab)[1:3] <- c("chr", "start", "end")
-    bed.tab.s <- dplyr::filter(bed.tab, chr == chrom & start >= start & end <= end)
+    bed.tab.s <- dplyr::filter(bed.tab, chr == chrom & start >= Start & end <= End)
     label <- "Peaks nr"
     } else if (filetype == "bedpe"){
       colnames(bed.tab)[1:6] <- c("chrA", "startA", "endA", "chrB", "startB", "endB")
-      bed.tab.s <- dplyr::filter(bed.tab, chrA == chrom & startA >= start & endA <= end | chrB == chrom & startB >= start & endB <= end)
+      bed.tab.s <- dplyr::filter(bed.tab, chrA == chrom & startA >= Start & endA <= End | chrB == chrom & startB >= Start & endB <= End)
       label <- "Arches nr"
     }
     bed.tab.list[[i]] <- bed.tab.s
@@ -197,13 +197,13 @@ report_time <- function(t1,
 
 
 ######################  HERE IS INSTEAD DEFINED MY OWN FUNCTION TO APPLY EPICOMPARE ON THE DATA LOADED IN THE APP
-peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, bedpe.names, chr, start, end){
+peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, bedpe.names, chr, Start, End){
   
   # Convert BED AND bedpe to GRanges:
     # BEDPE files are imported as object of class Paires, which is a double GRanges. Therefore to merge it into a single GRanges object a further step is needed with the spiky lib
  
   q=GRanges(seqnames=paste("chr", chr, sep=""),
-            ranges=IRanges(start = start, end = end))
+            ranges=IRanges(start = Start, end = End))
   
   bed.peaks.list <- list()
   bed.peaks.list.s <- list()
@@ -258,7 +258,7 @@ ggpubr::ggarrange(plotlist = anno.plot.list, nrow = ceiling(length(anno.plot.lis
 
 ########################################## FUNCTION TO GENERATE A MANHATTAN PLOT ON THE SELECTED CHROMOSOME AND ZOOM-IN REGION WITH SNPs NAMES
 
-manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.df, gwas.names){
+manhattan.plot.function <- function(gwas.file, Chr, Start, End, sign.p, chr.len.df, gwas.names){
   ## required libraries:
   # library(TxDb.Hsapiens.UCSC.hg38.knownGene)
   # library(plotgardener)
@@ -282,7 +282,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   
   ## Define plotting parameter for zoom-in region
   region <- pgParams(
-    chrom = chr, chromstart = start, chromend = end,
+    chrom = chr, chromstart = Start, chromend = End,
     assembly = "hg38",
     x = 0, just = c("left", "bottom"),
     width = 12, length = 12, height = 6, default.units = "cm"
@@ -395,8 +395,8 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     chrom = chr,
     plot = mp,
     prams = params,
-    chromstart = start,
-    chromend = end,
+    chromstart = Start,
+    chromend = End,
     y0 = 6, y1 = 5.5,
     x1 = c(0, 12),
     default.units = "cm"
@@ -427,7 +427,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     ## Annotate significant SNPs
     if(nrow(leadSNP > 0)){
     plotText(label = leadSNP$snp, 
-             x = (leadSNP$pos-start)*(12/(end - (start-1))) + 0.2 , 
+             x = (leadSNP$pos-Start)*(12/(End - (Start-1))) + 0.2 , 
              y = y.coord.z-(-log10(leadSNP$p)*(6/14)), 
              check.overlap = T, 
              params = region,
@@ -478,8 +478,111 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
 # TEST FUNCTION
 #manhattan.plot.function(gwas.file = dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext), 
  #                       Chr = 20, 
-  #                      start = 45841721, 
-   #                     end = 45857405, 
+  #                      Start = 45841721, 
+   #                     End = 45857405, 
     #                    sign.p = 5e-6,
      #                   chr.len.df = chrom.cen.df,
       #                  gwas.names =config$gwas.names)
+
+
+################### PIECHART OF CATEGORIES FOUND IN CATEGORICAL BED: 
+
+# This function generates a circular packing plot with the categories reported in the categoriacal bed file and their percentage in the whole genome and in the selected range
+
+
+#library(ggraph)
+#library(igraph)
+#library(dplyr)
+#library(ggplot2)
+#library(ggpubr)
+categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
+  
+  ## Specifiy complete chromosome name
+  chrom = paste("chr", chr, sep = "")
+  
+  ## Prepara data for whole genome plotting
+  group <- c()
+  subgroup <- c()
+  group.sel <- c()
+  subgroup.sel <- c()
+  vertices.df <- data.frame()
+  vertices.sel.df <- data.frame()
+  for (i in 1:length(cat.file)){
+    # Read cat file
+    cat.file.r <- read.table(cat.file[i], header = T, sep= "\t")
+    ##### For total genome
+    # crate dataframe with hierarchy: cat.name, categories
+    subgroup <- c(subgroup, unique(cat.file.r$category))
+    group <- c(group, rep(cat.names[i], length(unique(cat.file.r$category))))
+    # create datafrane with vertices names and size
+    vertices.df <- rbind(vertices.df, as.data.frame(table(cat.file.r$category)))
+    # add the leaf vertex with tot size of the group
+    vertices.df <- rbind(vertices.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.r)))
+    # generate column with percentages
+    vertex.perc <- as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))
+    vertices.df$perc <- c(vertex.perc$Freq, 100)
+    
+    #### For selected region
+    # filter the input table based on the selected region
+    cat.file.sel <- dplyr::filter(cat.file.r, chr == chrom & start >= Start & end <= End)
+    # crate dataframe with hierarchy: cat.name, categories
+    subgroup.sel <- c(subgroup.sel, unique(cat.file.sel$category))
+    group.sel <- c(group.sel, rep(cat.names[i], length(unique(cat.file.sel$category))))
+    # create datafrane with vertices names and size
+    vertices.sel.df <- rbind(vertices.sel.df, as.data.frame(table(cat.file.sel$category)))
+    # add the leaf vertex with tot size of the group
+    vertices.sel.df <- rbind(vertices.sel.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.sel)))
+    # generate column with percentages
+    vertex.sel.perc <- as.data.frame(round(prop.table(table(cat.file.sel$category))*100, 0))
+    vertices.sel.df$perc <- c(vertex.sel.perc$Freq, 100)
+  }
+  # change colnames vertices
+  colnames(vertices.df) <- c("names", "size", "perc")
+  colnames(vertices.sel.df) <- c("names", "size", "perc")
+  # Merge groups and subgroups in a data frame
+  groups.df <- data.frame(group = group,
+                         subgroup = subgroup)
+  groups.sel.df <- data.frame(group = group.sel,
+                          subgroup = subgroup.sel)
+  # Generate a 'graph' object with the igraph library
+  mygraph <- graph_from_data_frame(groups.df, vertices=vertices.df)
+  mygraph.sel <- graph_from_data_frame(groups.sel.df, vertices=vertices.sel.df)
+  # Make the plot
+  p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) + 
+    geom_node_circle(aes(fill = size), color = "white") +
+    geom_node_text(aes(label=paste(name, "\n", perc, "%", sep=""), filter = leaf), size = 5, repel = TRUE, color = "black", fontface = "bold") +
+    theme_void() + 
+    theme(legend.position = "none",
+          plot.title = element_text(size = 16, face = "bold")) +
+    scale_fill_distiller(palette =  "Blues", direction = 1) +
+    ggtitle(label = "Total genome")
+  #print(p1)
+  if (nrow(groups.sel.df) > 0){
+  p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) + 
+    geom_node_circle(aes(fill = size), color = "white") +
+    geom_node_text(aes(label=paste(name, "\n", perc, "%", sep=""), filter = leaf), size = 5, repel = TRUE, color = "gold", fontface = "bold") +
+    theme_void() + 
+    theme(legend.position = "none",
+          plot.title = element_text(size = 16, face = "bold")) +
+    scale_fill_distiller(palette =  "PuOr", direction = 1) +
+    ggtitle(label = "Selected region")
+  #print(p2)
+  
+  p <- ggpubr::ggarrange(p1, p2, nrow = 1, ncol = 2)
+  print(p)
+  } else {
+    p <- ggpubr::ggarrange(p1, nrow = 1, ncol = 2)
+    print(p)
+  }
+}
+
+
+
+## TEST function
+#categorical.pie.function(cat.file = dir(full.names = TRUE, pattern = config$cat.file),
+#                         cat.names = config$cat.names,
+#                         chr = 21,
+ #                        Start = 1,
+  #                       End = 1000)
+
+

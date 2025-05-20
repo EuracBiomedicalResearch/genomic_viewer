@@ -19,6 +19,8 @@ library(spiky)
 library(ComplexUpset)
 library(dplyr)
 library(ggpubr)
+library(ggraph)
+library(igraph)
 # for chromosomes plot
 library(ggchicklet)
 
@@ -120,6 +122,9 @@ ui <- page_sidebar(
                       # print table preview and download button: bedpe
                       uiOutput("view_bedpe") %>% withSpinner(type = 3, color.background = "white"),
                       uiOutput("bedpe_save"),
+                      # print table preview and download button: categorical bed
+                      uiOutput("view_cat") %>% withSpinner(type = 3, color.background = "white"),
+                      uiOutput("cat_save"),
                       # print table preview and download button: gwas
                       uiOutput("view_gwas") %>% withSpinner(type = 3, color.background = "white"),
                       uiOutput("gwas_save")
@@ -133,6 +138,8 @@ ui <- page_sidebar(
                 fluidRow(plotOutput("upset", height = 300) %>% withSpinner()),
                 # print piechart with peaks annotation
                 fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner()),
+                # print circular hierarchy plot for categories
+                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 250, width = 450) %>% withSpinner()),
                 # print manhattan plot with whole chr and zoom-in
                 fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 450) %>% withSpinner()),
                   )),
@@ -335,10 +342,11 @@ server <- function(input, output, session){
 
                 data.table <- shiny_read_table_function(bed.file = bed.file,
                                          bedpe.file = bedpe.file,
+                                         cat.file = cat.file,
                                          gwas.file = gwas.file,
                                          chr = reactiveChr(),
-                                         start = reactiveChrstart(),
-                                         end = reactiveChrend())
+                                         Start = reactiveChrstart(),
+                                         End = reactiveChrend())
                 
                 data.table
 
@@ -428,6 +436,49 @@ server <- function(input, output, session){
     })
   })
   
+  
+  ###### Categorical bed file table view
+  
+  # Rendering tables dependent on user input.
+  observeEvent(length(cat.file), {
+    x <- c(1:length(cat.file))
+    lapply(x[!x == 0], function(i) {
+      output[[paste0('cat', i)]] <- renderTable({
+        head(datasetTables()[[3]][[i]], n = 15)
+      }, caption = config$cat.names[i],
+      caption.placement = getOption("xtable.caption.placement", "top"))
+    })
+  })
+  
+  # Rendering UI and outputtign tables dependent on user input.
+  output$view_cat <- renderUI({
+    x <- c(1:length(cat.file))
+    lapply(x[!x == 0], function(i) {
+      uiOutput(paste0('cat', i))
+    })
+  })
+  
+  
+  # Download peaks
+  observeEvent(length(cat.file),{
+    x <- c(1:length(cat.file))
+    lapply(x[!x == 0], function(i) {
+      output[[paste0("downloadcat", i)]] <- downloadHandler(
+        filename = function(){paste0(config$cat.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".cat")},
+        content = function(file){
+          write.table(datasetTables()[[3]][[i]], file, row.names = F, quote = F, sep = "\t")
+        })
+    })
+  })
+  
+  output$cat_save <- renderUI({
+    x <- c(1:length(cat.file))
+    lapply(x[!x == 0], function(i) {
+      downloadButton(paste0("downloadCat", i), paste0("Download ", config$cat.names[i]))
+    })
+  })
+  
+  
   ###### GWAS file table view
   
   # Rendering tables dependent on user input.
@@ -435,7 +486,7 @@ server <- function(input, output, session){
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('gwas', i)]] <- renderTable({
-        head(datasetTables()[[3]][[i]], n = 15)
+        head(datasetTables()[[4]][[i]], n = 15)
       }, caption = config$gwas.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -457,7 +508,7 @@ server <- function(input, output, session){
       output[[paste0("downloadgwas", i)]] <- downloadHandler(
         filename = function(){paste0(config$gwas.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".gwas")},
         content = function(file){
-          write.table(datasetTables()[[3]][[i]], file, row.names = F, quote = F, sep = "\t")
+          write.table(datasetTables()[[4]][[i]], file, row.names = F, quote = F, sep = "\t")
         })
     })
   })
@@ -476,8 +527,8 @@ server <- function(input, output, session){
         basic_statistics_genome_tracks(bed.file = bed.file, 
                                      bed.names = config$bed.names,
                                      chr = reactiveChr(),  
-                                     start = reactiveChrstart(), 
-                                     end = reactiveChrend(),
+                                     Start = reactiveChrstart(), 
+                                     End = reactiveChrend(),
                                      filetype = "bed")
       }
     })
@@ -487,8 +538,8 @@ server <- function(input, output, session){
        basic_statistics_genome_tracks(bed.file = bedpe.file, 
                                    bed.names = config$bedpe.names,
                                    chr = reactiveChr(),  
-                                   start = reactiveChrstart(), 
-                                   end = reactiveChrend(),
+                                   Start = reactiveChrstart(), 
+                                   End = reactiveChrend(),
                                    filetype = "bedpe")
       }
     })
@@ -500,8 +551,8 @@ server <- function(input, output, session){
                                        bedpe.file = bedpe.file, 
                                        bedpe.names = config$bedpe.names, 
                                        chr = reactiveChr(), 
-                                       start = reactiveChrstart(), 
-                                       end = reactiveChrend())
+                                       Start = reactiveChrstart(), 
+                                       End = reactiveChrend())
       }
     })
 
@@ -512,13 +563,23 @@ server <- function(input, output, session){
                                        bed.names = config$bed.names)
       }
     })
+    ## For categories hierarchy plot
+    output$categories.pie <- renderPlot({
+      if(!is.null(cat.file) & length(cat.file) > 0){
+        categorical.pie.function(cat.file = cat.file, 
+                                 cat.names = config$cat.names,
+                                 chr = reactiveChr(),
+                                 Start = reactiveChrstart(),
+                                 End = reactiveChrend())
+      }
+    })
     ## For Manhattan plot
     output$manhattan <- renderPlot({
       if(!is.null(gwas.file) & length(gwas.file) > 0){
         manhattan.plot.function(gwas.file = gwas.file, 
                               Chr = reactiveChr(), 
-                              start = reactiveChrstart(), 
-                              end = reactiveChrend(), 
+                              Start = reactiveChrstart(), 
+                              End = reactiveChrend(), 
                               sign.p = 5e-6,
                               chr.len.df = chrom.cen.df,
                               gwas.names =config$gwas.names)
