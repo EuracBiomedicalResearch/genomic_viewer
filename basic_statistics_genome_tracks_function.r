@@ -34,7 +34,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
   # Generate plot of total peaks nr
   plot.bed.tot <- ggplot(peaks.nr.df, aes(x = names, y = peaks.nr)) +
     geom_bar(stat="identity", fill=paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[1:length(bed.names)])+
-    ggtitle(paste(label, " ",chrom, ":", start, "-", end, sep="")) +
+    ggtitle(paste(label, " ",chrom, ":", Start, "-", End, sep="")) +
     ylab(label) +
     xlab("") +
     theme_minimal() +
@@ -258,7 +258,7 @@ ggpubr::ggarrange(plotlist = anno.plot.list, nrow = ceiling(length(anno.plot.lis
 
 ########################################## FUNCTION TO GENERATE A MANHATTAN PLOT ON THE SELECTED CHROMOSOME AND ZOOM-IN REGION WITH SNPs NAMES
 
-manhattan.plot.function <- function(gwas.file, Chr, Start, End, sign.p, chr.len.df, gwas.names){
+manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.df, gwas.names){
   ## required libraries:
   # library(TxDb.Hsapiens.UCSC.hg38.knownGene)
   # library(plotgardener)
@@ -282,7 +282,7 @@ manhattan.plot.function <- function(gwas.file, Chr, Start, End, sign.p, chr.len.
   
   ## Define plotting parameter for zoom-in region
   region <- pgParams(
-    chrom = chr, chromstart = Start, chromend = End,
+    chrom = chr, chromstart = start, chromend = end,
     assembly = "hg38",
     x = 0, just = c("left", "bottom"),
     width = 12, length = 12, height = 6, default.units = "cm"
@@ -395,8 +395,8 @@ manhattan.plot.function <- function(gwas.file, Chr, Start, End, sign.p, chr.len.
     chrom = chr,
     plot = mp,
     prams = params,
-    chromstart = Start,
-    chromend = End,
+    chromstart = start,
+    chromend = end,
     y0 = 6, y1 = 5.5,
     x1 = c(0, 12),
     default.units = "cm"
@@ -427,7 +427,7 @@ manhattan.plot.function <- function(gwas.file, Chr, Start, End, sign.p, chr.len.
     ## Annotate significant SNPs
     if(nrow(leadSNP > 0)){
     plotText(label = leadSNP$snp, 
-             x = (leadSNP$pos-Start)*(12/(End - (Start-1))) + 0.2 , 
+             x = (leadSNP$pos-start)*(12/(end - (start-1))) + 0.2 , 
              y = y.coord.z-(-log10(leadSNP$p)*(6/14)), 
              check.overlap = T, 
              params = region,

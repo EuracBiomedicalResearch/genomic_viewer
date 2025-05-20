@@ -578,8 +578,8 @@ server <- function(input, output, session){
       if(!is.null(gwas.file) & length(gwas.file) > 0){
         manhattan.plot.function(gwas.file = gwas.file, 
                               Chr = reactiveChr(), 
-                              Start = reactiveChrstart(), 
-                              End = reactiveChrend(), 
+                              start = reactiveChrstart(), 
+                              end = reactiveChrend(), 
                               sign.p = 5e-6,
                               chr.len.df = chrom.cen.df,
                               gwas.names =config$gwas.names)
