@@ -217,26 +217,26 @@ When the app is opened the main panel will display. The main panel is divided in
 		
 		- A *Manhattan plot* for the user selected genomic range with its position in the corresponding chromosome and the *Manhattan plot* of the entire chromosome. This will help to understand how ***significant SNPs*** are distributed in the chromosome and if the selected genomic region is an hotspot. When a whole chromosome is selected by the user, the zoom-in panel will not be displayed. ***ID of the SNPs*** that are above the significance threshold will be displayed in a smart way that avoids label overlap. The complete table with SNPs ID and the relative information for the user selected genomic range can be downloaded form the [[#^7c20c9|Data tab]]. 
 	 ![stats_tab_1.jpg | center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/stats_tab_1.jpg)
-	   ![[stats_tab_2.jpg]]
+	   ![stats_tab_2.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/stats_tab_2.jpg)
 	   ^18d054
 
 3. **Right navigation bar**: this panel provides options for the automatic update of the genomic coordinates to visualize, as well as options to change the visualization mode for *[[#Categorical bed]] files* and the *[[#Required files for genome annotation|Gene annotation track]]*.  ^d610b2
 
 	- **Choose chromosome hover**: the top of the panel displays an overview of all the chromosomes relative to the active reference genome (**[GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)** in the default case). This allows the user to easily select the coordinates of a whole chromosome for visualization of the loaded data tracks. By mouse hovering to single chromosomes in the plot a text is displayed below the graph indicating the corresponding chromosome name. By clicking on the chromosome in the plot the coordinates displayed in the [[#^f6fb72|left sidebar]] will automatically update and the **[[#Plot, Data and Stats tab|Plot tab]]** in the central window will update upon clicking the *[[#^dbc4a3|GO button]]*. ^f30e7c
 	
-![[choose_chromosome_hover.jpg]]
+![choose_chromosome_hover.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/choose_chromosome_hover.jpg)
 
 - **Search by gene**: the bottom of the panel displays a search menu in which the user can type gene names. The search box allows for autofill of the typed text with the matching gene names which the used can select from the displaying drop-down menu. By clicking on the corresponding gene name or typing in the complete name the coordinates displayed in the [[#^f6fb72|left sidebar]] will automatically update and the **[[#Plot, Data and Stats tab|Plot tab]]** in the central window will update upon clicking the *[[#^dbc4a3|GO button]]*. 
 
-![[search_by_gene.jpg]]
+![search_by_gene.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/search_by_gene.jpg)
 
 - **Select categories to expand**: the bottom of the panel displays a selection menu relative to eventual *[[#Categorical bed]]* files loaded by the user. In this field options will be available in the case when categorical bed files are loaded. By selecting one or more of the available file names from this menu, the user will select to expand the view of the categories belonging to the corresponding track in the central plot. Categories expansion can be relevant when genomic ranges annotated to different categories overlap. In this case the can be plotted on different lines and separated through the categories expansion option. ^d7d54e
 
-![[expand_categories.jpg | center]]
+![expand_categories.jpg | center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/expand_categories.jpg)
 
 - **Expand transcripts**: the lowermost option available from the right navigation panel allows to take action on the genome annotation track relative to the active reference genome. In the default visualization *Gene tracks* are collapsed. By checking the *Expand transcript* box genes annotations relative to the visualize genomic range will be expanded to visualize all the annotated transcripts. ^75d596
 
-![[expand_transcript.jpg | center]]
+![expand_transcript.jpg | center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/expand_transcript.jpg)
 
 ## Usage
 
@@ -253,7 +253,7 @@ Once the [[#Configuration file]] is ready the app can be started. It will automa
 
 The most basic way to insert specific coordinates to be visualized is by manually typing in the *chromosome name*, *start* and *end* coordinate. This is feasible form the [[#^57c39c|left sidebar]]. The [[#Plot, Data and Stats tab]] will update with the new coordinates only upon clicking on the *[[#^dbc4a3|GO button]]*. Note that in the *Choose chromosome* field just the number or letter corresponding to the intended chromosome must be typed without being preceded by the *'chr'* string (e.g. *1* and not *chr1* or *X* and not *chrX*).
 
-![[manual_entering_coord.jpg]]
+![manual_entering_coord.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/manual_entering_coord.jpg)
 #### Chromosome hover
 
 In case the user wants to visualize an entire chromosome the [[#^d610b2|right navigation bar]] reports an interactive plot from which the user can mouse hover and click on the desired chromosome. The coordinates displayed in the [[#^57c39c|left sidebar]] will update according to the start and end coordinate of the selected chromosome. The [[#Plot, Data and Stats tab]] will be updated only upon clicking the *[[#^dbc4a3|GO button]]*. 
@@ -265,7 +265,7 @@ In case the user wants to visualize a specific gene, it can be queried by mean o
 
 Another way to select a specific genomic window to be visualized is by starting from a position and next gradually **[[#^af61fe|zooming-in and out]]** to adjust the focus on specific features of interest. This is feasible from the bottom part of the central **Plot** panel. 
 
-![[zoom_bar_wSections.jpg|center]]
+![zoom_bar_wSections.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/zoom_bar_wSections.jpg)
 
 The **zoom bar** offers different modes for zooming-in and out as illustrated in the figure above:
 - **Static plot zoom**: The '+', '-' and 'RESET' buttons in the bottom right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. The resolution of the plot will not change by zooming-in since it is a **vectorial image**. The 'RESET' button allows to restore the initial plot size. note that this type of zoom is just for dynamic visualization within the app and will not be applied on the **[[#Downloading plots and data|saved plot]]**.
@@ -291,7 +291,7 @@ File of the *.hic* format are used to plot [[#HiC and 3D contact matrices]]. The
 
 The image below shows some examples of HiC heatmaps plotted at different resolutions based on the genomic range.
 
-![[3D_matrix_resolutions.jpg|center]]
+![3D_matrix_resolutions.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/3D_matrix_resolutions.jpg)
 
 ##### bigWig profile and heatmap tracks
 
@@ -305,7 +305,7 @@ Like the [[#3D contacts Heatmap Matrix]] plots, also the *bigwig* files normally
 
 The image below shows some examples of *profile* plots and *heatmaps* from the same input *bigwig* file, plotted at different resolutions based on the genomic range.
 
-![[bigwig_binning.jpg|center]]
+![bigwig_binning.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/bigwig_binning.jpg)
 
 When multiple *bigwig* files are loaded and must be compared, it is good practice to uniform the y-scale for all samples. In the **Genomic viewer** the y-scale for bigwigs is automatically auto-scaled based on the maximal *y* value of the most intense sample, every time the selected genomic range is updated. When multiple *bigwig* files are loaded a different color is automatically applied to every sample, when plotted in the *profile mode*
 ##### Peaks bed file tracks
@@ -313,44 +313,44 @@ When multiple *bigwig* files are loaded and must be compared, it is good practic
 [[#Peaks bed|Peak]] files are normally stored in the *.bed* format. These files are plotted as ranges by exploiting the corresponding built-in function from **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html)**. When multiple *peaks .bed* files are loaded by the user a different color is automatically applied to every sample. There is no customization option for this type of track and no binning is normally necessary.
 An example of how peak file track appears in the **Genomic viewer** is reported in the figure below:
 
-![[peak_bed_track.jpg|center]]
+![peak_bed_track.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/peak_bed_track.jpg)
 ##### Categorical bed file tracks
 
 In addition to *peaks ranges* *.bed* files can also be used to mark genomic regions that belong to specific categories, which can be annotated with some external tool or database, or defined by he user. The **Genomic viewer** allows to load [[#Categorical bed|categorical .bed]] files and plot them by exploiting the same built-in function from **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html)** that is used for standard [[#Peaks bed]]. 
 In **Genomic viewer**, every category that is found in the [[#Categorical bed]] file is associated to a different color and represented in a legend beside that corresponding track in the plot. Since it can happen that the genomic ranges belonging to different categories overlap, or that a same genomic range belongs to two categories, **Genomic viewer** has the possibility to **[[#^d7d54e|expand or collapse]]** the categories.
 An example of *collapsed* and *expanded* categorical bed tracks is reported in the figure below:
 
-![[collapsed_expanded_categories.jpg|center]]
+![collapsed_expanded_categories.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/collapsed_expanded_categories.jpg)
 ##### 3D contact arches 
 
 In addition to contact matrices and heatmap, 3D contacts can also be represented as ***arches*** connecting the 2D genomic positions that are touching. This type of representation is stored in [[#3D contacts arches bedpe|bedpe files]] and is plotted in **Genomic viewer** through a dedicated **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotPairsArches.html)** built-in function. Some [[#3D contacts arches bedpe|bedpe files]] also have a *score* column containing a value that is proportional to the *strength/likelihood* of the contact. In this latter case the corresponding arch thickness will be proportional to the contact score.
 There is no customization option for this type of track and no binning is normally necessary.
 An example of how *3D contact arches bedpe* file track appears in the **Genomic viewer** is reported in the figure below:
 
-![[3D_contact_arches.jpg|center]]
+![3D_contact_arches.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/3D_contact_arches.jpg)
 ##### GWAS Manhattan track
 
 **[[#GWAS summary statistics]]** files can be exploited to generate **[[#^18d054|Manhattan plots]]** for the identification of trait-associated SNPs. Once the **[[#GWAS summary statistics]]** file has been correctly arranges by the user, the **[[#^18d054|Manhattan plots]]** are generated in the **Genomic viewer** through the dedicated **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotManhattan.html)** built-in function. In this plot every SNP is represented by a dot, which color is representative of the p-value of its association with specific traits, depending on the dataset. A **color-scale legend** is reported beside to the track plot and a dashed line indicate the *significance threshold*.
 There is no customization option for this type of track and no binning is normally necessary, however an overview of the visualized chromosome with a zoom-in on the selcted region and most significant SNPs label are reported in the [[#^95ac88|Stats tab]]. 
 An example of how  **[[#^18d054|Manhattan plots]]** track appears in the **Genomic viewer** is reported in the figure below:
 
-![[Manhattan_plot_track.jpg|center]]
+![Manhattan_plot_track.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/Manhattan_plot_track.jpg)
 ##### Genes annotation track
 
 The lowermost part of the main plot output consists of different layers of genes annotations. By default the genes annotation is plotted for the [GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/) reference genome exploiting built-in **plotgardener** functions allowing:
 
 1. The representation of **[genes and genes structures](https://phanstiellab.github.io/plotgardener/reference/plotGenes.html)** (promoters, introns, exons) in the user-selected genomic range. By default **plotgardener** plots in two different lines and colors genes that are encoded on the positive and negative strand. Through the [[#^d610b2|right navigation bar]], the user can optionally decide to [[#^75d596|expand transcripts]], which means that instead of visualizing the largest form of each ***gene*** in the displayed genomic range (default option), the separate ***transcript isoforms*** are plotted. The two options are represented in the image below:
-   ![[genes_and_transcripts.jpg]]
+   ![genes_and_transcripts.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/genes_and_transcripts.jpg)
    
    Another relevant feature of the **genes annotation track** is that when the genomic range selected for visualization is too wide (> 10 Mbp), individual genes are not plotted but are substituted by a **density plot** of genes density. This solution allows to obtain faster computation of the genes track and provides a more relevant biological information, since at that resolutions individual genes could not be distinguished. Below is an example of how **genes density plot** appear at large genomic ranges visualization:
-      ![[gene_density.jpg|center]]
+      ![gene_density.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/gene_density.jpg)
     The ***gene density*** visualization mode does not allow the user to apply the *[[#^75d596|Expand transcript]]* option.
  ^27ee20
 2. A **[Genome label](https://phanstiellab.github.io/plotgardener/reference/annoGenomeLabel.html)** track is always reported below of the [[#^27ee20|genes and genes structure]] track. This is a light representation of the genomic coordinates in *bp* and the *chromosome name* corresponding to the visualized region. An example of it is indicated in the [[#^27ee20|image]] above. 
    
 3. A **[Chromosome ideogram](https://phanstiellab.github.io/plotgardener/reference/plotIdeogram.html)** of the chromosome corresponding to the selected genomic region is always plotted below of all the other genomic annotation tracks. A *red highlight* indicates the position of the plotted genomic range in the chromosome, and two dashed lines connect the highlight to the below [[#^f0c38b|zooming bar]]. An example of this visualization is shown in the image below: 
    
-   ![[chromosome_ideogram.jpg| center]]
+   ![chromosome_ideogram.jpg| center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/chromosome_ideogram.jpg)
    
 #### Visualize raw data for the selected genomic range
 
