@@ -31,8 +31,8 @@ A .txt or .tsv file that contains the information about **chromosome name**, **c
 The original file with such information can be retrieved from UCSC portal. For example the file for  **[GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)** can be downloaded here:   https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/. This file contains several bins for centromeres that can be merged to obtain the file table using the script *[hg38_centromeres.rmd](<C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover/hg38_centromeres.rmd>)*
 
 This file is used in the app to store chromosomes coordinates which are needed to: 
-i) **limit the zoom area** based on the selected chromosome length ([Zoom-in and out](#Zoom-in and out));
-ii) plotting whole chromosome regions selected by the user from the **Choose chromosome** right panel ([Chromosome hover](#Chromosome hover)).
+i) **limit the zoom area** based on the selected chromosome length ([Zoom-in and out](#Zoom-in-and-out));
+ii) plotting whole chromosome regions selected by the user from the **Choose chromosome** right panel ([Chromosome hover](#Chromosome-hover)).
 
 ```
 chr	cen.start	cen.end	chr.len	order
