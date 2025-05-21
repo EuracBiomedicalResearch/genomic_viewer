@@ -168,7 +168,7 @@ In the following section the different panels of **Genomic viewer** tool are des
 ### Main panel overview
 When the app is opened the main panel will display. The main panel is divided into **three navigation bars**. 
 
-![[main_panel_wSections.jpg]]
+![main_panel_wSections.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/main_panel_wSections.jpg)
 
 
 1. **Left sidebar**: the left sidebar allows the user to set different options for the genomic region to be visualized: 
