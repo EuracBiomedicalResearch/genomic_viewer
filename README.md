@@ -183,7 +183,7 @@ When the app is opened the main panel will display. The main panel is divided in
 
 1. **Left sidebar**: the left sidebar allows the user to set different options for the genomic region to be visualized: 
 
-	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [right navigation bar](#f30e7c) or by zooming-in and out from the [central panel](#^af61fe).
+	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [right navigation bar](rightnav) or by zooming-in and out from the [central panel](#^af61fe).
 	 ^f6fb72
 	   
 	- **Select bigWig plots mode**: when there are bigWig tracks among the data files loaded by the user, one can choose if plotting bigWig signal as *Profile*, *Heatmap* or both *Profile and Heatmap* by choosing the desired option from the drop down menu. ^ab5d51
@@ -220,9 +220,9 @@ When the app is opened the main panel will display. The main panel is divided in
 	   ![stats_tab_2.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/stats_tab_2.jpg)
 	   ^18d054
 
-3. **Right navigation bar**: this panel provides options for the automatic update of the genomic coordinates to visualize, as well as options to change the visualization mode for *[Categorical bed](#Categorical-bed) files* and the *[gene annotation track](#Required-files-for-genome-annotation)*.  ^d610b2
+3. **Right navigation bar**: this panel provides options for the automatic update of the genomic coordinates to visualize, as well as options to change the visualization mode for *[Categorical bed](#Categorical-bed) files* and the *[gene annotation track](#Required-files-for-genome-annotation)*.  <a name="rightnav"></a>
 
-	- **Choose chromosome hover**: the top of the panel displays an overview of all the chromosomes relative to the active reference genome (**[GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)** in the default case). This allows the user to easily select the coordinates of a whole chromosome for visualization of the loaded data tracks. By mouse hovering to single chromosomes in the plot a text is displayed below the graph indicating the corresponding chromosome name. By clicking on the chromosome in the plot the coordinates displayed in the [left sidebar](#^f6fb72) will automatically update and the **[Plot tab](#Plot,-Data-and-Stats-tab)** in the central window will update upon clicking the *[GO button](#^dbc4a3)*. ^f30e7c
+	- **Choose chromosome hover**: the top of the panel displays an overview of all the chromosomes relative to the active reference genome (**[GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)** in the default case). This allows the user to easily select the coordinates of a whole chromosome for visualization of the loaded data tracks. By mouse hovering to single chromosomes in the plot a text is displayed below the graph indicating the corresponding chromosome name. By clicking on the chromosome in the plot the coordinates displayed in the [left sidebar](#^f6fb72) will automatically update and the **[Plot tab](#Plot,-Data-and-Stats-tab)** in the central window will update upon clicking the *[GO button](#^dbc4a3)*. ^7c
 	
 ![choose_chromosome_hover.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/choose_chromosome_hover.jpg)
 
