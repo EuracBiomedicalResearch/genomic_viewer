@@ -183,7 +183,7 @@ When the app is opened the main panel will display. The main panel is divided in
 
 1. **Left sidebar**: the left sidebar allows the user to set different options for the genomic region to be visualized: 
 
-	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [right navigation bar](#^f30e7c) or by zooming-in and out from the [central panel](#^af61fe).
+	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [right navigation bar](#f30e7c) or by zooming-in and out from the [central panel](#^af61fe).
 	 ^f6fb72
 	   
 	- **Select bigWig plots mode**: when there are bigWig tracks among the data files loaded by the user, one can choose if plotting bigWig signal as *Profile*, *Heatmap* or both *Profile and Heatmap* by choosing the desired option from the drop down menu. ^ab5d51
