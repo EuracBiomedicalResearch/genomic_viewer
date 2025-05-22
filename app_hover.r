@@ -338,6 +338,7 @@ server <- function(input, output, session){
   
   ########################## CARD DATA
   ######################################################## PLOT TAB
+
   datasetTables <- reactive({
 
                 data.table <- shiny_read_table_function(bed.file = bed.file,
@@ -348,8 +349,7 @@ server <- function(input, output, session){
                                          Start = reactiveChrstart(),
                                          End = reactiveChrend())
                 
-                data.table
-
+                data.table 
   })
   
   ######################################################## DATA TAB
@@ -459,11 +459,11 @@ server <- function(input, output, session){
   })
   
   
-  # Download peaks
+  # Download categorical peaks
   observeEvent(length(cat.file),{
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
-      output[[paste0("downloadcat", i)]] <- downloadHandler(
+      output[[paste0("downloadCat", i)]] <- downloadHandler(
         filename = function(){paste0(config$cat.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".cat")},
         content = function(file){
           write.table(datasetTables()[[3]][[i]], file, row.names = F, quote = F, sep = "\t")
