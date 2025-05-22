@@ -125,8 +125,6 @@ ii) an **extended version** with the minimal required columns correctly names, p
 The following section will describe how to provide the desired input datasets for being plotted in the **Genomic viewer**.
 #### Configuration file
 
-^3ad3f3
-
 To allow users to provide locally saved dataset to the **genomic viewer** without an heavy graphical interface, an **[R configuration files (YAML)](#Configuration-file)** has been set up. The configuration file (*[Shiny_wzoom_config_hover.yml](<file:///C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover/Shiny_wzoom_config_hover.yml>)*) is structured as shown below and allows the user to load any number of datasets for all the accepted data types. Note that when some of the specified entries is absent the corresponding field must be filled with an empty string " " or vector '[""]' as specified in the file comments.
 
 ```yml
@@ -174,8 +172,6 @@ In the following section the different panels of **Genomic viewer** tool are des
 
 ### Main panel overview
 
-^372e22
-
 When the app is opened the main panel will display. The main panel is divided into **three navigation bars**. 
 
 ![main_panel_wSections.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/main_panel_wSections.jpg)
@@ -183,7 +179,7 @@ When the app is opened the main panel will display. The main panel is divided in
 
 1. **Left sidebar**: the left sidebar allows the user to set different options for the genomic region to be visualized: 
 
-	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [right navigation bar](rightnav) or by zooming-in and out from the [central panel](#^af61fe).
+	- **Choosing the genomic range:** The used can select the *chromosome name* (accepted names for hg38 are 1-22, X, Y), *start coordinate* and *end coordinate*. These values can be selected in different way: by directly typing in the corresponding field, by selecting a whole chromosome or a specific gene from the [right navigation bar](rightnav) or by zooming-in and out from the [central panel](#zoom-in-and-out).
 	 ^f6fb72
 	   
 	- **Select bigWig plots mode**: when there are bigWig tracks among the data files loaded by the user, one can choose if plotting bigWig signal as *Profile*, *Heatmap* or both *Profile and Heatmap* by choosing the desired option from the drop down menu. ^ab5d51
@@ -354,12 +350,12 @@ The lowermost part of the main plot output consists of different layers of genes
    
 #### Visualize raw data for the selected genomic range
 
-The **[[#^198cc7|Data]]** tab in the [[#^372e22|main central panel]] provides an overview (first 15 lines) of the tables containing the raw data of the tracks that are used to generate the [[#^6fb625|genomic tracks plot]]. 
+The **[[#^198cc7|Data]]** tab in the [main central panel](#main-panel-overview) provides an overview (first 15 lines) of the tables containing the raw data of the tracks that are used to generate the [[#^6fb625|genomic tracks plot]]. 
 A preview of the tables can be visualized for: [[#Peaks bed]], [[#3D contacts arches bedpe]]; [[#Categorical bed]] and [[#GWAS summary statistics]]. 
 All the subset tables relative to the visualized genomic region can be downloaded from this tab, as described in the section: *[[#Download of raw data of the plotted genomic range]]*.
 #### Visualize basic statistics analysis for the loaded data
 
-The **[[#^95ac88|Stats]]** tab in the [[#^372e22|main central panel]] provides some basic analysis of the datasets loaded by the user.  The different plots that are generated in this tab are described in more details in the **[[#^95ac88|Stats]]** section. In brief, here are shown: 
+The **[[#^95ac88|Stats]]** tab in the [main central panel](#main-panel-overview) provides some basic analysis of the datasets loaded by the user.  The different plots that are generated in this tab are described in more details in the **[[#^95ac88|Stats]]** section. In brief, here are shown: 
 
 - A **barplots** for peaks (bed files) and arches (bedpe files) number in total and in the user-selected genomic region; 
 
@@ -379,10 +375,10 @@ In the following section are described the possibilities for downloading plots a
 The **[[#Genomic view plot of the selected genomic range]]** is the main output of **Genomic viewer** interface and can be easily downloaded from the *[[#^f312a6|Save button]]* in the [[#^57c39c|left sidebar]]. By clicking the button, the user can choose the destination folder and the name of the file. The plot is automatically saved in the **vectorial pdf** format. Any [[#^1ac939|static zoom]] that is applied to the graph through the interface is just for dynamic visualization and will not be applied to the saved plot.  
 #### Download of raw data of the plotted genomic range
 
-In the **[[#^198cc7|Data]]** tab in the [[#^372e22|main central panel]] is visualized a preview of the raw datasets that are used to generate the **genomic view plot**, subset to the user-selected genomic range. The subset data tables can be downloaded as tab separated files with the same extension as the originally loaded files though a specific **Download button** followed by the names of the dataset as provided by the user in the [[#Configuration file]]. By clicking on the **Download button** the user can choose the destination folder and the name of the file. By default the files will be named with the name of the corresponding input data file as provided by the user in the [[#Configuration file]]
+In the **[[#^198cc7|Data]]** tab in the [main central panel](#main-panel-overview) is visualized a preview of the raw datasets that are used to generate the **genomic view plot**, subset to the user-selected genomic range. The subset data tables can be downloaded as tab separated files with the same extension as the originally loaded files though a specific **Download button** followed by the names of the dataset as provided by the user in the [[#Configuration file]]. By clicking on the **Download button** the user can choose the destination folder and the name of the file. By default the files will be named with the name of the corresponding input data file as provided by the user in the [[#Configuration file]]
 #### Saving basic statistics plots
 
-The plots displaying basic analysis of the data that are shown in the **[[#^95ac88|Stats]]** tab in the [[#^372e22|main central panel]] are thought to provide to the user a quick overview of some easy information of the loaded data. They are not meant for direct external use, therefore they can not be directly downloaded through a dedicated button to save them as **vectorial** or **high quality** images. However the user can easily copy-and-paste the graphs images for external use.
+The plots displaying basic analysis of the data that are shown in the **[[#^95ac88|Stats]]** tab in the [main central panel](#main-panel-overview) are thought to provide to the user a quick overview of some easy information of the loaded data. They are not meant for direct external use, therefore they can not be directly downloaded through a dedicated button to save them as **vectorial** or **high quality** images. However the user can easily copy-and-paste the graphs images for external use.
 ### R session info
 
 Below is a **Session information** summary of ***R version*** and the used ***packages*** employed by **Genomic viewer**.
