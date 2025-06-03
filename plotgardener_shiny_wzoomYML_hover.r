@@ -62,13 +62,13 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
                          score=score.new)
          bw.list[[i]] <- bw.new
          print("Assigning colors to bins")
-          hm.colors[[i]] <- mapColors(vector = score.new, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+          hm.colors[[i]] <- mapColors(vector = score.new, palette = colorRampPalette(c("#2D3164", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
         }
        } else {
          hm.colors <- list()
            for (i in 1:length(bw.file)){
              bwScore <- c(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
-              hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3184", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
+              hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3164", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
          }
        }
       print("Binning colour assigned")
@@ -124,8 +124,11 @@ params <- pgParams(
 
 
 ## Create a plotgardener page
-    pageCreate(
-    width = 16, height = length(bw.names)+length(bed.names)+length(bedpe.names)+(length(hic.names)*4)+length(cat.names)+length(gwas.file)*3+5, default.units = "cm",
+  page.height <- 20 
+  conv <- page.height/((2*length(bw.file))+length(bed.file)+length(bedpe.file)+(length(hic.file)*4)+length(cat.file)+length(gwas.file)*3+10)
+   
+  pageCreate(
+    width = 16, height = page.height, default.units = "cm",
     showGuides = F, xgrid = 0, ygrid = 0
 )
 
@@ -135,7 +138,7 @@ params <- pgParams(
                params = params,
                fill = "#7ecdbb",
                linecolor = NA,
-               y = y.coord, height = 0.1)
+               y = y.coord*conv, height = 0.1*conv)
     
 #####------------------------------------------------ HiC Matrix
     ## Plot Hi-C data in region
@@ -149,12 +152,12 @@ params <- pgParams(
           
           ## Add text labels
           plotText(
-            label = hic.names[i], fonsize = 10, fontcolor = "black",
+            label = hic.names[i], fontsize = 10*(conv+0.2)*conv, fontcolor = "black",
             x = -0.5, y = "-1b", just = c("right", "bottom"),
             params = params)
           
           ## Increment y coord
-          y.coord <- y.coord+3.2
+          y.coord <- y.coord+(3.2*conv)
         }
       }
     }
@@ -174,56 +177,55 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
        data = bw.file[i],
        binSize = binsize,
        binCap = F,
-      linecolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
-      fill = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+      linecolor = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
+      fill = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
        params = params,
-       y = "1.5b", 
-       height = 1.5)
+       y = paste(1.5*conv, "b", sep=""), 
+       height = 1.5*conv)
    
      ## Add text labels
      plotText(
-      label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
-      x = -0.5, y = "-1b", just = c("right", "bottom"),
+      label = bw.names[i], fontsize = 10*(conv+0.2), fontcolor = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
+      x = -0.5, y = paste(-0.5*conv, "b", sep=""), just = c("right", "bottom"),
        params = params)
      
      ## Increment y coord
-     y.coord <- y.coord+1.5
+     y.coord <- y.coord+(1.5*conv)
   }
  }
 
 ## Plot bigwig as heatmap
   if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
    for (i in 1:length(bw.file)){
-    # bed signal
      # bed signal
      if(!is.na(binsize)){
        hm.plot <- plotRanges(
          data = bw.list[[i]],
          collapse = T,
          fill = hm.colors[[i]],
-         y = "0.5b", height = 0.5,
+         y = paste(0.75*conv, "b", sep=""), height = conv*0.75,
          params = params)} else {
            hm.plot <- plotRanges(
              data = bw.file[i],
              collapse = T,
              fill = hm.colors[[i]],
-             y = "0.5b", height = 0.5,
+             y = paste(0.75*conv, "b", sep=""), height = conv*0.75,
              params = params)}
     
     ## Add text labels
       plotText(
-       label = bw.names[i], fonsize = 10, fontcolor = paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[i],
+       label = bw.names[i], fontsize = 10*(conv+0.2), fontcolor = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
         x = -0.5, y = "0b", just = c("right", "bottom"),
         params = params)
       
       ## Increment y coord
-      y.coord <- y.coord+0.5
+      y.coord <- y.coord+(0.75*conv)
    }
     ## Add heatmap legend just once
     annoHeatmapLegend(
       plot = hm.plot, fontcolor = "black",
-      x = 6.5, y = "-0.9b", just = c("left", "top"),
-      width = 0.10, height = 0.5, fontsize = 10
+      x = 6.5, y = "-0.5b", just = c("left", "top"),
+      width = 0.10, height = 0.5, fontsize = 10*(conv+0.2)
     )
   }
 }
@@ -236,18 +238,18 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   plotRanges(
     data = bed.file[i],
    collapse = T,
-   fill = as.character(paletteer_d("ggthemes::excel_Ion_Boardroom")[i]),
-   y = "0.5b", height = 0.5,
+   fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]),
+   y = paste(0.5*conv, "b", sep=""), height = 0.5*conv,
    params = params)
    
    ## Add text labels
   plotText(
-    label = bed.names[i], fonsize = 10, fontcolor = paletteer_d("ggthemes::excel_Ion_Boardroom")[i],
+    label = bed.names[i], fontsize = 10*(conv+0.2), fontcolor = rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i],
     x = -0.5, y = "0b", just = c("right", "bottom"),
     params = params)
 
   ## Increment y coord
-  y.coord <- y.coord+0.5
+  y.coord <- y.coord+(0.5*conv)
       }
     }
   
@@ -260,31 +262,32 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
         plotRanges(
          data = cat.file[i],
          collapse = cat.collapse[i],
-          fill = colorby("category", palette =  colorRampPalette(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
-          y = "0.5b", height = 0.5,
+          fill = colorby("category", palette =  colorRampPalette(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
+          y = paste(0.5*conv, "b", sep=""), height = 0.5*conv,
           params = params)
       
         ## Add text labels
         plotText(
-         label = cat.names[i], fonsize = 10, fontcolor = "black",
+         label = cat.names[i], fontsize = 10*(conv+0.2), fontcolor = "black",
          x = -0.5, y = "0b", just = c("right", "bottom"),
          params = params)
       
         ## Increment y coord
-        y.coord <- y.coord+0.5
+        y.coord <- y.coord+(0.5*conv)
     
     
      plotLegend(
        legend = c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)),
-       fill = as.character(paletteer_d("ggthemes::Nuriel_Stone")[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
+       fill = as.character(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
         border = FALSE,
-       x = 6.25, y = "1b", width = 1.5, height = 0.7,
-       just = c("left", "bottom"),
-        default.units = "inches"
+       x = 16.25, y = "-0.5b", width = 1.5, height = 0.3*length(c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)))*(conv+0.2),
+       just = c("left", "top"),
+        default.units = "cm",
+       fontsize = 10*(conv+0.2)
       )
     
       ## Increment y coord
-      y.coord <- y.coord+1
+      y.coord <- y.coord+(1*conv)
        }
     }
 
@@ -299,13 +302,13 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     params = params
   )
   plotText(
-    label = bedpe.names, fonsize = 10, fontcolor = "black",
-    x = -0.5, y = "-0.5b", just = c("right", "bottom"),
+    label = bedpe.names, fontsize = 10*(conv+0.2), fontcolor = "black",
+    x = -0.5, y = paste(-0.5*conv, "b", sep=""), just = c("right", "top"),
     params = params
   )
   
   ## Increment y coord
-  y.coord <- y.coord+1
+  y.coord <- y.coord+(1*conv)
      }
   }
     
@@ -321,29 +324,28 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
                   sigLine = TRUE, col = "grey",
                   lty = 2, range = c(0, 10),
                   y = "0b",
-                  height = 1.5,
+                  height = 1.5*conv,
                   just = c("left", "top")
                   )
       ## Annotate y-axis
       annoYaxis(
         plot = man.plot,
-        at = c(seq(0, 10, by = 10)),
-        axisLine = F, fontsize = 8
+        axisLine = F, fontsize = 8*(conv+0.2)
       )
       ## Plot y-axis label
       plotText(
-        label = "-log10(p)", x = -1, y = "0b", rot = 90,
-        fontsize = 9, fontface = "bold", just = c("left, top"),
+        label = "-log10(p)", x = -1, y = "-0b", rot = 90,
+        fontsize = 9*(conv+0.2), fontface = "bold", just = c("left, bottom"),
         params = params
       )
       ## Add text labels
       plotText(
-        label = gwas.names[i], fonsize = 8, fontface = "bold", fontcolor = "black",
+        label = gwas.names[i], fontsize = 8*(conv+0.2), fontface = "bold", fontcolor = "black",
         x = -1.25, y = "0b", just = c("right", "center"),
         params = params
         )
       ## Increment y coord
-      y.coord <- y.coord+1.25
+      y.coord <- y.coord+(1.5*conv)
       
     }
     
@@ -351,7 +353,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     annoHeatmapLegend(
       plot = man.plot, fontcolor = "black",
       x = 6.5, y = "-0.9b", just = c("left", "top"),
-      width = 0.10, height = 0.5, fontsize = 10, digits = 1, scientific = T
+      width = 0.10, height = 0.5, fontsize = 10*(conv+0.2), digits = 1, scientific = T
     )
     }
 
@@ -362,25 +364,25 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     ## Plot gene track
      if(!expand.transcripts == TRUE){
         plotGenes(
-          y = "1.75b", height = 1.25,
+          y = paste(2*conv, "b", sep=""), height = 3*conv,
           params = params
         )
        plotText(
-          label = "Gene", fonsize = 10, fontcolor = "black",
+          label = "Gene", fontsize = 10*(conv+0.2), fontcolor = "black",
           x = -0.5, y = "0b", just = c("right", "bottom"),
           params = params
         )
-        y.coord = y.coord + 1.75} else { 
+        y.coord = y.coord + (2*conv)} else { 
          plotTranscripts(
-            y = "5b", height = 5,
+            y = paste(5*conv, "b", sep=""), height = 5*conv,
            params = params, labels = "gene"
          )
           plotText(
-           label = "Transcripts", fonsize = 10, fontcolor = "black",
+           label = "Transcripts", fontsize = 10*(conv+0.2), fontcolor = "black",
            x = -0.5, y = "0b", just = c("right", "bottom"),
             params = params
           )
-          y.coord = y.coord + 5
+          y.coord = y.coord + (5*conv)
         }
       } else {
         gene.density.plot <- ggplot(filter(genes.hgnc, chromosome_name == chr), aes(x = start_position)) +
@@ -394,15 +396,15 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
                )
         
         plotGG(gene.density.plot,
-               x = -0.7, y = "1.75b", height = 1.25, width = 17.4,
+               x = -0.7, y = paste(1.75*conv, "b", sep=""), height = 1.25*conv, width = 17.4,
                params = params
                )
         plotText(
-          label = "Gene density", fonsize = 10, fontcolor = "black",
+          label = "Gene density", fontsize = 10*(conv+0.2), fontcolor = "black",
           x = -0.5, y = "0b", just = c("right", "bottom"),
           params = params
         )
-        y.coord = y.coord + 1.75
+        y.coord = y.coord + (1.75*conv)
       }
 
 
@@ -410,7 +412,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 ## Plot genome label
   plotGenomeLabel(
      params = params,
-       y = "1b", scale = "Mb"
+       y = paste(2*conv, "b", sep=""), scale = "Mb"
   )
 
 
@@ -420,17 +422,17 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 ## Plot and place ideogram
 ideogramPlot <- plotIdeogram(
   chrom = paste("chr", chr, sep=""), assembly = "hg38",
-  x = 0.75, y = "1.5b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.7,
+  x = 0.75, y = "1b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.7,
   just = c("left", "top"),
   default.units = "cm"
 )
 ## Increment y coord
-y.coord <- y.coord+1+1.5+0.5
+y.coord <- y.coord+1+0.7+2+((2+1.8+0.5)*conv)
 
 ## Plot chromosome name
 plotText(
   label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
-  x = 4.5, y = "0.5b", just = "right")
+  x = 4.5, y = paste(0.5*conv, "b", sep=""), just = "right")
 
 ## Add highlight region
 region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
@@ -442,14 +444,32 @@ annoHighlight(
 ## Add zoom-in lines
 annoZoomLines(
   plot = ideogramPlot, params = region,
-  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+1, default.units = "cm"
+  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+(1*conv), default.units = "cm"
 )
 
 }
 
 
-#plotgardener.shiny.function(bw.file = bw.file, hic.file = hic.file, bedpe.file = bedpe.file, chr = chr, start = chrstart, end = chrend)
+#plotgardener.shiny.function(bw.file = bw.file, 
+#                            hic.file = hic.file, 
+#                            bed.file = bed.file, 
+#                            bedpe.file = bedpe.file,
+#                            bw.names = config$bw.names,
+#                            hic.names = config$hic.names,
+#                            bed.names = config$bed.names,
+#                            bedpe.names = config$bedpe.names,
+#                            gwas.file = gwas.file,
+#                            gwas.names = config$gwas.names,
+#                            cat.file = cat.file,
+#                            cat.names = config$cat.names,
+#                            cat.collapse = T,
+#                            chr = chr,
+#                            start = start, 
+#                            end = end,
+#                            bw.mode = "Profile",
+#                            expand.transcripts = F,
+ #                           genes.hgnc = genes.hgnc)
 
 #chr <- "1"
-#start <- 28000000
-#end <- 30300000
+#chrstart <- 28000000
+#chrend <- 30300000

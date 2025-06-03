@@ -7,6 +7,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   chrom <- paste0("chr", chr)
   
   # Read bed files
+  print("Reading bed tables")
   bed.tab.list <- list()
   if(length(bed.file) > 0){
     for (i in 1:length(bed.file)){
@@ -19,6 +20,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
     }
   
   # Read bedpe files
+  print("Reading bedpe tables")
   bedpe.tab.list <- list()
   if(length(bedpe.file) > 0){
     for (i in 1:length(bedpe.file)){
@@ -31,6 +33,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   }
   
   # Read categorical bed files
+  print("Reading categorical bed tables")
   cat.tab.list <- list()
   if(length(cat.file) > 0){
     for (i in 1:length(cat.file)){
@@ -44,6 +47,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   
   
   # Read gwas files
+  print("reading GWAS tables")
   gwas.tab.list <- list()
   if(length(gwas.file) > 0){
    for (i in 1:length(gwas.file)){

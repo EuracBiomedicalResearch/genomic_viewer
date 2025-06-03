@@ -26,7 +26,7 @@ library(ggchicklet)
 
 
 # Source script
-#setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps")
+#setwd("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover")
 source("plotgardener_shiny_wzoomYML_hover.r")
 source("shiny_read_table_function.r")
 source("basic_statistics_genome_tracks_function.r")
@@ -34,25 +34,26 @@ source("basic_statistics_genome_tracks_function.r")
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "Shiny_wzoom_config_hover.yml")
+#config <- config::get(file = "Shiny_wzoom_config_hover.yml")
+config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
 
 ## Read data
 # Set a BigWig file
-bw.file <- dir(paste(config$data.dir, config$bw.dir, sep=""), full.names = TRUE, pattern = config$bw.ext)
+bw.file <- dir(paste(config$data.dir, config$bw.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bw.ext)
 # Set a bed file
-bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), full.names = TRUE, pattern = config$bedpe.ext)
+bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bedpe.ext)
 # Set a bedpe file
-bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), full.names = TRUE, pattern = config$bed.ext)
+bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bed.ext)
 # Set hiC data file
-hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), full.names = TRUE, pattern = config$hic.ext)
+hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.ext)
 # Set GWAS data file
-gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext)
+gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.ext)
 ### For chromosomes plotting
 chrom.cen.df <- read.table(config$chrom.cen, header = T, sep="\t")
 # Genes hgnc symbol
 genes.hgnc <- read.table(config$genes.hgnc, header = T, sep = "\t")
 # Categorical bed file
-cat.file <- dir(full.names = TRUE, pattern = config$cat.file)
+cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
 
 ## Set options for bw file plotting mode:
 bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
@@ -100,8 +101,8 @@ ui <- page_sidebar(
             title = "Selected genomic region",
             header = h6(textOutput("sel.coord"), style = "font-size:14px; padding:0px 0px;"), 
               # Panel with plot ----------------------------------------------------------------------------------
-              nav_panel("Plot", class = "gap-2 p-3 border-0 align-items-top",
-                        svgPanZoomOutput(outputId = "res") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
+              nav_panel("Plot", class = "gap-2 p-0 border-0 align-items-top",
+                        svgPanZoomOutput(outputId = "res", width = "auto", height = "900px") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
                         verbatimTextOutput("click_info"),
                         fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
@@ -134,14 +135,24 @@ ui <- page_sidebar(
                 # print plots of peaks numbers
                 fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200) %>% withSpinner()),
                 column(width = 6, plotOutput("arches.nr", height = 200) %>% withSpinner())),
+                # GO button
+                actionButton("run.stat1", "Run", width = "25%"),
                 # print upset plot for peaks intersections
                 fluidRow(plotOutput("upset", height = 300) %>% withSpinner()),
+                # GO button
+                actionButton("run.stat2", "Run", width = "25%"),
                 # print piechart with peaks annotation
                 fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner()),
+                # GO button
+                actionButton("run.stat3", "Run", width = "25%"),
                 # print circular hierarchy plot for categories
                 fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 250, width = 450) %>% withSpinner()),
+                # GO button
+                actionButton("run.stat4", "Run", width = "25%"),
                 # print manhattan plot with whole chr and zoom-in
                 fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 450) %>% withSpinner()),
+                # GO button
+                actionButton("run.stat5", "Run", width = "25%")
                   )),
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
@@ -220,7 +231,7 @@ server <- function(input, output, session){
   
   output$res <- renderSvgPanZoom({
     svgPanZoom(svglite:::inlineSVG(tracks()), 
-               panEnabled = F, width = "auto", height = "auto", controlIconsEnabled = T) 
+               panEnabled = T, controlIconsEnabled = T, viewBox = T, width = "auto", height = "900px") #width = "auto", height = "auto",
   })
 
   ##-------------------- Output zooming region plot:
@@ -521,70 +532,108 @@ server <- function(input, output, session){
   })
   
   ######################################################## STATS TAB
+  vals <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
   ## For bed files
+  observeEvent(input$run.stat1, {
+    vals$bed.file <- bed.file
+    vals$bedpe.file <- bedpe.file
+    vals$chr <-  input$chr
+    vals$start <- input$chrstart
+    vals$end <- input$chrend
+  })
+  
     output$peak.nr <- renderPlot({
-      if(!is.null(bed.file) & length(bed.file) > 0){
+            if(!is.null(vals$bed.file) & length(vals$bed.file) > 0){
         basic_statistics_genome_tracks(bed.file = bed.file, 
                                      bed.names = config$bed.names,
-                                     chr = reactiveChr(),  
-                                     Start = reactiveChrstart(), 
-                                     End = reactiveChrend(),
+                                     chr = vals$chr,  
+                                     Start = vals$start, 
+                                     End = vals$end,
                                      filetype = "bed")
       }
     })
+  
+
   ## For bedpe files
     output$arches.nr <- renderPlot({
-      if(!is.null(bedpe.file) & length(bedpe.file) > 0){
+      if(!is.null(vals$bedpe.file) & length(vals$bedpe.file) > 0){
        basic_statistics_genome_tracks(bed.file = bedpe.file, 
                                    bed.names = config$bedpe.names,
-                                   chr = reactiveChr(),  
-                                   Start = reactiveChrstart(), 
-                                   End = reactiveChrend(),
+                                   chr = vals$chr,  
+                                   Start = vals$start, 
+                                   End = vals$end,
                                    filetype = "bedpe")
       }
     })
   ## For upset plot
+    vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    observeEvent(input$run.stat2, {
+      vals2$bed.file <- bed.file
+      vals2$bedpe.file <- bedpe.file
+      vals2$chr <-  input$chr
+      vals2$start <- input$chrstart
+      vals2$end <- input$chrend
+    })
     output$upset <- renderPlot({
-      if(!is.null(bed.file) & !is.null(bedpe.file) & length(bed.file) > 0 & length(bedpe.file) > 0){
+      if(!is.null(vals2$bed.file) & !is.null(vals2$bedpe.file) & length(vals2$bed.file) > 0 & length(vals2$bedpe.file) > 0 | 
+         !is.null(vals2$bed.file) & length(vals2$bed.file) > 1 | !is.null(vals2$bedpe.file) & length(vals2$bedpe.file) > 1){
         peaks_intersection_venn_function(bed.file = bed.file, 
-                                       bed.names = config$bed.names, 
+                                      bed.names = config$bed.names, 
                                        bedpe.file = bedpe.file, 
                                        bedpe.names = config$bedpe.names, 
-                                       chr = reactiveChr(), 
-                                       Start = reactiveChrstart(), 
-                                       End = reactiveChrend())
+                                       chr = vals2$chr, 
+                                       Start = vals2$start, 
+                                       End = vals2$end)
       }
     })
 
   ## For annotation plot
+    vals3 <- reactiveValues(bed.file=NULL)
+    observeEvent(input$run.stat3, {
+      vals3$bed.file <- bed.file
+    })
     output$annotation <- renderPlot({
-      if(!is.null(bed.file) & length(bed.file) > 0){
+      if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
         peaks.annotation.function(bed.file = bed.file, 
                                        bed.names = config$bed.names)
       }
     })
     ## For categories hierarchy plot
+    vals4 <- reactiveValues(cat.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    observeEvent(input$run.stat4, {
+      vals4$cat.file <- cat.file
+      vals4$chr <-  input$chr
+      vals4$start <- input$chrstart
+      vals4$end <- input$chrend
+    })
     output$categories.pie <- renderPlot({
-      if(!is.null(cat.file) & length(cat.file) > 0){
+      if(!is.null(vals4$cat.file) & length(vals4$cat.file) > 0){
         categorical.pie.function(cat.file = cat.file, 
                                  cat.names = config$cat.names,
-                                 chr = reactiveChr(),
-                                 Start = reactiveChrstart(),
-                                 End = reactiveChrend())
+                                 chr = vals4$chr,
+                                 Start = vals4$start,
+                                 End = vals4$end)
       }
     })
     ## For Manhattan plot
+    vals5 <- reactiveValues(gwas.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    observeEvent(input$run.stat5, {
+      vals5$gwas.file <- gwas.file
+      vals5$chr <-  input$chr
+      vals5$start <- input$chrstart
+      vals5$end <- input$chrend
+    })
     output$manhattan <- renderPlot({
-      if(!is.null(gwas.file) & length(gwas.file) > 0){
+      if(!is.null(vals5$gwas.file) & length(vals5$gwas.file) > 0){
         manhattan.plot.function(gwas.file = gwas.file, 
-                              Chr = reactiveChr(), 
-                              start = reactiveChrstart(), 
-                              end = reactiveChrend(), 
+                              Chr = vals5$chr, 
+                              start = vals5$start, 
+                              end = vals5$end, 
                               sign.p = 5e-6,
                               chr.len.df = chrom.cen.df,
                               gwas.names =config$gwas.names)
-      }
-    })
+        }
+      })
 
   
   

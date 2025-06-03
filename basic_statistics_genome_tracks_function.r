@@ -5,7 +5,7 @@
 
 basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End, filetype){
   chrom <- paste0("chr", chr)
-
+  print("Calculating peaks nr")
   # Read bed files and peaks nr
   bed.tab.list <- list() ## Capire se serve davvero storare questa info o se posso evitare
   peaks.nr <- c() # For total nr of peaks
@@ -33,7 +33,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
                             names = bed.names)
   # Generate plot of total peaks nr
   plot.bed.tot <- ggplot(peaks.nr.df, aes(x = names, y = peaks.nr)) +
-    geom_bar(stat="identity", fill=paletteer_d("colorBlindness::Blue2DarkOrange12Steps")[1:length(bed.names)])+
+    geom_bar(stat="identity", fill="#009999") +
     ggtitle(paste(label, " ",chrom, ":", Start, "-", End, sep="")) +
     ylab(label) +
     xlab("") +
@@ -198,33 +198,45 @@ report_time <- function(t1,
 
 ######################  HERE IS INSTEAD DEFINED MY OWN FUNCTION TO APPLY EPICOMPARE ON THE DATA LOADED IN THE APP
 peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, bedpe.names, chr, Start, End){
-  
+  print("Calculating peaks overlaps upset")
   # Convert BED AND bedpe to GRanges:
     # BEDPE files are imported as object of class Paires, which is a double GRanges. Therefore to merge it into a single GRanges object a further step is needed with the spiky lib
  
   q=GRanges(seqnames=paste("chr", chr, sep=""),
             ranges=IRanges(start = Start, end = End))
   
-  bed.peaks.list <- list()
-  bed.peaks.list.s <- list()
-  for (i in 1:length(bed.file)){
-    bed.peaks.list[[i]] <- import(bed.file[i], format = "BED", genome = "hg38")
-    bed.peaks.list.s[[i]] <- subsetByOverlaps(bed.peaks.list[[i]], q)
+  if (!is.null(bed.file) & length(bed.file) > 0){
+   bed.peaks.list <- list()
+   bed.peaks.list.s <- list()
+    for (i in 1:length(bed.file)){
+      bed.peaks.list[[i]] <- import(bed.file[i], format = "BED", genome = "hg38")
+      bed.peaks.list.s[[i]] <- subsetByOverlaps(bed.peaks.list[[i]], q)
+      }
+  } else {
+    bed.peaks.list <- list()
+    bed.peaks.list.s <- list()
+    bed.names <- NULL
   }
   
-  bedpe.peaks.list <- list()
-  bedpe.peaks.list.s <- list()
-  for (i in 1:length(bedpe.file)){
-    bedpe.peaks.list[[i]] <- spiky::convertPairedGRtoGR(import(bedpe.file[i], format = "bedpe", genome = "hg38"))
-    bedpe.peaks.list.s[[i]] <- subsetByOverlaps(bedpe.peaks.list[[i]], q)
-  }
+  if (!is.null(bedpe.file) & length(bedpe.file) > 0){
+    bedpe.peaks.list <- list()
+    bedpe.peaks.list.s <- list()
+      for (i in 1:length(bedpe.file)){
+        bedpe.peaks.list[[i]] <- spiky::convertPairedGRtoGR(import(bedpe.file[i], format = "bedpe", genome = "hg38"))
+        bedpe.peaks.list.s[[i]] <- subsetByOverlaps(bedpe.peaks.list[[i]], q)
+      }
+  } else {
+    bedpe.peaks.list <- list()
+    bedpe.peaks.list.s <- list()
+    bedpe.names <- NULL
+    }
   
   peaklist <-  c(bed.peaks.list, bedpe.peaks.list)
-  names(peaklist) <-c(bed.names, bedpe.names)
+  names(peaklist) <- names <- c(bed.names, bedpe.names)
   ups <- overlap_upset_plot(peaklist = peaklist, verbose = T)
 
 
-  peaklist2 <- c(bed.peaks.list.s, bedpe.peaks.list.s)
+  peaklist2 <- c(unlist(bed.peaks.list.s), bedpe.peaks.list.s)
   names(peaklist2) <-c(bed.names, bedpe.names)
   peaklist2 <- Filter(function(x) length(x) > 0, peaklist2) # remove empty sublists
   if (length(peaklist2) > 1){
@@ -243,6 +255,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
 
 # Plot peaks distribution over different feature levels
 peaks.annotation.function <- function(bed.file, bed.names){
+  print("Calculating peaks annotation")
   ## Start of function
 anno.plot.list <- list()
 for (i in 1:length(bed.file)){
@@ -264,7 +277,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   # library(plotgardener)
   # library(paletteer)
   # library(dplyr)
-  
+  print("Calculating manhattan plot")
   ## Specifiy complete chromosome name
   chr = paste("chr", Chr, sep = "")
   ## Retrieve chromosome length for plotting
@@ -496,7 +509,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
 #library(ggplot2)
 #library(ggpubr)
 categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
-  
+  print("Calculating categorical pie")
   ## Specifiy complete chromosome name
   chrom = paste("chr", chr, sep = "")
   
