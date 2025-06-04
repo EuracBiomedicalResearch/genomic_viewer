@@ -124,8 +124,9 @@ params <- pgParams(
 
 
 ## Create a plotgardener page
-  page.height <- 20 
-  conv <- page.height/((2*length(bw.file))+length(bed.file)+length(bedpe.file)+(length(hic.file)*4)+length(cat.file)+length(gwas.file)*3+10)
+  page.height <- 20.1 
+  conv <- (page.height-6)/((2*length(bw.file))+(0.75*length(bed.file))+(0.75*length(bedpe.file))+(length(hic.file)*3)+(0.75*length(cat.file))+(length(gwas.file)*2))
+  if ( conv > 1){conv <-  1 } # to avoid plotting data too big
    
   pageCreate(
     width = 16, height = page.height, default.units = "cm",
@@ -138,7 +139,9 @@ params <- pgParams(
                params = params,
                fill = "#7ecdbb",
                linecolor = NA,
-               y = y.coord*conv, height = 0.1*conv)
+               y = y.coord, height = 0.1)
+    y.coord <- y.coord + 0.1
+    print(y.coord)
     
 #####------------------------------------------------ HiC Matrix
     ## Plot Hi-C data in region
@@ -148,12 +151,12 @@ params <- pgParams(
           plotHicTriangle(
             data = hicDataChromRegion[[i]],
             params = params,
-            y = 3.2,  height = 3)
+            y = 3.2*conv,  height = 3*conv)
           
           ## Add text labels
           plotText(
             label = hic.names[i], fontsize = 10*(conv+0.2)*conv, fontcolor = "black",
-            x = -0.5, y = "-1b", just = c("right", "bottom"),
+            x = -0.5, y = paste(-1*conv,"b", sep=""), just = c("right", "bottom"),
             params = params)
           
           ## Increment y coord
@@ -161,6 +164,7 @@ params <- pgParams(
         }
       }
     }
+    print(y.coord)
 
 #####------------------------------------------------ BIGWIGS
 
@@ -229,6 +233,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     )
   }
 }
+    print(y.coord)
 
 #####------------------------------------------------ BED
 ## Plot bed files
@@ -239,7 +244,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     data = bed.file[i],
    collapse = T,
    fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]),
-   y = paste(0.5*conv, "b", sep=""), height = 0.5*conv,
+   y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,
    params = params)
    
    ## Add text labels
@@ -249,10 +254,10 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     params = params)
 
   ## Increment y coord
-  y.coord <- y.coord+(0.5*conv)
+  y.coord <- y.coord+(0.75*conv)
       }
     }
-  
+    print(y.coord)
     
 #####------------------------------------------------ CATEGORICAL BED  
   ## Plot categorical bed files
@@ -263,7 +268,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
          data = cat.file[i],
          collapse = cat.collapse[i],
           fill = colorby("category", palette =  colorRampPalette(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
-          y = paste(0.5*conv, "b", sep=""), height = 0.5*conv,
+          y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,
           params = params)
       
         ## Add text labels
@@ -273,31 +278,33 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
          params = params)
       
         ## Increment y coord
-        y.coord <- y.coord+(0.5*conv)
-    
+        y.coord <- y.coord+(0.75*conv)
+        
+        ## Calculate legend height
+        cat.h <- (0.3*length(c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)))*(conv+0.2))
+  
     
      plotLegend(
        legend = c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)),
        fill = as.character(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
         border = FALSE,
-       x = 16.25, y = "-0.5b", width = 1.5, height = 0.3*length(c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)))*(conv+0.2),
+       x = 16.45, y = paste(-cat.h, "b", sep = ""), width = 1.5, height = cat.h,
        just = c("left", "top"),
         default.units = "cm",
        fontsize = 10*(conv+0.2)
       )
-    
-      ## Increment y coord
-      y.coord <- y.coord+(1*conv)
        }
     }
+    print(y.coord)
 
 #####------------------------------------------------ HiC LOOPS
 ## Plot loop annotations
   if(length(bedpe.file) > 0){
+    bedpe.h <- 2*conv
  for (i in 1:length(bedpe.file)){
   plotPairsArches(
     data = bedpe.file[i],
-    y = "1b", height = 1,
+    y = paste(bedpe.h, "b", sep=""), height = 2*conv,
     fill = "black", linecolor = "black", flip = TRUE,
     params = params
   )
@@ -308,9 +315,10 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   )
   
   ## Increment y coord
-  y.coord <- y.coord+(1*conv)
+  y.coord <- y.coord+(2*conv)
      }
   }
+    print(y.coord)
     
 #####------------------------------------------------ GWAS Manhattan
 ## Plot Manhattan for GWAS
@@ -322,9 +330,9 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
                   fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
                   trans = "-log10",
                   sigLine = TRUE, col = "grey",
-                  lty = 2, range = c(0, 10),
+                  lty = 2, range = c(0, 40),
                   y = "0b",
-                  height = 1.5*conv,
+                  height = 2*conv,
                   just = c("left", "top")
                   )
       ## Annotate y-axis
@@ -334,7 +342,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
       )
       ## Plot y-axis label
       plotText(
-        label = "-log10(p)", x = -1, y = "-0b", rot = 90,
+        label = "-log10(p)", x = -1, y = "0b", rot = 90,
         fontsize = 9*(conv+0.2), fontface = "bold", just = c("left, bottom"),
         params = params
       )
@@ -345,7 +353,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
         params = params
         )
       ## Increment y coord
-      y.coord <- y.coord+(1.5*conv)
+      y.coord <- y.coord+(2*conv)
       
     }
     
@@ -356,6 +364,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
       width = 0.10, height = 0.5, fontsize = 10*(conv+0.2), digits = 1, scientific = T
     )
     }
+    print(y.coord)
 
 #####------------------------------------------------ GENE and GENOME TRACKS
 
@@ -364,7 +373,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     ## Plot gene track
      if(!expand.transcripts == TRUE){
         plotGenes(
-          y = paste(2*conv, "b", sep=""), height = 3*conv,
+          y = "1.5b", height = 1.5,
           params = params
         )
        plotText(
@@ -372,9 +381,9 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
           x = -0.5, y = "0b", just = c("right", "bottom"),
           params = params
         )
-        y.coord = y.coord + (2*conv)} else { 
+        y.coord = y.coord + 1.5} else { 
          plotTranscripts(
-            y = paste(5*conv, "b", sep=""), height = 5*conv,
+            y = "3b", height = 3,
            params = params, labels = "gene"
          )
           plotText(
@@ -382,7 +391,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
            x = -0.5, y = "0b", just = c("right", "bottom"),
             params = params
           )
-          y.coord = y.coord + (5*conv)
+          y.coord = y.coord + 3
         }
       } else {
         gene.density.plot <- ggplot(filter(genes.hgnc, chromosome_name == chr), aes(x = start_position)) +
@@ -396,7 +405,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
                )
         
         plotGG(gene.density.plot,
-               x = -0.7, y = paste(1.75*conv, "b", sep=""), height = 1.25*conv, width = 17.4,
+               x = -0.7, y = "1.5b", height = 1.5, width = 17.4,
                params = params
                )
         plotText(
@@ -404,7 +413,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
           x = -0.5, y = "0b", just = c("right", "bottom"),
           params = params
         )
-        y.coord = y.coord + (1.75*conv)
+        y.coord = y.coord + 1.5
       }
 
 
@@ -412,9 +421,12 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 ## Plot genome label
   plotGenomeLabel(
      params = params,
-       y = paste(2*conv, "b", sep=""), scale = "Mb"
+       y = "0.5b", scale = "Mb",
+     fontsize = 11*(conv+0.2)
   )
+  y.coord = y.coord + 1
 
+  print(y.coord)
 
 #####------------------------------------------------ CHROMOSOME IDEOGRAM
 # Plot chromosome ideogram:
@@ -422,29 +434,34 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 ## Plot and place ideogram
 ideogramPlot <- plotIdeogram(
   chrom = paste("chr", chr, sep=""), assembly = "hg38",
-  x = 0.75, y = "1b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.7,
-  just = c("left", "top"),
+  x = 0.75, y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5,
+  just = c("left", "bottom"),
   default.units = "cm"
 )
 ## Increment y coord
-y.coord <- y.coord+1+0.7+2+((2+1.8+0.5)*conv)
+y.coord <- y.coord+0.5
 
 ## Plot chromosome name
-plotText(
-  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
-  x = 4.5, y = paste(0.5*conv, "b", sep=""), just = "right")
+#plotText(
+#  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
+#  x = 4.5, y = "0.5b", just = "right")
+#y.coord <- y.coord+0.5
+# COmmented because redundant with GenomeLabel
 
 ## Add highlight region
 region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
 annoHighlight(
   plot = ideogramPlot, params = region,
   fill = "darkred",
-  y = "-0.8b", height = 0.9, just = c("left", "top"), default.units = "cm"
+  y = "-0.6b", height = 0.7, just = c("left", "top"), default.units = "cm"
 )
+
+print(y.coord)
+
 ## Add zoom-in lines
 annoZoomLines(
   plot = ideogramPlot, params = region,
-  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+(1*conv), default.units = "cm"
+  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+0.75, default.units = "cm"
 )
 
 }

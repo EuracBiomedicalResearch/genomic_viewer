@@ -134,24 +134,24 @@ ui <- page_sidebar(
               nav_panel("Stats", class = "gap-2 p-3 border-0 align-items-top",
                 # print plots of peaks numbers
                 fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200) %>% withSpinner()),
-                column(width = 6, plotOutput("arches.nr", height = 200) %>% withSpinner())),
-                # GO button
+                column(width = 6, plotOutput("arches.nr", height = 200) %>% withSpinner()), verbatimTextOutput('warn.message1')),
+                # GO button peaks nr
                 actionButton("run.stat1", "Run", width = "25%"),
                 # print upset plot for peaks intersections
-                fluidRow(plotOutput("upset", height = 300) %>% withSpinner()),
-                # GO button
+                fluidRow(plotOutput("upset", height = 300) %>% withSpinner(), verbatimTextOutput('warn.message2')),
+                # GO button upset
                 actionButton("run.stat2", "Run", width = "25%"),
                 # print piechart with peaks annotation
-                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner()),
-                # GO button
+                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner(), verbatimTextOutput('warn.message3')),
+                # GO button annotation
                 actionButton("run.stat3", "Run", width = "25%"),
                 # print circular hierarchy plot for categories
-                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 250, width = 450) %>% withSpinner()),
-                # GO button
+                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 250, width = 450) %>% withSpinner(), verbatimTextOutput('warn.message4')),
+                # GO button circular hierarchy
                 actionButton("run.stat4", "Run", width = "25%"),
                 # print manhattan plot with whole chr and zoom-in
-                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 450) %>% withSpinner()),
-                # GO button
+                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 450) %>% withSpinner(), verbatimTextOutput('warn.message5')),
+                # GO button manhattan
                 actionButton("run.stat5", "Run", width = "25%")
                   )),
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
@@ -348,7 +348,7 @@ server <- function(input, output, session){
   
   
   ########################## CARD DATA
-  ######################################################## PLOT TAB
+  ######################################################## DATA TAB
 
   datasetTables <- reactive({
 
@@ -371,10 +371,11 @@ server <- function(input, output, session){
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('bed', i)]] <- renderTable({
-        head(datasetTables()[[1]][[i]], n = 15)
+        tryCatch(head(datasetTables()[[1]][[i]], n = 15),error = function(e) {print("Press GO to visualize data")})
       }, caption = config$bed.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
+    
   })
   
   # Rendering UI and outputtign tables dependent on user input.
@@ -413,7 +414,7 @@ server <- function(input, output, session){
     x <- c(1:length(bedpe.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('bedpe', i)]] <- renderTable({
-        head(datasetTables()[[2]][[i]], n = 15)
+        tryCatch(head(datasetTables()[[2]][[i]], n = 15),error = function(e) {print("Press GO to visualize data")})
       }, caption = config$bedpe.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -455,7 +456,7 @@ server <- function(input, output, session){
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('cat', i)]] <- renderTable({
-        head(datasetTables()[[3]][[i]], n = 15)
+        tryCatch(head(datasetTables()[[3]][[i]], n = 15),error = function(e) {print("Press GO to visualize data")})
       }, caption = config$cat.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -497,7 +498,7 @@ server <- function(input, output, session){
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('gwas', i)]] <- renderTable({
-        head(datasetTables()[[4]][[i]], n = 15)
+        tryCatch(head(datasetTables()[[4]][[i]], n = 15), error = function(e) {print("Press GO to visualize data")})
       }, caption = config$gwas.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -533,32 +534,40 @@ server <- function(input, output, session){
   
   ######################################################## STATS TAB
   vals <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
-  ## For bed files
+  ## For bed files peak count
   observeEvent(input$run.stat1, {
-    vals$bed.file <- bed.file
-    vals$bedpe.file <- bedpe.file
+    vals$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
+    vals$bedpe.file <- bedpe.file[which(file.size(bedpe.file) <= 45e+06)]
     vals$chr <-  input$chr
     vals$start <- input$chrstart
     vals$end <- input$chrend
+    # Specifiy if data not plotted in warning message
+    large.data <- c(config$bed.names[which(file.size(bed.file) > 45e+06)], config$bedpe.names[which(file.size(bedpe.file) > 45e+06)])
+    if(!isEmpty(large.data)){
+      output$warn.message1 <- renderText({paste(large.data,"data larger than 45 Mb not plotted",  collapse = " ")})
+    }
   })
   
+
     output$peak.nr <- renderPlot({
             if(!is.null(vals$bed.file) & length(vals$bed.file) > 0){
-        basic_statistics_genome_tracks(bed.file = bed.file, 
-                                     bed.names = config$bed.names,
+        basic_statistics_genome_tracks(bed.file = vals$bed.file, 
+                                     bed.names = config$bed.names[which(file.size(bed.file) < 400e+06)],
                                      chr = vals$chr,  
                                      Start = vals$start, 
                                      End = vals$end,
                                      filetype = "bed")
       }
     })
+    
+    
   
 
-  ## For bedpe files
+  ## For bedpe files peak count
     output$arches.nr <- renderPlot({
       if(!is.null(vals$bedpe.file) & length(vals$bedpe.file) > 0){
-       basic_statistics_genome_tracks(bed.file = bedpe.file, 
-                                   bed.names = config$bedpe.names,
+       basic_statistics_genome_tracks(bed.file = vals$bedpe.file, 
+                                   bed.names = config$bedpe.names[which(file.size(bedpe.file) <= 45e+06)],
                                    chr = vals$chr,  
                                    Start = vals$start, 
                                    End = vals$end,
@@ -567,20 +576,27 @@ server <- function(input, output, session){
     })
   ## For upset plot
     vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    
     observeEvent(input$run.stat2, {
-      vals2$bed.file <- bed.file
-      vals2$bedpe.file <- bedpe.file
+      vals2$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
+      vals2$bedpe.file <- bedpe.file[which(file.size(bedpe.file) <= 45e+06)]
       vals2$chr <-  input$chr
       vals2$start <- input$chrstart
       vals2$end <- input$chrend
+      # Specifiy if data not plotted in warning message
+      large.data <- c(config$bed.names[which(file.size(bed.file) > 45e+06)], config$bedpe.names[which(file.size(bedpe.file) > 45e+06)])
+      if(!isEmpty(large.data)){
+        output$warn.message2 <- renderText({paste(large.data,"data larger than 45 Mb not plotted",  collapse = " ")})
+      }
     })
+    
     output$upset <- renderPlot({
       if(!is.null(vals2$bed.file) & !is.null(vals2$bedpe.file) & length(vals2$bed.file) > 0 & length(vals2$bedpe.file) > 0 | 
          !is.null(vals2$bed.file) & length(vals2$bed.file) > 1 | !is.null(vals2$bedpe.file) & length(vals2$bedpe.file) > 1){
-        peaks_intersection_venn_function(bed.file = bed.file, 
-                                      bed.names = config$bed.names, 
-                                       bedpe.file = bedpe.file, 
-                                       bedpe.names = config$bedpe.names, 
+        peaks_intersection_venn_function(bed.file = vals2$bed.file, 
+                                      bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)], 
+                                       bedpe.file = vals$bedpe.file, 
+                                       bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)], 
                                        chr = vals2$chr, 
                                        Start = vals2$start, 
                                        End = vals2$end)
@@ -589,49 +605,71 @@ server <- function(input, output, session){
 
   ## For annotation plot
     vals3 <- reactiveValues(bed.file=NULL)
+    
     observeEvent(input$run.stat3, {
-      vals3$bed.file <- bed.file
-    })
-    output$annotation <- renderPlot({
-      if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
-        peaks.annotation.function(bed.file = bed.file, 
-                                       bed.names = config$bed.names)
+      vals3$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
+      # Specifiy if data not plotted in warning message
+      large.data <- c(config$bed.names[which(file.size(bed.file) > 45e+06)])
+      if(!isEmpty(large.data)){
+        output$warn.message3 <- renderText({paste(large.data,"data larger than 45 Mb not plotted",  collapse = " ")})
       }
     })
+    
+    output$annotation <- renderPlot({
+      if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
+        peaks.annotation.function(bed.file = vals3$bed.file, 
+                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)])
+      }
+    })
+    
     ## For categories hierarchy plot
     vals4 <- reactiveValues(cat.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    
     observeEvent(input$run.stat4, {
-      vals4$cat.file <- cat.file
+      vals4$cat.file <- cat.file[which(file.size(cat.file) <= 400e+06)]
       vals4$chr <-  input$chr
       vals4$start <- input$chrstart
       vals4$end <- input$chrend
+      # Specifiy if data not plotted in warning message
+      large.data <- c(config$cat.names[which(file.size(cat.file) > 400e+06)])
+      if(!isEmpty(large.data)){
+        output$warn.message4 <- renderText({paste(large.data,"data larger than 400 Mb not plotted",  collapse = " ")}) ### not working sistemare
+      } 
+      
     })
     output$categories.pie <- renderPlot({
       if(!is.null(vals4$cat.file) & length(vals4$cat.file) > 0){
-        categorical.pie.function(cat.file = cat.file, 
-                                 cat.names = config$cat.names,
+        categorical.pie.function(cat.file = vals4$cat.file, 
+                                 cat.names = config$cat.names[which(file.size(cat.file) < 400e+06)],
                                  chr = vals4$chr,
                                  Start = vals4$start,
                                  End = vals4$end)
       }
     })
+    
     ## For Manhattan plot
     vals5 <- reactiveValues(gwas.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    
     observeEvent(input$run.stat5, {
-      vals5$gwas.file <- gwas.file
+      vals5$gwas.file <- gwas.file[which(file.size(gwas.file) <= 400e+06)]
       vals5$chr <-  input$chr
       vals5$start <- input$chrstart
       vals5$end <- input$chrend
+      # Specifiy if data not plotted in warning message
+      large.data <- c(config$gwas.names[which(file.size(gwas.file) > 400e+06)])
+      if(!isEmpty(large.data)){
+        output$warn.message5 <- renderText({paste(large.data,"data larger than 400 Mb not plotted",  collapse = " ")})
+      }
     })
     output$manhattan <- renderPlot({
       if(!is.null(vals5$gwas.file) & length(vals5$gwas.file) > 0){
-        manhattan.plot.function(gwas.file = gwas.file, 
+        manhattan.plot.function(gwas.file = vals5$gwas.file, 
                               Chr = vals5$chr, 
                               start = vals5$start, 
                               end = vals5$end, 
                               sign.p = 5e-6,
                               chr.len.df = chrom.cen.df,
-                              gwas.names =config$gwas.names)
+                              gwas.names =config$gwas.names[which(file.size(gwas.file) < 400e+06)])
         }
       })
 

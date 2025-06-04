@@ -563,7 +563,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   # Make the plot
   p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) + 
     geom_node_circle(aes(fill = size), color = "white") +
-    geom_node_text(aes(label=paste(name, "\n", perc, "%", sep=""), filter = leaf), size = 5, repel = TRUE, color = "black", fontface = "bold") +
+    geom_node_label(aes(label=paste(name, " ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
     theme_void() + 
     theme(legend.position = "none",
           plot.title = element_text(size = 16, face = "bold")) +
@@ -573,7 +573,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   if (nrow(groups.sel.df) > 0){
   p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) + 
     geom_node_circle(aes(fill = size), color = "white") +
-    geom_node_text(aes(label=paste(name, "\n", perc, "%", sep=""), filter = leaf), size = 5, repel = TRUE, color = "gold", fontface = "bold") +
+    geom_node_label(aes(label=paste(name, " ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
     theme_void() + 
     theme(legend.position = "none",
           plot.title = element_text(size = 16, face = "bold")) +
