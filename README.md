@@ -205,15 +205,10 @@ When the app is opened the main panel will display. The main panel is divided in
 ![stats_peak_counts_file_size_lim.jpg](https://github.com/sarlago/ShinyApps/blob/large-datasets/Genomic%20viewer%20Documentation/stats_peak_counts_file_size_lim.jpg)
 
 The analysis that are available are:  <a name="stats-tab-anchor"></a>
-		
 		- the count of peaks (from [Peaks bed](#Peaks-bed) file) and arches number (from [3D contacts arches bedpe](#3D-contacts-arches-bedpe) file) in the selected genomic region compared to the total nr of peaks and arches of the corresponding sample; 
-		
 		- when both [Peaks bed](#Peaks-bed) and [3D contacts arches bedpe](#3D-contacts-arches-bedpe) files are available, the intersection of peaks in the two sets will be calculated and their numerosity plotted as ***upset plot*** for both the whole genome and the selected genomic range;
-		
-		- [Peaks bed](#Peaks-bed) file will be used for peaks annotation in the main functional genomic regions through the *[ChIPpeakAnno R package](https://bioconductor.org/packages/release/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html)*; 
-		  
+		- [Peaks bed](#Peaks-bed) file will be used for peaks annotation in the main functional genomic regions through the *[ChIPpeakAnno R package](https://bioconductor.org/packages/release/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html)*;  
 		- A **[circular packing](https://r-graph-gallery.com/circle-packing.html)** plot of categories classification and percentage abundance in the whole genome, and if present, in the user-selected genomic range. This plot will be generated merging the information from all the provided [Categorical bed](#Categorical-bed) files;
-		
 		- A *Manhattan plot* for the user selected genomic range with its position in the corresponding chromosome and the *Manhattan plot* of the entire chromosome. This will help to understand how ***significant SNPs*** are distributed in the chromosome and if the selected genomic region is an hotspot. When a whole chromosome is selected by the user, the zoom-in panel will not be displayed. ***ID of the SNPs*** that are above the significance threshold will be displayed in a smart way that avoids label overlap. The complete table with SNPs ID and the relative information for the user selected genomic range can be downloaded form the [Data tab](#data-tab-anchor). 
 	 ![stats_tab_1.jpg | center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/stats_tab_1.jpg)
 	   ![stats_tab_2.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/stats_tab_2.jpg)
