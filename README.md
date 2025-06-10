@@ -77,7 +77,7 @@ The following section will describe the type of datasets that **Genomic viewer**
 #### HiC and 3D contact matrices
 3D contacts files, like HiC, stored in [hic file format](https://genome.ucsc.edu/goldenpath/help/hic.html). These is a binary format allowing for fast access to contact matrix heatmaps and is used for displaying chromatin conformation data in a browser.
 #### 3D contacts arches bedpe
-3D contacts can be represented not only as a heatmap or matrix, but as well as arches that join two distal genomic regions that are found in contact. This type of information is stored in the [.bedpe file format](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format).
+3D contacts can be represented not only as a heatmap or matrix, but as well as arches that join two distal genomic regions that are found in contact. This type of information is stored in the [.bedpe file format](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format). Normally **bedpe files** are 6 columns files with *chr*, *start*, *end* fields of the two anchor and bait regions, however optional columns can be added. In the latter case 7th column must contain the name of the row in string format, the 8th column is a number representing the score and the 9th column represents the strand. Mis-formatting of these columns will give an error. 
 #### ChIP-seq, ATAC-seq, RNA-seq or any other bigWig 
 Most of the 2D NGS datasets are normally stored in bigWig file formats, that are indexed binary files allowing the fast access of selected portions of the file corresponding to a browsed genomic region. The most common data types that can be loaded through a [bigWig file](https://genome.ucsc.edu/goldenpath/help/bigWig.html) are ChIP-seq, CUT&Tag, ATAC-seq, RNA-seq datasets.
 #### Peaks bed 
@@ -125,7 +125,7 @@ ii) an **extended version** with the minimal required columns correctly names, p
 The following section will describe how to provide the desired input datasets for being plotted in the **Genomic viewer**.
 #### Configuration file
 
-To allow users to provide locally saved dataset to the **genomic viewer** without an heavy graphical interface, an **[R configuration files (YAML)](#Configuration-file)** has been set up. The configuration file (*[Shiny_wzoom_config_hover.yml](<file:///C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover/Shiny_wzoom_config_hover.yml>)*) is structured as shown below and allows the user to load any number of datasets for all the accepted data types. Note that when some of the specified entries is absent the corresponding field must be filled with an empty string " " or vector '[""]' as specified in the file comments.
+To allow users to provide locally saved dataset to the **genomic viewer** without an heavy graphical interface, an **[R configuration files (YAML)](#Configuration-file)** has been set up. The configuration file (*[Shiny_wzoom_config_hover.yml](<file:///C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover/Shiny_wzoom_config_hover.yml>)*) is structured as shown below and allows the user to load any number of datasets for all the accepted data types. Note that the ***ext field*** takes regular expressions as input and that when some of the specified entries is absent the corresponding field must be filled with a **two whitespace** empty string "  " or vector '[""]' as specified in the file comments.
 
 ```yml
 ---
@@ -133,29 +133,29 @@ To allow users to provide locally saved dataset to the **genomic viewer** withou
 default:
 
     # Set here the parameters related to the input files path and extensions
-  # Data directory
+  # Data directory (uppermost common data directory)
   data.dir: "local/path/to/files/folder/"
   # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type " " or [""] in names.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
   bw.ext: "treat_pileup.bw"
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
-  # bedpe directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  # bedpe directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
   bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2.bedpe"
   bedpe.names: ["HiC arches"]
-  # bed directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  # bed directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
   bed.dir: "GSE212908_ATAC_peaks"
   bed.ext: "GSE212908_RAM012_013_015_peak_masterlist.bed"
   bed.names: ["ATAC peaks"]
-  # hic directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  # hic directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
   hic.dir: "GSE212910_RAW_HiC"
   hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM.hic"
   hic.names: ["HiC cortex"]
-  # GWAS directory and files final pattern, ordered file name to visualize. If empty type " " or [""] in names.
+  # GWAS directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
   gwas.dir: "GWAScatalog_KidneyDisease"
   gwas.ext: "relocatedCol.tsv.gz"
   gwas.names: ["GWAS chronic kidney disease"]
-  # categorical bed file.If empty type " " or [""] in names.
+  # categorical bed file.If empty type "  " or [""] in names.
   cat.file: "regulatory_elements_hg38.bed"
   cat.names: ["Regulatory Elements"]
   # file with chromosomes and centromeres coordinates
@@ -200,7 +200,11 @@ When the app is opened the main panel will display. The main panel is divided in
 	- **[Data](#Visualize-raw-data-for-the-selected-genomic-range)**: this tab shows a preview (first 15 lines) of the original data that were used for plotting in the *[Plot tab](#plot-anchor)*. One table with the name of the corresponding dataset (as defined by the user in the *[Configuration file](#Configuration-file)*) is shown, together with a download button allowing the user to export the data of [Peaks bed](#Peaks-bed), [3D contacts arches bedpe](#3D-contacts-arches-bedpe), [Categorical bed](#Categorical-bed) and [GAWS summary statistics](#GWAS-summary-statistics) relative to the visualized genomic region.  <a name="data-tab-anchor"></a>
 	  
 	 ![data_tab.jpg | center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/data_tab.jpg)
-	- **[Stats](#Visualize-basic-statistics-analysis-for-the-loaded-data)**: this tab displays some basic analysis calculated on the loaded data. The analysis that are available are:  <a name="stats-tab-anchor"></a>
+	- **[Stats](#Visualize-basic-statistics-analysis-for-the-loaded-data)**: this tab displays some basic analysis calculated on the loaded data. The user can choose which **Stats plots** to run by pressing the **Run button** corresponding to each available stats section. Note that there are some data size limits above which the statistics will not be calculated to avoid too long computing times. When some datasets are not used in the stats calculation it will be indicated with a ***Warning message*** in the corresponding graph section. An example is shown in the figure below.
+
+![stats_peak_counts_file_size_lim.jpg](https://github.com/sarlago/ShinyApps/blob/large-datasets/Genomic%20viewer%20Documentation/stats_peak_counts_file_size_lim.jpg)
+
+The analysis that are available are:  <a name="stats-tab-anchor"></a>
 		
 		- the count of peaks (from [Peaks bed](#Peaks-bed) file) and arches number (from [3D contacts arches bedpe](#3D-contacts-arches-bedpe) file) in the selected genomic region compared to the total nr of peaks and arches of the corresponding sample; 
 		
@@ -264,7 +268,7 @@ Another way to select a specific genomic window to be visualized is by starting 
 ![zoom_bar_wSections.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/zoom_bar_wSections.jpg)
 
 The **zoom bar** offers different modes for zooming-in and out as illustrated in the figure above:
-- **Static plot zoom**: The '+', '-' and 'RESET' buttons in the bottom right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. The resolution of the plot will not change by zooming-in since it is a **vectorial image**. The 'RESET' button allows to restore the initial plot size. note that this type of zoom is just for dynamic visualization within the app and will not be applied on the **[saved plot](#Downloading-plots-and-data)**. <a name="static-zoom-anchor"></a>
+- **Static plot zoom**: The '+', '-' and 'RESET' buttons in the bottom right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. The resolution of the plot will not change by zooming-in since it is a **vectorial image**. The 'RESET' button allows to restore the initial plot size. The static zoom is also a **pan-zoom**, meaning that the user can move the image by hold-clicking on it. Note that this type of zoom is just for dynamic visualization within the app and will not be applied on the **[saved plot](#Downloading-plots-and-data)**. In addition the ***static zoom controller*** will be disabled when the cumulative size of the files to plot is greater than 2 GB and the selected range to plot larger than 500 kbp, this is because in such condition the visualized image is not **vectorial**, but is a **jpeg** to allow for faster and more dynamic image visualization. The **[saved plot](#Downloading-plots-and-data)** will instead keep vectorial resolution. <a name="static-zoom-anchor"></a>
 
 - **Drag an drop bar**: below the static zoom button there is a draggable bar consisting in an orange rectangle, that matches the plotted genomic range, and grey flanking representing the ***25% extensions*** of the visualized range. The numbers below the bar report the coordinates in bp. By mouse drag-and-drop in the orange rectangle the user can zoom-in in the visualized genomic area, while by mouse drag-and-drop in the grey area the user can either zoom-out enlarging the actual genomic range or zoom-in in the flanking range. The maximum allowed zoom-in is **500 bp**, further zoom will not be allowed. Zooming by drag-and-drop is **limited to the selected chromosome coordinates**. The coordinates of the zoomed region will be automatically displayed in the [left sidebar](#left-sidebar-anchor), but the [Plot, Data and Stats tab](#Plot,-Data-and-Stats-tab) will be updated just upon clicking the *[GO button](#go-button-anchor)*. <a name="drag-drop-anchor"></a>
 
@@ -274,7 +278,7 @@ The **zoom bar** offers different modes for zooming-in and out as illustrated in
 The main functionalities of the **Genomic viewer** can be accessed through the three tabs in the [central panel](#central-panel-anchor). These allow respectively to visualize the genomic and annotation tracks loaded by the user through the [Configuration file](#Configuration-file) with few options to adapt the output, to display and download the raw data corresponding to a user-selected genomic range, and to obtain an overview of some feature relative to the different tracks type.
 #### Genomic view plot of the selected genomic range
 
-The principal output of the app is the **genomic view plot**. This will be generated using the track files selected by the user in the [Configuration file](#Configuration-file). The tracks will be plotted after [Selecting the genomic region to visualize](#Selecting-the-genomic-region-to-visualize) and can be updated at any time.  
+The principal output of the app is the **genomic view plot**. This will be generated using the track files selected by the user in the [Configuration file](#Configuration-file). The tracks will be plotted after [Selecting the genomic region to visualize](#Selecting-the-genomic-region-to-visualize) and can be updated at any time. Tracks height is automatically scaled depending on the number of loaded datasets. 
 Depending on the type of track and the wideness of the selected genomic region, the tool behaves differently to improve the image readability and computation speed. It follows a description of all the single tracks that can be displayed, if available which are the options that the user has to modify their visualization, and how the tool calculates the output depending on the size of the genomic range to be visualized.
 ##### 3D contacts Heatmap Matrix
 
@@ -306,10 +310,13 @@ The image below shows some examples of *profile* plots and *heatmaps* from the s
 When multiple *bigwig* files are loaded and must be compared, it is good practice to uniform the y-scale for all samples. In the **Genomic viewer** the y-scale for bigwigs is automatically auto-scaled based on the maximal *y* value of the most intense sample, every time the selected genomic range is updated. When multiple *bigwig* files are loaded a different color is automatically applied to every sample, when plotted in the *profile mode*
 ##### Peaks bed file tracks
 
-[Peak](#Peaks-bed) files are normally stored in the *.bed* format. These files are plotted as ranges by exploiting the corresponding built-in function from **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html)**. When multiple *peaks .bed* files are loaded by the user a different color is automatically applied to every sample. There is no customization option for this type of track and no binning is normally necessary.
+[Peak](#Peaks-bed) files are normally stored in the *.bed* format. These files are plotted as ranges by exploiting the corresponding built-in function from **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html)**. When multiple *peaks .bed* files are loaded by the user a different color is automatically applied to every sample. There is no customization option for this type of track and no binning is normally necessary. However, when the plotted range is larger than 10 Mbp peaks are displayed as **density plots** to improve readability, informativity and reduce image size.
 An example of how peak file track appears in the **Genomic viewer** is reported in the figure below:
 
 ![peak_bed_track.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/peak_bed_track.jpg)
+
+![peak_bed_track_density.jpg|center](https://github.com/sarlago/ShinyApps/blob/large-datasets/Genomic%20viewer%20Documentation/peak_bed_track_density.jpg)
+
 ##### Categorical bed file tracks
 
 In addition to *peaks ranges* *.bed* files can also be used to mark genomic regions that belong to specific categories, which can be annotated with some external tool or database, or defined by he user. The **Genomic viewer** allows to load [categorical .bed](#Categorical-bed) files and plot them by exploiting the same built-in function from **[plotgardener](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html)** that is used for standard [Peaks bed](#Peaks-bed). 
@@ -333,7 +340,7 @@ An example of how  **[Manhattan plots](#manhattan-plot-anchor)** track appears i
 ![Manhattan_plot_track.jpg|center](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/Manhattan_plot_track.jpg)
 ##### Genes annotation track
 
-The lowermost part of the main plot output consists of different layers of genes annotations. By default the genes annotation is plotted for the [GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/) reference genome exploiting built-in **plotgardener** functions allowing:
+The lowermost part of the main plot output consists of different layers of genes annotations. By default the genes annotation is plotted for the [GRCh38 (hg38)](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/) reference genome exploiting built-in **plotgardener** functions.  The **genes annotation track** height is fixed and will not be scale4d depending on the number of loaded datasets. The available options for this type of track are:
 
 1. The representation of **[genes and genes structures](https://phanstiellab.github.io/plotgardener/reference/plotGenes.html)** (promoters, introns, exons) in the user-selected genomic range. By default **plotgardener** plots in two different lines and colors genes that are encoded on the positive and negative strand. Through the [right navigation bar](#rightnav-anchor), the user can optionally decide to [expand transcripts](#expand-transcript-anchor), which means that instead of visualizing the largest form of each ***gene*** in the displayed genomic range (default option), the separate ***transcript isoforms*** are plotted. The two options are represented in the image below:
    ![genes_and_transcripts.jpg](https://github.com/sarlago/ShinyApps/blob/main/Genomic%20viewer%20Documentation/genes_and_transcripts.jpg) <a name="genes-track-anchor"></a>
@@ -365,14 +372,18 @@ The **[Stats](#stats-tab-anchor)** tab in the [main central panel](#main-panel-o
   
 - A **[circular packing](https://r-graph-gallery.com/circle-packing.html)** plot which reports the percentage abundance of the features in the provided [Categorical bed](#Categorical-bed) files for either the whole genome or, if any, the user-selected genomic range. This plot consists in a series of circles which radius is proportional to the amount of elements classified according to the reported categories. Circles are also organized hierarchically, allowing to evaluate different types of classifications in the same plot. This is particularly useful when more than one [Categorical bed](#Categorical-bed) file is provided.
 
-- A **[Manhattan plot](#manhattan-plot-anchor)** of the chromosome relative to the user-selected region with the IDs of the significant SNPs. When the selected region is smaller than the entire chromosome, a zoom-in of the region with the IDs of the significant SNPs is displayed. This allows the user to evaluate the relevance of the features in the selected regions within the context of the surrounding genomic elements. 
+- A **[Manhattan plot](#manhattan-plot-anchor)** of the chromosome relative to the user-selected region with the IDs of the significant SNPs. When the selected region is smaller than the entire chromosome, a zoom-in of the region with the IDs of the significant SNPs is displayed. This allows the user to evaluate the relevance of the features in the selected regions within the context of the surrounding genomic elements.
+
+The user can choose which **Stats plots** to run by pressing the **Run button** corresponding to each available stats section. Note that there are some data size limits above which the statistics will not be calculated to avoid too long computing times. When some datasets are not used in the stats calculation it will be indicated with a ***Warning message*** in the corresponding graph section. 
 
 ### Downloading plots and data
 
-In the following section are described the possibilities for downloading plots and data from the **Genomic viewer** interface.
+In the following section are described the possibilities for downloading plots and data from the **Genomic viewer** interface. The downloaded image has a maximum size of 10"x8" and the plotted tracks height, except of the genomic annotation track, is scaled depending on the number of loaded datasets.
+
 #### Download of the genomic view plot
 
-The **[Genomic view plot of the selected genomic range](#Genomic-view-plot-of-the-selected-genomic-range)** is the main output of **Genomic viewer** interface and can be easily downloaded from the *[Save button](#save-button-anchor)* in the [left sidebar](#left-sidebar-anchor). By clicking the button, the user can choose the destination folder and the name of the file. The plot is automatically saved in the **vectorial pdf** format. Any [static zoom](#static-zoom-anchor) that is applied to the graph through the interface is just for dynamic visualization and will not be applied to the saved plot.  
+The **[Genomic view plot of the selected genomic range](#Genomic-view-plot-of-the-selected-genomic-range)** is the main output of **Genomic viewer** interface and can be easily downloaded from the *[Save button](#save-button-anchor)* in the [left sidebar](#left-sidebar-anchor). By clicking the button, the user can choose the destination folder and the name of the file. The plot is automatically saved in the **vectorial pdf** format. Any [static zoom](#static-zoom-anchor) that is applied to the graph through the interface is just for dynamic visualization and will not be applied to the saved plot. When the visualized image of the selected genomic range is plotted as a **jpeg** (because the range exceeds 500 kbp and the cumulative size of the input files is larger than 2 GBs) the saved plot will still be a **vectorial pdf**. 
+
 #### Download of raw data of the plotted genomic range
 
 In the **[Data](#data-tab-anchor)** tab in the [main central panel](#main-panel-overview) is visualized a preview of the raw datasets that are used to generate the **genomic view plot**, subset to the user-selected genomic range. The subset data tables can be downloaded as tab separated files with the same extension as the originally loaded files though a specific **Download button** followed by the names of the dataset as provided by the user in the [configuration file](#Configuration-file). By clicking on the **Download button** the user can choose the destination folder and the name of the file. By default the files will be named with the name of the corresponding input data file as provided by the user in the [configruation file](#Configuration-file)
