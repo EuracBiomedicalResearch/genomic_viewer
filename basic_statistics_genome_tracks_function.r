@@ -11,7 +11,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
   peaks.nr <- c() # For total nr of peaks
   peaks.nr.sel <- c() # For peaks nr in the selected region
   for (i in 1:length(bed.file)){
-    bed.tab <- read.table(bed.file[i], header = F, sep= "\t")
+    bed.tab <- read_delim(bed.file[i], "\t", col_names = T)
     peaks.nr <- c(peaks.nr, nrow(bed.tab))
     # For bed files or bedpe files
     if(filetype == "bed"){
@@ -38,11 +38,11 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
     ylab(label) +
     xlab("") +
     theme_minimal() +
-    theme(text = element_text(size = 12),
-          axis.text.y = element_text(size = 12),
-          axis.text.x = element_text(size = 12),
-          strip.text.x = element_text(size = 12)) +
-    geom_text(aes(label=peaks.nr), vjust=1.6, color="white", size=6) +
+    theme(text = element_text(size = 10),
+          axis.text.y = element_text(size = 10),
+          axis.text.x = element_text(size = 10),
+          strip.text.x = element_text(size = 10)) +
+    geom_text(aes(label=peaks.nr), vjust=1.6, color="white", size=4) +
     facet_wrap( ~ category, , scales = "free")
   
   plot.bed.tot
@@ -303,17 +303,17 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   
   ################# WHOLE CHROMOSOME MANHATTAN
   ## Create page
-  pageCreate(width = 12, height = h, default.units = "cm", showGuides = F) 
+  pageCreate(width = 12, height = h, default.units = "cm", showGuides = T) 
   
   ## Define starting y coordinate
   y.coord <- h
   
   ## Loop over every GWAS of input
   for (i in 1:length(gwas.file)){
-    man.data.t <- read.table(gwas.file[i], sep = "\t", header = T)
+    man.data.t <- read_delim(gwas.file[i], "\t", col_names = T)
     
     ## Define lead SNPs to be plotted wit their name specified
-    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p)
+    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p) %>% dplyr::arrange(p)
     
     ## Plot fictitious segment
     plotRanges(data = data.frame(chr = chr, start = 1, end = chr.len),
@@ -328,20 +328,32 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
       fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
       trans = "-log10",
       sigVal = sign.p, sigLine = TRUE, sigCol = "#7ecdbb",  col = "grey",
-      lty = 2, range = c(0, 14),
+      lty = 2, #range = c(0, NA),
       y = "0b",
       default.units = "cm",
       params = params
     )
     ## Annotate signifcant SNPs
-    if(nrow(leadSNP) > 0){
+    if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
     plotText(label = leadSNP$snp, 
-             x = leadSNP$pos*(12/chr.len) + 0.2 , 
-             y = y.coord-(-log10(leadSNP$p)*(6/14)), 
-             check.overlap = T, 
+             x = leadSNP$pos*(12/chr.len) + 0.2 ,  
+             y = h - ((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))), #äy = y.coord-(-log10(leadSNP$p)*6/14), 
+             check.overlap = T,
+             repel = T,
              params = params,
-             rot = 35)
+             rot = 35,
+             fontsize = 8)
+    } else if (nrow(leadSNP) > 10){
+      plotText(label = leadSNP$snp[1:10], 
+               x = leadSNP$pos[1:10]*(12/chr.len) + 0.2 , 
+               y = h- ((-log10(leadSNP$p[1:10])*(y.coord-5.99))/-log10(min(leadSNP$p[1:10]))), 
+               check.overlap = T,
+               repel = T,
+               params = params,
+               rot = 35,
+               fontsize = 8)
     }
+    #print(h-((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))))
   
     ## Highlight genomic region on signal plot
     annoHighlight(
@@ -377,7 +389,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   ## Annotate y-axis
   annoYaxis(
     plot = mp,
-    at = c(0, 2, 4, 12, 8, 10, 12, 14),
+    #at = seq(0, 40, by = 10),
     axisLine = TRUE, fontsize = 8
   )
   #> yaxis[yaxis2]
@@ -420,10 +432,10 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   
   ## Loop over every GWAS of input
   for (i in 1:length(gwas.file)){
-    man.data.t <- read.table(gwas.file[i], sep = "\t", header = T)
+    man.data.t <- read_delim(gwas.file[i], "\t", col_names = T)
     
     ## Define lead SNPs to be plotted wit their name specified
-    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p)
+    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p) %>% dplyr::arrange(p)
     
     ## Create Manhattan plot of the selected chromosome
     mp2 <- plotManhattan(
@@ -431,23 +443,36 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
       fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
       trans = "-log10",
       sigVal = sign.p, sigLine = TRUE, sigCol = "#7ecdbb",  col = "grey",
-      lty = 2, range = c(0, 14),
+      lty = 2, range = c(0, 40),
       y = y.coord.z,
       default.units = "cm",
       params = region,
       label = "zoom"
     )
+    
+    y.coord.z <- y.coord.z - 6
     ## Annotate significant SNPs
-    if(nrow(leadSNP > 0)){
-    plotText(label = leadSNP$snp, 
-             x = (leadSNP$pos-start)*(12/(end - (start-1))) + 0.2 , 
-             y = y.coord.z-(-log10(leadSNP$p)*(6/14)), 
-             check.overlap = T, 
-             params = region,
-             rot = 35)
+    if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
+      plotText(label = leadSNP$snp, 
+               x = leadSNP$pos*(12/chr.len) + 0.2 ,  
+               y = h - ((-log10(leadSNP$p)*(y.coord.z-5.99))/-log10(min(leadSNP$p))), 
+               check.overlap = T,
+               repel = T,
+               params = params,
+               rot = 35,
+               fontsize = 8)
+    } else if (nrow(leadSNP) > 10){
+      plotText(label = leadSNP$snp[1:10], 
+               x = leadSNP$pos[1:10]*(12/chr.len) + 0.2 , 
+               y = h- ((-log10(leadSNP$p[1:10])*(y.coord.z-5.99))/-log10(min(leadSNP$p[1:10]))), 
+               check.overlap = T,
+               repel = T,
+               params = params,
+               rot = 35,
+               fontsize = 8)
     }
     
-    y.coord.z <- y.coord.z - 6 
+     
     
     ## Plot graph title
     plotText(
@@ -473,7 +498,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   ## Annotate y-axis
   annoYaxis(
     plot = mp2,
-    at = c(0, 2, 4, 6, 8, 10, 12, 14),
+    at = seq(0, 40, by = 10),
     axisLine = TRUE, fontsize = 8
   )
   #> yaxis[yaxis2]
@@ -491,8 +516,8 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
 # TEST FUNCTION
 #manhattan.plot.function(gwas.file = dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext), 
  #                       Chr = 20, 
-  #                      Start = 45841721, 
-   #                     End = 45857405, 
+  #                      start = 45841721, 
+   #                     end = 45857405, 
     #                    sign.p = 5e-6,
      #                   chr.len.df = chrom.cen.df,
       #                  gwas.names =config$gwas.names)
@@ -500,7 +525,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
 
 ################### PIECHART OF CATEGORIES FOUND IN CATEGORICAL BED: 
 
-# This function generates a circular packing plot with the categories reported in the categoriacal bed file and their percentage in the whole genome and in the selected range
+# This function generates a circular packing plot with the categories reported in the categorical bed file and their percentage in the whole genome and in the selected range
 
 
 #library(ggraph)
@@ -522,7 +547,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   vertices.sel.df <- data.frame()
   for (i in 1:length(cat.file)){
     # Read cat file
-    cat.file.r <- read.table(cat.file[i], header = T, sep= "\t")
+    cat.file.r <- read_delim(cat.file[i], "\t", col_names = T)
     ##### For total genome
     # crate dataframe with hierarchy: cat.name, categories
     subgroup <- c(subgroup, unique(cat.file.r$category))
@@ -599,3 +624,104 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   #                       End = 1000)
 
 
+################### CIRCOS PLOT FROM BEDPE FILE
+
+# This function is used to generate a circos plot from the 3D contacts stored in the bedpe file. the 7th column of the bedpe file must contain a score value
+  # Used libraries:
+  #library(circlize)
+  #library(readr)
+  #library(dplyr)
+  #library(paletteer)
+
+circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end, genes.label, bedpe.names){
+  
+  col <- c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::gdoc"),paletteer_d("ggthemes::excel_Atlas") )
+  names(col) <- paste("chr", c(1:22, "X", "Y"), sep="")
+  chrom = paste("chr", chromosome, sep="")
+  
+  ##### READING FILES #####
+  # read cytoband, common for all bedpe
+  cytoband = read.cytoband(species = genome, chromosome.index = chrom)
+  # bed of genes annotation hg38, common for all bedpe
+  genes.ann <- genes.label
+  genes.ann$chromosome_name <- paste("chr", genes.ann$chromosome_name, sep="") # add complete name to chr
+  ## calculate gene density fro the selected chromosome
+  genes.density.bed <- c()
+  for (i in 1:nrow(cytoband.bed)){
+    start <- cytoband.bed$V2[i]
+    end <- cytoband.bed$V3[i]
+    genes.ann.chr <- dplyr::filter(genes.ann, chromosome_name == chrom)
+    genes.density.bed <- c(genes.density.bed, length(which(genes.ann.chr$start_position >= start & genes.ann.chr$end_position <= end)))
+  }
+  
+  genes.ann <- dplyr::filter(genes.ann, chromosome_name == chrom & start_position >= zoom_start & end_position <= zoom_end) # filter just genes in the zoom region
+  genes.ann$chromosome_name <- paste("zoom_", genes.ann$chromosome_name, sep="") # add zoo to the chromosome name
+  
+
+  
+  
+  # for every separate bedpe
+  for (i in 1:length(bedpe.file)){
+  # Read contacts for entire genome
+  bed1 <- read_delim(bedpe.file[i], col_select = c(1,2,3), col_names = F)
+  bed2 <- read_delim(bedpe.file[i], col_select = c(4,5,6), col_names = F)
+  # bedpe of the zoomed region
+  bedpe.zoom <- read_delim(bedpe.file[i], col_names = F) %>% dplyr::filter( X1 == chrom & X2 >= zoom_start & X4 == chrom & X6 <= zoom_end)
+  bedpe.zoom[, c(1,4)] <- paste("zoom_", chrom, sep="")
+  
+  
+  
+  ##### PLOT ENTIRE CHROMOSOME #####
+  circos.clear()
+  col_text <- "grey40"
+  circos.par("track.height"=0.8, gap.degree=5, cell.padding=c(0, 0, 0, 0))
+  ## initialize idagram
+  circos.initializeWithIdeogram(species = genome, chromosome.index = chrom, plotType = c("ideogram"))
+  ## add label for genomic position
+  brk <- seq(from = 1, to= cytoband$chr.len, length.out=50)
+  circos.track(track.index = get.current.track.index(), panel.fun=function(x, y) {
+    circos.axis(h="top", major.at=brk, labels=round(brk/10^6, 1), labels.cex=0.7, 
+                col=col_text, labels.col=col_text, lwd=0.7, labels.facing="clockwise")
+  }, bg.border=F)
+  ## plot contact density
+  bed <-  data.frame(chr = cytoband.bed$V1, start = cytoband.bed$V2, end = cytoband.bed$V3, value = log10(cytoband.bed$value+1))
+  circos.genomicTrackPlotRegion(bed, ylim = range(bed$value), bg.border = NA, panel.fun = function(region, value, ...) {
+    circos.genomicLines(region, value, area = TRUE, border = NA, baseline = 0, col = col[chrom])
+  }, track.height = 0.05)
+  ## plot contacts arches on the whole chromosome
+  circos.genomicLink(region1 = bed1, region2 = bed2, h = 0.1, col = col[chrom])
+  ## add link across sectors
+  circos.link(chrom, point1 = c(zoom_start, zoom_end),
+              chrom, point2 = c(zoom_start, zoom_end), 
+              col = "#00000020", border = NA, h = 0.205, w =0.1)
+  
+  circos.clear()
+  
+  ##### PLOT ZOOM CHROMOSOME #####
+  par(mar = c(0, 0, 0, 0), new = TRUE)
+  ## initialize zoom genomic region    
+  circos.par("canvas.xlim" = c(-0.1, 0.1), "canvas.ylim" = c(-1.7, 1.7), clock.wise = FALSE,
+             cell.padding = c(0, 0, 0, 0), gap.degree = 5, start.degree = 92.5)
+  circos.genomicInitialize(data.frame(chr = paste("zoom_", chrom, sep=""), start = zoom_start, end = zoom_end), plotType = NULL)
+  ## add label of genomic bp
+  brk.zoom <- seq(from = zoom_start, to= zoom_end, length.out=20)
+  circos.track(track.index = 1, ylim = c(0,1), panel.fun=function(x, y) {
+    circos.axis(h="top", major.at=brk.zoom, labels=round(brk.zoom/10^6, 1), labels.cex=0.6, 
+                col=col_text, labels.col=col_text, lwd=0.7, labels.facing="clockwise")
+  }, bg.border=F)
+  ## Add gene label annotation
+  circos.genomicLabels(genes.ann, labels.column=5,  cex=0.4, col=col_text, line_lwd=0.5, line_col="grey80", 
+                       side="outside", connection_height=0.05, labels_height=0.01, niceFacing = T, track.margin = c(0,0.2))
+  ## add contact arches of the zoom region
+  circos.genomicLink(region1 = bedpe.zoom[, c(1,2,3)], region2= bedpe.zoom[, c(4,5,6)], h = 0.2, col = "dodgerblue")
+  ## add sector highlight
+  highlight.sector(sector.index = paste("zoom_", chrom, sep=""),col = "#00000020")
+  # add chromosome name in the center of the plot
+  text(0, 0, paste(chrom, "\n", bedpe.names[i], sep=""), cex = 1, col = col_text)
+  circos.link(paste("zoom_", chrom, sep=""), point1 = c(zoom_start, zoom_end),
+              paste("zoom_", chrom, sep=""), point2 = c(zoom_start, zoom_end), 
+              col = "#00000020", border = NA, h = 0.205, w =0.1)
+  
+  circos.clear() 
+  }
+}

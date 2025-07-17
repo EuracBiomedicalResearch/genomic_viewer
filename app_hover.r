@@ -18,9 +18,12 @@ library(rtracklayer)
 library(spiky)
 library(ComplexUpset)
 library(dplyr)
+library(readr)
+library(sqldf)
 library(ggpubr)
 library(ggraph)
 library(igraph)
+library(circlize)
 # for chromosomes plot
 library(ggchicklet)
 
@@ -34,8 +37,9 @@ source("basic_statistics_genome_tracks_function.r")
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-#config <- config::get(file = "Shiny_wzoom_config_hover.yml")
-config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
+config <- config::get(file = "Shiny_wzoom_config_hover_test.yml")
+#config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
+#config <- config::get(file = "C:/Users/sarlago/Documents/Projects/SENECA RNAseq Udine/03_Processing/03.02_Scripts/03.02.01_scripts_post_processing_RNAseq/Shiny_RNAseq_UD2025_config_correct.yml")
 
 ## Read data
 # Set a BigWig file
@@ -49,9 +53,9 @@ hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, i
 # Set GWAS data file
 gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.ext)
 ### For chromosomes plotting
-chrom.cen.df <- read.table(config$chrom.cen, header = T, sep="\t")
+chrom.cen.df <- read_delim(config$chrom.cen, "\t", col_names = T, show_col_types = F)
 # Genes hgnc symbol
-genes.hgnc <- read.table(config$genes.hgnc, header = T, sep = "\t")
+genes.hgnc <- read_delim(config$genes.hgnc, "\t", col_names = T, show_col_types = F)
 # Categorical bed file
 cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
 
@@ -103,14 +107,14 @@ ui <- page_sidebar(
               # Panel with plot ----------------------------------------------------------------------------------
               nav_panel("Plot", class = "gap-2 p-0 border-0 align-items-top",
                         svgPanZoomOutput(outputId = "res", width = "auto", height = "900px") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
+                        imageOutput("plot.test", width = "auto", height = "10px", inline=T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),
                         plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
-                        verbatimTextOutput("click_info"),
                         fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
-                        column(width = 1, actionButton("z1out", "1x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                        column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
                         column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
                         column(width = 1,actionButton("z10out", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                         column(width = 2, h6(tags$b("Zoom-in:")), style = "padding: 3px 5px; text-align:right"),
-                        column(width = 1,actionButton("z1in", "1x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                        column(width = 1,actionButton("z2in", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
                         column(width = 1,actionButton("z5in", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
                         column(width = 1,actionButton("z10in", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px")
               )
@@ -142,15 +146,20 @@ ui <- page_sidebar(
                 # GO button upset
                 actionButton("run.stat2", "Run", width = "25%"),
                 # print piechart with peaks annotation
-                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 200) %>% withSpinner(), verbatimTextOutput('warn.message3')),
+                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 350)  %>% withSpinner(), verbatimTextOutput('warn.message3')),
                 # GO button annotation
                 actionButton("run.stat3", "Run", width = "25%"),
+                # print circos of 3D contacts
+                fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), imageOutput("circos", width = "auto", height = 300, inline = T) %>% withSpinner(), verbatimTextOutput('warn.message6')),
+                #fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), plotOutput("circos", height = 600) %>% withSpinner(), verbatimTextOutput('warn.message6')),
+                # GO button circos
+                actionButton("run.stat6", "Run", width = "25%"),
                 # print circular hierarchy plot for categories
                 fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 250, width = 450) %>% withSpinner(), verbatimTextOutput('warn.message4')),
                 # GO button circular hierarchy
                 actionButton("run.stat4", "Run", width = "25%"),
                 # print manhattan plot with whole chr and zoom-in
-                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 450) %>% withSpinner(), verbatimTextOutput('warn.message5')),
+                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 600) %>% withSpinner(), verbatimTextOutput('warn.message5')),
                 # GO button manhattan
                 actionButton("run.stat5", "Run", width = "25%")
                   )),
@@ -204,8 +213,9 @@ server <- function(input, output, session){
   output$sel.coord <- renderText({paste("chr", reactiveChr(), ": ", reactiveChrstart(), "-", reactiveChrend(), sep="")})
   ##---------------------- Output genomic view plot:
   
-  
     tracks <- reactive({
+     req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 | 
+           sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
       plotgardener.shiny.function(bw.file = bw.file, 
                                                                           hic.file = hic.file, 
                                                                           bed.file = bed.file, 
@@ -225,14 +235,51 @@ server <- function(input, output, session){
                                                                           bw.mode = input$bw.mode,
                                                                           expand.transcripts = reactiveTranscript(),
                                                                           genes.hgnc = genes.hgnc)
-    
-     
+    # } else {return(NULL)}
+      
     })
   
   output$res <- renderSvgPanZoom({
+    #req(!is.null(tracks()))
     svgPanZoom(svglite:::inlineSVG(tracks()), 
                panEnabled = T, controlIconsEnabled = T, viewBox = T, width = "auto", height = "900px") #width = "auto", height = "auto",
   })
+  
+  image <- reactive({
+    req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
+    outfile <- tempfile(fileext='.png')
+    png(outfile, width =1200, height=900, res = 120)
+    plotgardener.shiny.function(bw.file = bw.file, 
+                                hic.file = hic.file, 
+                                bed.file = bed.file, 
+                                bedpe.file = bedpe.file,
+                                bw.names = config$bw.names,
+                                hic.names = config$hic.names,
+                                bed.names = config$bed.names,
+                                bedpe.names = config$bedpe.names,
+                                gwas.file = gwas.file,
+                                gwas.names = config$gwas.names,
+                                cat.file = cat.file,
+                                cat.names = config$cat.names,
+                                cat.collapse = reactiveCat(),
+                                chr = reactiveChr(), #input$chr, 
+                                start = reactiveChrstart(), #input$chrstart, 
+                                end = reactiveChrend(), #input$chrend,
+                                bw.mode = input$bw.mode,
+                                expand.transcripts = reactiveTranscript(),
+                                genes.hgnc = genes.hgnc)
+    dev.off()
+    list(src = outfile,
+         alt = "genomic viewer image")
+    #} else {return(NULL)}
+  })
+  
+  output$plot.test <- renderImage({
+#    req(!is.null(image()))
+    image()
+  }, deleteFile = F)
+  
+ 
 
   ##-------------------- Output zooming region plot:
   
@@ -256,7 +303,7 @@ server <- function(input, output, session){
   
   ##-------------------- Zooming when click on zoom buttons:
   ########## ZOOM-OUT
-   ## Zoom out 1x
+   ## Zoom out 2x
    observe({
       zoom <- round((input$chrend - input$chrstart)/2, 0)
       s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
@@ -266,7 +313,7 @@ server <- function(input, output, session){
         s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
       if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
         e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
-      }) %>%  bindEvent(input$z1out)
+      }) %>%  bindEvent(input$z2out)
    ## Zoom out 5x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
@@ -290,7 +337,7 @@ server <- function(input, output, session){
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
      }) %>%  bindEvent(input$z10out)
    ########## ZOOM-IN
-   ## Zoom out 1x
+   ## Zoom out 2x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/2)/2, 0)
      mid.region <- input$chrstart + round(((input$chrend - input$chrstart)/2), 0)
@@ -300,7 +347,7 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){ 
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
-     }) %>%  bindEvent(input$z1in)
+     }) %>%  bindEvent(input$z2in)
    ## Zoom out 5x
    observe({
      zoom <- round(((input$chrend - input$chrstart)/5)/2, 0)
@@ -544,7 +591,7 @@ server <- function(input, output, session){
     # Specifiy if data not plotted in warning message
     large.data <- c(config$bed.names[which(file.size(bed.file) > 45e+06)], config$bedpe.names[which(file.size(bedpe.file) > 45e+06)])
     if(!isEmpty(large.data)){
-      output$warn.message1 <- renderText({paste(large.data,"data larger than 45 Mb not plotted",  collapse = " ")})
+      output$warn.message1 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")})
     }
   })
   
@@ -558,7 +605,7 @@ server <- function(input, output, session){
                                      End = vals$end,
                                      filetype = "bed")
       }
-    })
+    }, res = 100)
     
     
   
@@ -573,7 +620,7 @@ server <- function(input, output, session){
                                    End = vals$end,
                                    filetype = "bedpe")
       }
-    })
+    }, res = 100)
   ## For upset plot
     vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
     
@@ -586,7 +633,7 @@ server <- function(input, output, session){
       # Specifiy if data not plotted in warning message
       large.data <- c(config$bed.names[which(file.size(bed.file) > 45e+06)], config$bedpe.names[which(file.size(bedpe.file) > 45e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message2 <- renderText({paste(large.data,"data larger than 45 Mb not plotted",  collapse = " ")})
+        output$warn.message2 <- renderText({paste(large.data,"data larger than", ceiling(45e+06/2^20), "Mb not plotted",  collapse = " ")})
       }
     })
     
@@ -601,7 +648,7 @@ server <- function(input, output, session){
                                        Start = vals2$start, 
                                        End = vals2$end)
       }
-    })
+    }, res = 100)
 
   ## For annotation plot
     vals3 <- reactiveValues(bed.file=NULL)
@@ -611,7 +658,7 @@ server <- function(input, output, session){
       # Specifiy if data not plotted in warning message
       large.data <- c(config$bed.names[which(file.size(bed.file) > 45e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message3 <- renderText({paste(large.data,"data larger than 45 Mb not plotted",  collapse = " ")})
+        output$warn.message3 <- renderText({paste(large.data,"data larger than", ceiling(45e+06/2^20), "Mb not plotted",  collapse = " ")})
       }
     })
     
@@ -620,7 +667,57 @@ server <- function(input, output, session){
         peaks.annotation.function(bed.file = vals3$bed.file, 
                                        bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)])
       }
+    }, res = 100)
+    
+    ## For circos plot
+    vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    
+    observeEvent(input$run.stat6, {
+      vals6$bedpe.file <- bedpe.file[which(file.size(bedpe.file) <= 400e+06)]
+      vals6$chr <-  input$chr
+      vals6$start <- input$chrstart
+      vals6$end <- input$chrend
+      # Specifiy if data not plotted in warning message
+      large.data <- c(config$bedpe.names[which(file.size(bedpe.file) > 400e+06)])
+      if(!isEmpty(large.data)){
+        output$warn.message6 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")})
+      }
     })
+    
+   # output$circos <- renderPlot({
+    #  if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
+     #   circos.function(bedpe.file = vals6$bedpe.file, 
+      #                  chromosome = vals6$chr,
+       #                 genome = "hg38",
+        #                zoom_start = vals6$start,
+         #               zoom_end = vals6$end,
+          #              genes.label = genes.hgnc,
+           #             bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)])
+  #    }
+   # }, res = 100)
+    
+    circos.image <- reactive({
+      if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
+        outfile2 <- tempfile(fileext='.png')
+        png(outfile2, width = 800, height = 600, res = 120)
+        circos.function(bedpe.file = vals6$bedpe.file, 
+                        chromosome = vals6$chr,
+                        genome = "hg38",
+                        zoom_start = vals6$start,
+                        zoom_end = vals6$end,
+                        genes.label = genes.hgnc,
+                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)])
+        dev.off()
+        list(src = outfile2,
+             alt = "circos image")
+      }
+    })
+    
+    output$circos <- renderImage({
+          req(!is.null(circos.image()))
+      circos.image()
+    }, deleteFile = T)
+    
     
     ## For categories hierarchy plot
     vals4 <- reactiveValues(cat.file=NULL, chr = "1", start = 2800000, end = 2850000)
@@ -633,7 +730,7 @@ server <- function(input, output, session){
       # Specifiy if data not plotted in warning message
       large.data <- c(config$cat.names[which(file.size(cat.file) > 400e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message4 <- renderText({paste(large.data,"data larger than 400 Mb not plotted",  collapse = " ")}) ### not working sistemare
+        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")}) ### not working sistemare
       } 
       
     })
@@ -651,14 +748,14 @@ server <- function(input, output, session){
     vals5 <- reactiveValues(gwas.file=NULL, chr = "1", start = 2800000, end = 2850000)
     
     observeEvent(input$run.stat5, {
-      vals5$gwas.file <- gwas.file[which(file.size(gwas.file) <= 400e+06)]
+      vals5$gwas.file <- gwas.file[which(file.size(gwas.file) <= 800e+06)]
       vals5$chr <-  input$chr
       vals5$start <- input$chrstart
       vals5$end <- input$chrend
       # Specifiy if data not plotted in warning message
-      large.data <- c(config$gwas.names[which(file.size(gwas.file) > 400e+06)])
+      large.data <- c(config$gwas.names[which(file.size(gwas.file) > 800e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message5 <- renderText({paste(large.data,"data larger than 400 Mb not plotted",  collapse = " ")})
+        output$warn.message5 <- renderText({paste(large.data,"data larger than", ceiling(800e+06/2^20), "Mb not plotted",  collapse = " ")})
       }
     })
     output$manhattan <- renderPlot({
@@ -667,11 +764,11 @@ server <- function(input, output, session){
                               Chr = vals5$chr, 
                               start = vals5$start, 
                               end = vals5$end, 
-                              sign.p = 5e-6,
+                              sign.p = 5e-10,
                               chr.len.df = chrom.cen.df,
-                              gwas.names =config$gwas.names[which(file.size(gwas.file) < 400e+06)])
+                              gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)])
         }
-      })
+      }, res = 100)
 
   
   
