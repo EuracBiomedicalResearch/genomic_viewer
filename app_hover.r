@@ -37,7 +37,7 @@ source("basic_statistics_genome_tracks_function.r")
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "Shiny_wzoom_config_hover_test.yml")
+config <- config::get(file = "Shiny_wzoom_config_hover.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Projects/SENECA RNAseq Udine/03_Processing/03.02_Scripts/03.02.01_scripts_post_processing_RNAseq/Shiny_RNAseq_UD2025_config_correct.yml")
 
@@ -53,14 +53,17 @@ hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, i
 # Set GWAS data file
 gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.ext)
 ### For chromosomes plotting
-chrom.cen.df <- read_delim(config$chrom.cen, "\t", col_names = T, show_col_types = F)
+#chrom.cen.df <- read_delim(config$chrom.cen, "\t", col_names = T, show_col_types = F)
 # Genes hgnc symbol
-genes.hgnc <- read_delim(config$genes.hgnc, "\t", col_names = T, show_col_types = F)
+genes.hgnc.path <- paste(config$genes.hgnc.dir, "/", gsub( " .*", "", "hg38"), "_hgnc_symbol_cleaned.bed", sep="")
+genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
 # Categorical bed file
 cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
 
 ## Set options for bw file plotting mode:
 bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
+## Define accepted reference genomes assmblies
+#ref.gen.short <- c("hg19", "hg38", "T2T", "mm10", "mm39")
 
 ######----------------------------------------------------------- SHINY
 # Define UI -----------------------------------------------------
@@ -69,6 +72,12 @@ ui <- page_sidebar(
   sidebar = sidebar(
     # text input to choose genomic coordinates:
     helpText("Choose the genomic range to be visualized, then press GO."),
+      # Reference genome
+    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - human)", 
+                                                             "hg38 (GRCh38 - human)", 
+                                                             "T2T (CHM13 - human)",
+                                                             "mm10 (GRCm38 - mouse)",
+                                                             "mm39 (GRCm39 - mouse)"), selectize = F),
       # Chr
     textInput("chr", "Choose chromosome:", value = "1"),
       # coordinates
@@ -187,8 +196,21 @@ ui <- page_sidebar(
 # Define SERVER logic ---------------------------------------------------
 server <- function(input, output, session){
   
+  ##---------------------- Read reference genome related files
+  # Genes hgnc symbol
+  #genes.hgnc <- eventReactive(input$ref.genome, {
+  #genes.hgnc.path <- paste(config$genes.hgnc.dir, "/", gsub( " .*", "", input$ref.genome), "_hgnc_symbol_cleaned.bed", sep="")
+  #genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
+  #})
+
+  ### For chromosomes plotting
+  chrom.cen.df <- eventReactive(input$ref.genome, {
+  chrom.cen.path <- paste(config$chrom.cen, "/chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep="")
+  chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
+  })
+  
+  
   ##---------------------- Establish reactive events
-    ## Chr
   reactiveChr <- eventReactive(input$go, {
     print(input$chr)
   })
@@ -199,6 +221,7 @@ server <- function(input, output, session){
   })
   ## Chr end
   reactiveChrend <- eventReactive(input$go, {
+    chrom.cen.df <- chrom.cen.df()
     if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
       } else print(input$chrend)
   })
@@ -305,6 +328,7 @@ server <- function(input, output, session){
   ########## ZOOM-OUT
    ## Zoom out 2x
    observe({
+     chrom.cen.df <- chrom.cen.df()
       zoom <- round((input$chrend - input$chrstart)/2, 0)
       s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
@@ -316,6 +340,7 @@ server <- function(input, output, session){
       }) %>%  bindEvent(input$z2out)
    ## Zoom out 5x
    observe({
+     chrom.cen.df <- chrom.cen.df()
      zoom <- round(((input$chrend - input$chrstart)/2)*5, 0)
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
@@ -327,6 +352,7 @@ server <- function(input, output, session){
      }) %>%  bindEvent(input$z5out)
    ## Zoom out 10x
    observe({
+     chrom.cen.df <- chrom.cen.df()
      zoom <- round(((input$chrend - input$chrstart)/2)*10, 0)
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
@@ -339,6 +365,7 @@ server <- function(input, output, session){
    ########## ZOOM-IN
    ## Zoom out 2x
    observe({
+     chrom.cen.df <- chrom.cen.df()
      zoom <- round(((input$chrend - input$chrstart)/2)/2, 0)
      mid.region <- input$chrstart + round(((input$chrend - input$chrstart)/2), 0)
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
@@ -350,6 +377,7 @@ server <- function(input, output, session){
      }) %>%  bindEvent(input$z2in)
    ## Zoom out 5x
    observe({
+     chrom.cen.df <- chrom.cen.df()
      zoom <- round(((input$chrend - input$chrstart)/5)/2, 0)
      mid.region <- round(input$chrstart + ((input$chrend - input$chrstart)/2), 0)
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
@@ -361,6 +389,7 @@ server <- function(input, output, session){
      }) %>%  bindEvent(input$z5in)
    ## Zoom out 10x
    observe({
+     chrom.cen.df <- chrom.cen.df()
      zoom <- round(((input$chrend - input$chrstart)/10)/2, 0)
      mid.region <- round(input$chrstart + ((input$chrend - input$chrstart)/2), 0)
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
@@ -375,6 +404,7 @@ server <- function(input, output, session){
   
   ##-------------------- Update chr start end upon click on zoomed range
   observeEvent(input$plot_brush, {
+    chrom.cen.df <- chrom.cen.df()
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x <- input$plot_brush
     # Define START min
@@ -765,7 +795,7 @@ server <- function(input, output, session){
                               start = vals5$start, 
                               end = vals5$end, 
                               sign.p = 5e-10,
-                              chr.len.df = chrom.cen.df,
+                              chr.len.df = chrom.cen.df(),
                               gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)])
         }
       }, res = 100)
@@ -775,6 +805,7 @@ server <- function(input, output, session){
   ##--------------------- Chromosome plot and additional options
     ## Plot
   output$chr.plot <- renderPlot({
+    chrom.cen.df <- chrom.cen.df()
      ggplot(chrom.cen.df) +
       ggchicklet:::geom_rrect(aes(xmin = order - 0.25,
                                   xmax = order + 0.25,
@@ -786,7 +817,7 @@ server <- function(input, output, session){
                                   ymin = 0,
                                   ymax = cen.end,
                                   fill = chr)) +
-      scale_x_continuous(breaks = c(1:24), labels = factor(chrom.cen.df$chr, levels = chrom.cen.df$chr)) +
+      scale_x_continuous(breaks = c(1:length(chrom.cen.df$chr)), labels = factor(chrom.cen.df$chr, levels = chrom.cen.df$chr)) +
       theme_void() +
       theme(legend.position = "none",
             axis.ticks.x = element_line(size = 2, linetype = 2),
@@ -797,6 +828,7 @@ server <- function(input, output, session){
     ## Hover output
 
   output$chr.info <- renderText({
+    chrom.cen.df <- chrom.cen.df()
     if(!is.null(input$chr.hover)){
       hover=input$chr.hover
       paste0(chrom.cen.df$chr[round(as.numeric(hover[1],0))], ": click to select")
@@ -835,6 +867,7 @@ server <- function(input, output, session){
   
   ##------------------------ Update chr start end upon click on chr plot
     observeEvent(input$chr.click, {
+      chrom.cen.df <- chrom.cen.df()
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
     x2 <- input$chr.click
     updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", chrom.cen.df$chr[x2$x]))
