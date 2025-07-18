@@ -150,7 +150,7 @@ ui <- page_sidebar(
                 # GO button annotation
                 actionButton("run.stat3", "Run", width = "25%"),
                 # print circos of 3D contacts
-                fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), imageOutput("circos", width = "auto", height = 300, inline = T) %>% withSpinner(), verbatimTextOutput('warn.message6')),
+                fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), imageOutput("circos", width = "auto", height = 600, inline = T) %>% withSpinner(), verbatimTextOutput('warn.message6')),
                 #fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), plotOutput("circos", height = 600) %>% withSpinner(), verbatimTextOutput('warn.message6')),
                 # GO button circos
                 actionButton("run.stat6", "Run", width = "25%"),
@@ -699,7 +699,7 @@ server <- function(input, output, session){
     circos.image <- reactive({
       if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
         outfile2 <- tempfile(fileext='.png')
-        png(outfile2, width = 800, height = 600, res = 120)
+        png(outfile2, width = 900, height = 1200, res = 120)
         circos.function(bedpe.file = vals6$bedpe.file, 
                         chromosome = vals6$chr,
                         genome = "hg38",

@@ -657,8 +657,8 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
   genes.ann <- dplyr::filter(genes.ann, chromosome_name == chrom & start_position >= zoom_start & end_position <= zoom_end) # filter just genes in the zoom region
   genes.ann$chromosome_name <- paste("zoom_", genes.ann$chromosome_name, sep="") # add zoo to the chromosome name
   
-
-  
+  # Arrange the layout of the resulting image that maz combine multiple plots beased on the number of input bedpe files
+  layout(matrix(1:length(bedpe.file), length(bedpe.file), 2)) 
   
   # for every separate bedpe
   for (i in 1:length(bedpe.file)){
