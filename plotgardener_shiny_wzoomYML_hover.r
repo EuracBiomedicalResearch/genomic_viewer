@@ -1,11 +1,39 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, expand.transcripts, genes.hgnc){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, expand.transcripts, genes.hgnc, genome, cytoband){
   
   
   
   ################################## INIZIO PREPROCESSING OF FILES ####################
   
      #### prepare data for plotting when needed:
+  
+  ## Get sizes of chromosomes to scale their sizes, used for genomic annotation tracks
+  # define organism
+  if (genome %in% c("hg19", "hg38", "T2T")){
+    org <- "Hsapiens"
+  } else if (genome %in% c("mm10", "mm39")){
+    org <- "Mmusculus"
+  }
+  # define TxDb
+  tx_db <- get(paste("TxDb.", org, ".UCSC.", genome, ".knownGene", sep=""))
+  chromSizes <- GenomeInfoDb::seqlengths(tx_db)
+  maxChromSize <- max(chromSizes)
+  
+  # define assembly for non-default genomes
+  if (genome == "mm39"){
+    genome <- assembly(Genome = "mm39",
+                     TxDb = "TxDb.Mmusculus.UCSC.mm39.knownGene",
+                     OrgDb = "org.Mm.eg.db",
+                     BSgenome = "BSgenome.Mmusculus.UCSC.mm39")
+
+  } else if (genome == "T2T") {
+    genome <- assembly(Genome = "T2T",
+                    OrgDb = "org.Hs.eg.db",
+                    TxDb = "TxDb.Hsapiens.UCSC.T2T.knownGene",
+                    BSgenome = "BSgenome.Hsapiens.NCBI.T2T.CHM13v2.0",
+                    gene.id.column = "SYMBOL")
+  } 
+  
   # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
   
   # read bw file to use later
@@ -92,7 +120,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
           }
      
       hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
-         chrom = as.numeric(chr), assembly = "hg38",
+         chrom = as.numeric(chr), assembly = genome,
          chromstart = start, chromend = end,
         resolution = resolution, res_scale = "BP", norm = "KR"
           ) 
@@ -100,10 +128,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
       }
     }
     
-    ## Get sizes of chromosomes to scale their sizes, used for genomic annotation tracks
-    tx_db <- TxDb.Hsapiens.UCSC.hg38.knownGene
-    chromSizes <- GenomeInfoDb::seqlengths(tx_db)
-    maxChromSize <- max(chromSizes)
     
     ################################## END PREPROCESSING OF FILES ####################
   
@@ -113,7 +137,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
   ## Set parameters regarding the region that we would like to visualize. Those can be imported from every plot that we want to add.
 params <- pgParams(
     chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end,
-    assembly = "hg38",
+    assembly = genome,
     x = 0, just = c("left", "bottom"),
     width = 16, length = 16, default.units = "cm",
     range = c(0, maxScore) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
@@ -238,25 +262,44 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 #####------------------------------------------------ BED
 ## Plot bed files
     if(length(bed.file) > 0){
-  for (i in 1:length(bed.file)){
-   # bed signal
-  plotRanges(
-    data = bed.file[i],
-   collapse = T,
-   fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]),
-   y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,
-   params = params)
-   
-   ## Add text labels
-  plotText(
+      # plot as ranges or as density based on the width of the genomic region
+       for (i in 1:length(bed.file)){
+         if(end - start <= 10e+6){
+          # bed signal
+          plotRanges(
+          data = bed.file[i],
+          collapse = T,
+          fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]),
+          y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,
+          params = params)
+         } else {
+           bed.den <- read.csv.sql(bed.file[i], paste("select V1, V2 from file where V1 = '", paste("chr", chr, sep=""), "'", sep =""), sep="\t", header = F, eol = "\n")
+           bed.density.plot <- ggplot(bed.den, aes(x = V2)) +
+             geom_density(fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]), alpha = 0.7, bw = 50000, color = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i])) +
+             xlim(start, end) +
+             theme_void() +
+             theme(plot.margin = grid::unit(c(0,0,0,0), "mm"),
+                   # panel.border = element_rect(color = "black", 
+                   #                            fill = NA, 
+                   #                            size = 2)
+             
+             )
+           bed.den <- NULL
+           plotGG(bed.density.plot,
+                  x = -0.7, paste(0.75*conv, "b", sep=""), height = 0.75*conv, width = 17.4,
+                  params = params
+           )
+         }
+     ## Add text labels
+    plotText(
     label = bed.names[i], fontsize = 10*(conv+0.2), fontcolor = rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i],
     x = -0.5, y = "0b", just = c("right", "bottom"),
     params = params)
 
   ## Increment y coord
   y.coord <- y.coord+(0.75*conv)
+       }
       }
-    }
     print(y.coord)
     
 #####------------------------------------------------ CATEGORICAL BED  
@@ -267,7 +310,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
         plotRanges(
          data = cat.file[i],
          collapse = cat.collapse[i],
-          fill = colorby("category", palette =  colorRampPalette(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))])),
+          fill = colorby("category", palette =  colorRampPalette(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read_delim(cat.file[i], "\t", col_names = T, show_col_types = F)$category))])),
           y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,
           params = params)
       
@@ -281,12 +324,12 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
         y.coord <- y.coord+(0.75*conv)
         
         ## Calculate legend height
-        cat.h <- (0.3*length(c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)))*(conv+0.2))
+        cat.h <- (0.35*length(c(unique(read_delim(cat.file[i], "\t", col_names = T, show_col_types = F)$category)))*(conv+0.2))
   
     
      plotLegend(
-       legend = c(unique(read.table(cat.file[i], sep = "\t", header = T)$category)),
-       fill = as.character(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read.table(cat.file[i], sep = "\t", header = T)$category))]),
+       legend = c(unique(read_delim(cat.file[i], "\t", col_names = T, show_col_types = F)$category)),
+       fill = as.character(c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::Nuriel_Stone"))[1:length(unique(read_delim(cat.file[i], "\t", col_names = T, show_col_types = F)$category))]),
         border = FALSE,
        x = 16.45, y = paste(-cat.h, "b", sep = ""), width = 1.5, height = cat.h,
        just = c("left", "top"),
@@ -432,21 +475,16 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 # Plot chromosome ideogram:
 
 ## Plot and place ideogram
+  if (genome[1] %in% c("hg19", "hg38", "mm10")){
+    
 ideogramPlot <- plotIdeogram(
-  chrom = paste("chr", chr, sep=""), assembly = "hg38",
+  chrom = paste("chr", chr, sep=""), assembly = genome,
   x = 0.75, y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5,
   just = c("left", "bottom"),
-  default.units = "cm"
-)
+  default.units = "cm")
+
 ## Increment y coord
 y.coord <- y.coord+0.5
-
-## Plot chromosome name
-#plotText(
-#  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
-#  x = 4.5, y = "0.5b", just = "right")
-#y.coord <- y.coord+0.5
-# COmmented because redundant with GenomeLabel
 
 ## Add highlight region
 region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
@@ -456,37 +494,71 @@ annoHighlight(
   y = "-0.6b", height = 0.7, just = c("left", "top"), default.units = "cm"
 )
 
+  } else {
+    ## Define region and cytoband data
+      region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
+     cytoband_data <- dplyr::filter(cytoband, seqnames == paste("chr", chr, sep=""))
+     ## Plot cytoband as ggplot object and add zoom highlight
+     ideo <- ggplot(cytoband_data, aes(x = seqnames, ymin = start, ymax = end, fill = gieStain)) +
+      geom_rect(aes(xmin = 0, xmax = 2)) +
+      ggchicklet:::geom_rrect(aes(xmin=0, xmax =2, ymin=0, ymax=max(end)), fill="transparent", color="slategray") +
+      coord_flip() + # Optional: Flip coordinates for a vertical ideogram
+      theme_void() +# Optional: Remove default ggplot theme elements
+      theme(legend.position = "none") +
+      scale_fill_manual(values = c(paletteer_d("RColorBrewer::Greys")[1:length(grep("gneg*|gpos*", unique(cytoband_data$gieStain)))], rev(paletteer_dynamic("cartography::pastel.pal",5 ) [1:(length( unique(cytoband_data$gieStain))-length(grep("gneg*|gpos*", unique(cytoband_data$gieStain))))]))) +
+      annotate(geom = "rect", xmin = 0, xmax = 2, ymin = region$chromstart, ymax = region$chromend, color = "darkred", fill = "darkred", alpha = 0.5)
+      
+     ideogramPlot <- plotGG(ideo,
+           x = 0.75 , y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5, params = region,
+           just = c("left", "bottom"),
+           default.units = "cm")
+     
+     ideogramPlot$chrom <- paste("chr", chr, sep="")
+     ## Increment y coord
+     y.coord <- y.coord+0.5
+
+  }
+  
+
+## Plot chromosome name
+#plotText(
+#  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
+#  x = 4.5, y = "0.5b", just = "right")
+#y.coord <- y.coord+0.5
+# COmmented because redundant with GenomeLabel
+
 print(y.coord)
 
+
 ## Add zoom-in lines
-annoZoomLines(
-  plot = ideogramPlot, params = region,
-  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+0.75, default.units = "cm"
+annoZoomLines(params = region, 
+  plot = ideogramPlot, 
+  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+0.75, default.units = "cm", just = c("left", "bottom")
 )
 
 }
 
 
 #plotgardener.shiny.function(bw.file = bw.file, 
-#                            hic.file = hic.file, 
-#                            bed.file = bed.file, 
-#                            bedpe.file = bedpe.file,
-#                            bw.names = config$bw.names,
-#                            hic.names = config$hic.names,
-#                            bed.names = config$bed.names,
-#                            bedpe.names = config$bedpe.names,
-#                            gwas.file = gwas.file,
-#                            gwas.names = config$gwas.names,
-#                            cat.file = cat.file,
-#                            cat.names = config$cat.names,
-#                            cat.collapse = T,
-#                            chr = chr,
-#                            start = start, 
-#                            end = end,
-#                            bw.mode = "Profile",
-#                            expand.transcripts = F,
- #                           genes.hgnc = genes.hgnc)
+  #                          hic.file = hic.file, 
+   #                         bed.file = bed.file, 
+    #                        bedpe.file = bedpe.file,
+     #                       bw.names = config$bw.names,
+      #                      hic.names = config$hic.names,
+       #                     bed.names = config$bed.names,
+        #                    bedpe.names = config$bedpe.names,
+         #                   gwas.file = gwas.file,
+          #                  gwas.names = config$gwas.names,
+           #                 cat.file = cat.file,
+            #                cat.names = config$cat.names,
+                   #         cat.collapse = T,
+             #               chr = chr,
+              #              start = chrstart, 
+               #             end = chrend,
+                #            bw.mode = "Profile",
+                 #           expand.transcripts = F,
+                  #          genes.hgnc = genes.hgnc)
 
-#chr <- "1"
-#chrstart <- 28000000
-#chrend <- 30300000
+#chr <- "4"
+#chrstart <- 1
+#chrend <- 190214555

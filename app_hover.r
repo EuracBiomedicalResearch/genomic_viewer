@@ -10,7 +10,13 @@ library(shinycssloaders)
 # Load server libraries
 library(plotgardener)
 library(org.Hs.eg.db)
+library(BSgenome.Hsapiens.NCBI.T2T.CHM13v2.0)
+library(BSgenome.Mmusculus.UCSC.mm39)
+library(TxDb.Hsapiens.UCSC.T2T.knownGene)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library(TxDb.Mmusculus.UCSC.mm39.knownGene)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(AnnotationHub)
 library(ggplot2)
 library(ChIPpeakAnno)
@@ -52,18 +58,11 @@ bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), recursive = T, i
 hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.ext)
 # Set GWAS data file
 gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.ext)
-### For chromosomes plotting
-#chrom.cen.df <- read_delim(config$chrom.cen, "\t", col_names = T, show_col_types = F)
-# Genes hgnc symbol
-genes.hgnc.path <- paste(config$genes.hgnc.dir, "/", gsub( " .*", "", "hg38"), "_hgnc_symbol_cleaned.bed", sep="")
-genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
 # Categorical bed file
 cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
-
 ## Set options for bw file plotting mode:
 bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
-## Define accepted reference genomes assmblies
-#ref.gen.short <- c("hg19", "hg38", "T2T", "mm10", "mm39")
+
 
 ######----------------------------------------------------------- SHINY
 # Define UI -----------------------------------------------------
@@ -198,15 +197,31 @@ server <- function(input, output, session){
   
   ##---------------------- Read reference genome related files
   # Genes hgnc symbol
-  #genes.hgnc <- eventReactive(input$ref.genome, {
-  #genes.hgnc.path <- paste(config$genes.hgnc.dir, "/", gsub( " .*", "", input$ref.genome), "_hgnc_symbol_cleaned.bed", sep="")
-  #genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
-  #})
-
+  genes.hgnc <- eventReactive(input$ref.genome, {
+  genes.hgnc.path <- paste(config$genes.hgnc.dir, "/", gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep="")
+  genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
+  })
+  
   ### For chromosomes plotting
   chrom.cen.df <- eventReactive(input$ref.genome, {
-  chrom.cen.path <- paste(config$chrom.cen, "/chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep="")
+  chrom.cen.path <- paste(config$chrom.cen.dir, "/chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep="")
   chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
+  })
+  
+  ### For cytoband
+  Cytoband <- eventReactive(input$ref.genome, {
+    ref.genome <- gsub( " .*", "", input$ref.genome)
+    if (ref.genome %in% c("hg19", "hg38", "mm10")){
+      cytoband <- NULL
+    } else if (ref.genome == "T2T"){
+      cytoband <- read_delim(paste(config$chrom.cen.dir, "/chm13v2.0_cytobands_allchrs.bed", sep=""), delim = "\t", col_names = F)
+      colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
+      return(cytoband)
+    } else if (ref.genome == "mm39"){
+      cytoband <- read_delim(paste(config$chrom.cen.dir, "/cytoBand_GRCm39.txt", sep=""), delim = "\t", col_names = F)
+      colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
+      return(cytoband)
+    }
   })
   
   
@@ -237,6 +252,7 @@ server <- function(input, output, session){
   ##---------------------- Output genomic view plot:
   
     tracks <- reactive({
+      genes.hgnc <- genes.hgnc()
      req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 | 
            sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
       plotgardener.shiny.function(bw.file = bw.file, 
@@ -257,7 +273,9 @@ server <- function(input, output, session){
                                                                           end = reactiveChrend(), #input$chrend,
                                                                           bw.mode = input$bw.mode,
                                                                           expand.transcripts = reactiveTranscript(),
-                                                                          genes.hgnc = genes.hgnc)
+                                                                          genes.hgnc = genes.hgnc,
+                                                                          genome = gsub( " .*", "", input$ref.genome),
+                                                                          cytoband = Cytoband())
     # } else {return(NULL)}
       
     })
@@ -269,6 +287,7 @@ server <- function(input, output, session){
   })
   
   image <- reactive({
+    genes.hgnc <- genes.hgnc()
     req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
     outfile <- tempfile(fileext='.png')
     png(outfile, width =1200, height=900, res = 120)
@@ -290,7 +309,9 @@ server <- function(input, output, session){
                                 end = reactiveChrend(), #input$chrend,
                                 bw.mode = input$bw.mode,
                                 expand.transcripts = reactiveTranscript(),
-                                genes.hgnc = genes.hgnc)
+                                genes.hgnc = genes.hgnc,
+                                genome = gsub( " .*", "", input$ref.genome),
+                                cytoband = Cytoband())
     dev.off()
     list(src = outfile,
          alt = "genomic viewer image")
@@ -676,7 +697,8 @@ server <- function(input, output, session){
                                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)], 
                                        chr = vals2$chr, 
                                        Start = vals2$start, 
-                                       End = vals2$end)
+                                       End = vals2$end,
+                                      genome = gsub( " .*", "", input$ref.genome))
       }
     }, res = 100)
 
@@ -695,7 +717,8 @@ server <- function(input, output, session){
     output$annotation <- renderPlot({
       if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
         peaks.annotation.function(bed.file = vals3$bed.file, 
-                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)])
+                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
+                                  genome = gsub( " .*", "", input$ref.genome))
       }
     }, res = 100)
     
@@ -727,12 +750,13 @@ server <- function(input, output, session){
    # }, res = 100)
     
     circos.image <- reactive({
+      genes.hgnc <- genes.hgnc()
       if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
         outfile2 <- tempfile(fileext='.png')
         png(outfile2, width = 900, height = 1200, res = 120)
         circos.function(bedpe.file = vals6$bedpe.file, 
                         chromosome = vals6$chr,
-                        genome = "hg38",
+                        genome = gsub( " .*", "", input$ref.genome),
                         zoom_start = vals6$start,
                         zoom_end = vals6$end,
                         genes.label = genes.hgnc,
@@ -796,7 +820,8 @@ server <- function(input, output, session){
                               end = vals5$end, 
                               sign.p = 5e-10,
                               chr.len.df = chrom.cen.df(),
-                              gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)])
+                              gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)],
+                              genome = gsub( " .*", "", input$ref.genome))
         }
       }, res = 100)
 
@@ -845,17 +870,19 @@ server <- function(input, output, session){
     }
   })
   
-  observeEvent(genes.hgnc, {
-    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$hgnc_symbol, options = list(maxOptions = 12), server = TRUE)
+  observeEvent(genes.hgnc(), {
+    genes.hgnc <- genes.hgnc()
+    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$gene_symbol, options = list(maxOptions = 12), server = TRUE)
   })
   
   output$sel.gene <- renderText({input$gene.search})
 
   observeEvent(gene.names(),{
     if (!input$gene.search == ""){
-    updateTextInput(session = getDefaultReactiveDomain(), "chr", value = genes.hgnc$chromosome_name[which(genes.hgnc$hgnc_symbol == input$gene.search)])
-    updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = genes.hgnc$start_position[which(genes.hgnc$hgnc_symbol == input$gene.search)])
-    updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = genes.hgnc$end_position[which(genes.hgnc$hgnc_symbol == input$gene.search)])
+    genes.hgnc <- genes.hgnc()
+    updateTextInput(session = getDefaultReactiveDomain(), "chr", value = genes.hgnc$chromosome_name[which(genes.hgnc$gene_symbol == input$gene.search)])
+    updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = genes.hgnc$start_position[which(genes.hgnc$gene_symbol == input$gene.search)])
+    updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = genes.hgnc$end_position[which(genes.hgnc$gene_symbol == input$gene.search)])
     }
   })
   
@@ -881,6 +908,7 @@ server <- function(input, output, session){
     output$plot_save <- downloadHandler(
       filename = function() { "output.pdf" },
       content = function(file) {
+      genes.hgnc <- genes.hgnc()
       pdf(file, width = 10, height = 8 )
         plotgardener.shiny.function(bw.file = bw.file, 
                                     hic.file = hic.file, 
@@ -900,7 +928,9 @@ server <- function(input, output, session){
                                     end = reactiveChrend(), #input$chrend,
                                     bw.mode = input$bw.mode,
                                     expand.transcripts = reactiveTranscript(),
-                                    genes.hgnc = genes.hgnc)
+                                    genes.hgnc = genes.hgnc,
+                                    genome = gsub( " .*", "", input$ref.genome),
+                                    cytoband = Cytoband())
          dev.off()
       
       })
