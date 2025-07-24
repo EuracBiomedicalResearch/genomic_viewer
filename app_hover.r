@@ -44,6 +44,7 @@ source("basic_statistics_genome_tracks_function.r")
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
 config <- config::get(file = "Shiny_wzoom_config_hover.yml")
+#config <- config::get(file = "Shiny_wzoom_config_hover_test_circos.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Projects/SENECA RNAseq Udine/03_Processing/03.02_Scripts/03.02.01_scripts_post_processing_RNAseq/Shiny_RNAseq_UD2025_config_correct.yml")
 
@@ -760,7 +761,8 @@ server <- function(input, output, session){
                         zoom_start = vals6$start,
                         zoom_end = vals6$end,
                         genes.label = genes.hgnc,
-                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)])
+                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)],
+                        cytoband.ext = Cytoband())
         dev.off()
         list(src = outfile2,
              alt = "circos image")
