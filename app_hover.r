@@ -25,6 +25,7 @@ library(spiky)
 library(ComplexUpset)
 library(dplyr)
 library(readr)
+library(stringr)
 library(sqldf)
 library(ggpubr)
 library(ggraph)
@@ -44,6 +45,7 @@ source("basic_statistics_genome_tracks_function.r")
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
 config <- config::get(file = "Shiny_wzoom_config_hover.yml")
+#config <- config::get(file = "C:/Users/sarlago/Documents/Projects/Galli sphingolipids/PeakCalling/Peaks_analysis_results/Shiny_wzoom_config_Galli.yml")
 #config <- config::get(file = "Shiny_wzoom_config_hover_test_circos.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Projects/SENECA RNAseq Udine/03_Processing/03.02_Scripts/03.02.01_scripts_post_processing_RNAseq/Shiny_RNAseq_UD2025_config_correct.yml")
@@ -61,6 +63,11 @@ hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, i
 gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.ext)
 # Categorical bed file
 cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
+# Region Table file
+saved.coord.path <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
+saved.coord <- read_delim(saved.coord.path, "\t", col_names = F, show_col_types = F)
+saved.coord <- apply(saved.coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
+saved.coord <- gsub(" ", "", saved.coord) # remove eventual white spaces
 ## Set options for bw file plotting mode:
 bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 
@@ -70,6 +77,13 @@ bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 ui <- page_sidebar(
   title = "Genomic viewer",
   sidebar = sidebar(
+    # graphics tags
+    tags$style(type='text/css',
+               ".selectize-dropdown-content{
+                font-size: 85%;}
+               .selectize-input { word-wrap : break-word;}
+               .selectize-input { word-break: break-word;}"),
+    width = 300,
     # text input to choose genomic coordinates:
     helpText("Choose the genomic range to be visualized, then press GO."),
       # Reference genome
@@ -95,17 +109,31 @@ ui <- page_sidebar(
       min = NA, 
       max = NA 
     ), 
-
-    
-    # Select mode for bigwig plotting
-    selectInput('bw.mode', 'Select bigWig plots mode', bw.mode, selectize=FALSE),
     
   # GO button
   actionButton("go", "Go"),
   
   # Download button 
-  downloadButton('plot_save', "Save")
-   ),
+  downloadButton('plot_save', "Save"),
+  
+  
+  # List of user-defined coordinates
+  selectizeInput(
+    inputId = "select", 
+    label = "Select coordinates from list",
+    choices = saved.coord,
+    multiple = F,
+    selected = ""
+  ),
+  
+  #uiOutput("out"),
+  fluidRow( 
+    actionButton("add", "Add", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
+    actionButton("remove", "Remove", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
+    downloadButton("export", "Export", style = "width: 33%; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
+    column(width = 12, h6(tags$i("Add, remove or export coordinates to list"), style = "font-size: 80%"), style = "text-align:center")
+  )
+  ),
   
   # Card
   page_fillable(
@@ -180,6 +208,8 @@ ui <- page_sidebar(
                       # Search by gene
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
                       textOutput('sel.gene'),
+                      # Select mode for bigwig plotting
+                      selectInput('bw.mode', 'Select bigWig plots mode', bw.mode, selectize=FALSE),
                       # Select mode for categories plotting
                       selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T),
                       # Expand transcript track option
@@ -862,9 +892,9 @@ server <- function(input, output, session){
     }
     
   })
+  ##--------------------- END OF Chromosome plot and additional options
   
   ##------------------------ Search by gene
-  
   
   gene.names <- reactive({
     if (!input$gene.search == ""){
@@ -887,12 +917,13 @@ server <- function(input, output, session){
     updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = genes.hgnc$end_position[which(genes.hgnc$gene_symbol == input$gene.search)])
     }
   })
-  
+  ##------------------------ END OF Search by gene
   
   ##------------------------ Expand transcripts checkbox
   reactiveTranscript <- eventReactive(input$checkbox, {
     print(input$checkbox)
   })
+  ##------------------------ END OF Expand transcripts checkbox
   
   ##------------------------ Update chr start end upon click on chr plot
     observeEvent(input$chr.click, {
@@ -903,7 +934,157 @@ server <- function(input, output, session){
     updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
     updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])])
   })
+    ##----------------------- END OF Update chr start end upon click on chr plot
   
+    ##----------------------- User selected coordiates REGION TABLE
+    coord <- reactive({
+      if (!is.null(saved.coord)){
+        coord <- saved.coord
+      }
+    })
+    # if there is a coord file update the list from whcih the used can select
+    observeEvent(coord(), {
+      coord <- coord()
+      updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
+    })
+    # transform coordinates form loaded table to usable array  
+    pass.coord <- reactive({
+      if (!input$select == ""){
+        pass <- unlist(strsplit(input$select, ":"))
+      }
+    })
+    # Pass the parsed coordinates to the tool for visualization
+    observeEvent(pass.coord(),{
+      if (!input$select == ""){
+        pass.coord <- pass.coord()
+        updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", pass.coord[1]))
+        updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = as.numeric(pass.coord[2]))
+        updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = as.numeric(pass.coord[3]))
+      }
+    })
+    
+    ################################## ACTIONS ON THE COORDINATES FROM THE USER DEFINED LIST ###############################  
+    coord.list <- reactiveVal(value = saved.coord)
+    #####----------------- ADD visualized coordinates to coordinates list
+    ## Save coordinates to variables
+    ## Chr
+    chrNew <- eventReactive(input$add, {
+      print(input$chr)
+    })
+    ## Chr start
+    chrstartNew <- eventReactive(input$add, {
+      if (input$chrstart <= 0) {print(1)} else {
+        print(input$chrstart)}
+    })
+    ## Chr end
+    chrendNew <- eventReactive(input$add, {
+       chrom.cen.df <- chrom.cen.df() #UNCOMMENT THIS LINE IN THE REAL CODE
+      if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      } else print(input$chrend)
+    })
+    
+    ## Add coordinates to Selectize drop-down list
+    ### Aggiungerle solo se non é giá presente la stessa coordinata
+    observeEvent(input$add,{
+      chrNew <- chrNew()
+      chrstartNew <- chrstartNew()
+      chrendNew <- chrendNew()
+      coord.list <- coord.list()
+      coord.new <- c(coord.list, paste(paste("chr", chrNew, sep=""), chrstartNew, chrendNew, sep=":"))
+      print(coord.new)
+      if (isEmpty(grep(coord.new[length(coord.new)], coord.list))){
+        # updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.new, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
+        coord.list(coord.new)
+        #print(coord.list())
+      }
+    })
+    
+    ## Add name to selected genomic range through a pop-up window
+    # reactiveValues object for storing current data set.
+    vals <- reactiveValues(data = NULL)
+    
+    dataModal <- function(failed = FALSE) {
+      coord.list <- coord.list()
+      modalDialog(
+        textInput("region.name", "Insert name of region",
+                  placeholder = 'e.g. GAPDH promoter',
+        ),
+        span(coord.list[length(coord.list)]),
+        if (failed)
+          div(tags$b("These coordinates already exist, to change the name remove the old one from the list before.", style = "color: red;")),
+        
+        footer = tagList(
+          modalButton("Cancel"),
+          actionButton("ok", "OK")
+        )
+      )
+    }
+    
+    # Show modal when button is clicked.
+    observeEvent(input$add, {
+      showModal(dataModal())
+    })
+    
+    # When OK button is pressed, attempt to load the data set. If successful,
+    # remove the modal. If not show another modal, but this time with a failure
+    # message.
+    observeEvent(input$ok, {
+      coord.list <- coord.list()
+      # Check that data object exists and is data frame.
+      if (!is.null(input$region.name) && str_count(coord.list[grep(coord.list[length(coord.list)], coord.list)], ":") < 3){ 
+        vals$data <- input$region.name
+        coord.list[length(coord.list)] <- paste(coord.list[length(coord.list)], vals$data, sep=":")
+        updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.list, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
+        coord.list(coord.list)
+        removeModal()
+      } else {
+        showModal(dataModal(failed = TRUE))
+      }
+    })
+    
+    
+    #####----------------- REMOVE visualized coordinates to coordinates list
+    ## Save coordinates to variables
+    ## Chr
+    chrRem <- eventReactive(input$remove, {
+      print(input$chr)
+    })
+    ## Chr start
+    chrstartRem <- eventReactive(input$remove, {
+      if (input$chrstart <= 0) {print(1)} else {
+        print(input$chrstart)}
+    })
+    ## Chr end
+    chrendRem <- eventReactive(input$remove, {
+       chrom.cen.df <- chrom.cen.df() #UNCOMMENT THIS LINE IN THE REAL CODE
+      if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      } else print(input$chrend)
+    })
+    
+    ## Remove coordinates to Selectize drop-down list
+    ### Remove just if matching
+    observeEvent(input$remove,{
+      chrRem <- chrRem()
+      chrstartRem <- chrstartRem()
+      chrendRem <- chrendRem()
+      coord.list <- coord.list()
+      coord.new <- c(coord.list[coord.list != grep(paste(paste("chr", chrRem, sep=""), chrstartRem, chrendRem, sep=":"), coord.list, value = T)])
+      #print(coord.new)
+      
+      updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.new, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
+      coord.list(coord.new)
+      #print(coord.list())
+    })
+    
+    #####----------------- EXPORT updated coordinates coordinates to file
+    ## Arrange coordinates to table  
+    output$export <- downloadHandler(
+      filename = function() { "User_Defined_RegionTable.bed" },
+      content = function(file) {
+        coord.list <- coord.list()
+        write_delim(as.data.frame(str_split_fixed(coord.list , ":", n=4)), file = file, delim = "\t", col_names = F)
+      })
+    ##----------------------- END OF User selected coordiates REGION TABLE
   
     ##------------------------ Save plot as PDF
     
@@ -936,6 +1117,7 @@ server <- function(input, output, session){
          dev.off()
       
       })
+    ##------------------------ END OF Save plot as PDF
 }
 
 # Run the app -------------------------------------------------------
