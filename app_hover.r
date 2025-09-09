@@ -75,9 +75,10 @@ bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 ######----------------------------------------------------------- SHINY
 # Define UI -----------------------------------------------------
 ui <- page_sidebar(
-  title = "Genomic viewer",
+  title = span("", img(src = "GV_logo.png", height = 50, style = "margin-left:10%;" )),
   sidebar = sidebar(
     # graphics tags
+    style = "background-color:#f2f0eb",
     tags$style(type='text/css',
                ".selectize-dropdown-content{
                 font-size: 85%;}
@@ -85,13 +86,14 @@ ui <- page_sidebar(
                .selectize-input { word-break: break-word;}"),
     width = 300,
     # text input to choose genomic coordinates:
-    helpText("Choose the genomic range to be visualized, then press GO."),
+    helpText("Choose the reference genome and the genomic range to be visualized, then press GO."),
       # Reference genome
     selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - human)", 
                                                              "hg38 (GRCh38 - human)", 
                                                              "T2T (CHM13 - human)",
                                                              "mm10 (GRCm38 - mouse)",
                                                              "mm39 (GRCm39 - mouse)"), selectize = F),
+    card(tags$b("Option 1: Manually insert coordinates", style = "font-size: 90%; text-align:center"),  
       # Chr
     textInput("chr", "Choose chromosome:", value = "1"),
       # coordinates
@@ -101,30 +103,25 @@ ui <- page_sidebar(
       value = 28000000, 
       min = NA, 
       max = NA 
-    ), 
+      ), 
     numericInput( 
       "chrend", 
       "End coordinate", 
       value = 28500000, 
       min = NA, 
       max = NA 
+      )
     ), 
-    
-  # GO button
-  actionButton("go", "Go"),
   
-  # Download button 
-  downloadButton('plot_save', "Save"),
-  
-  
+  card(tags$b("Option 2: Load saved coordinates", style = "font-size: 90%; text-align:center"),
   # List of user-defined coordinates
-  selectizeInput(
-    inputId = "select", 
-    label = "Select coordinates from list",
-    choices = saved.coord,
-    multiple = F,
-    selected = ""
-  ),
+    selectizeInput(
+     inputId = "select", 
+     label = "Select from menu",
+     choices = saved.coord,
+     multiple = F,
+     selected = ""
+     ),
   
   #uiOutput("out"),
   fluidRow( 
@@ -132,7 +129,14 @@ ui <- page_sidebar(
     actionButton("remove", "Remove", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
     downloadButton("export", "Export", style = "width: 33%; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
     column(width = 12, h6(tags$i("Add, remove or export coordinates to list"), style = "font-size: 80%"), style = "text-align:center")
-  )
+      )
+  ),
+  
+  # GO button
+  actionButton("go", tags$b("Go")),
+  
+  # Download button 
+  downloadButton('plot_save', "Save"),
   ),
   
   # Card
@@ -205,6 +209,7 @@ ui <- page_sidebar(
             card_body(#class = "border-0 gap-1 align-items-bottom",
                       plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = T), hover = "chr.hover"),
                       verbatimTextOutput("chr.info"),
+                      span(tags$b("Advanced Options:"), style = "text-align: center;"),
                       # Search by gene
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
                       textOutput('sel.gene'),
@@ -991,7 +996,7 @@ server <- function(input, output, session){
       chrendNew <- chrendNew()
       coord.list <- coord.list()
       coord.new <- c(coord.list, paste(paste("chr", chrNew, sep=""), chrstartNew, chrendNew, sep=":"))
-      print(coord.new)
+      #print(coord.new)
       if (isEmpty(grep(coord.new[length(coord.new)], coord.list))){
         # updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.new, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
         coord.list(coord.new)
