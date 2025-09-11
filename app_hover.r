@@ -44,11 +44,12 @@ source("basic_statistics_genome_tracks_function.r")
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "Shiny_wzoom_config_hover.yml")
+#config <- config::get(file = "Shiny_wzoom_config_hover.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Projects/Galli sphingolipids/PeakCalling/Peaks_analysis_results/Shiny_wzoom_config_Galli.yml")
 #config <- config::get(file = "Shiny_wzoom_config_hover_test_circos.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Public Datasets/Kidney human tissues/Kidney multiome/kidney_multiome_config.yml")
 #config <- config::get(file = "C:/Users/sarlago/Documents/Projects/SENECA RNAseq Udine/03_Processing/03.02_Scripts/03.02.01_scripts_post_processing_RNAseq/Shiny_RNAseq_UD2025_config_correct.yml")
+config <- config::get(file = "C:/Users/sarlago/Documents/Projects/Hyperprofile/HyperProfile/ChromHMM/Shiny_wzoom_config_ChromHMM_hyperprofile.yml")
 
 ## Read data
 # Set a BigWig file
@@ -64,7 +65,7 @@ gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T,
 # Categorical bed file
 cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
 # Region Table file
-saved.coord.path <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
+saved.coord.path <- dir(paste(config$data.dir, config$reg.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
 saved.coord <- read_delim(saved.coord.path, "\t", col_names = F, show_col_types = F)
 saved.coord <- apply(saved.coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
 saved.coord <- gsub(" ", "", saved.coord) # remove eventual white spaces
@@ -196,7 +197,7 @@ ui <- page_sidebar(
                 # GO button circos
                 actionButton("run.stat6", "Run", width = "25%"),
                 # print circular hierarchy plot for categories
-                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 250, width = 450) %>% withSpinner(), verbatimTextOutput('warn.message4')),
+                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 350, width = 900) %>% withSpinner(), verbatimTextOutput('warn.message4')),
                 # GO button circular hierarchy
                 actionButton("run.stat4", "Run", width = "25%"),
                 # print manhattan plot with whole chr and zoom-in

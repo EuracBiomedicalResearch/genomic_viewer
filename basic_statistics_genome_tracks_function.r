@@ -542,43 +542,35 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   print("Calculating categorical pie")
   ## Specifiy complete chromosome name
   chrom = paste("chr", chr, sep = "")
-  
-  ## Prepara data for whole genome plotting
-  group <- c()
-  subgroup <- c()
-  group.sel <- c()
-  subgroup.sel <- c()
-  vertices.df <- data.frame()
-  vertices.sel.df <- data.frame()
+  plots <- list()
   for (i in 1:length(cat.file)){
+    ## Prepara data for whole genome plotting
     # Read cat file
-    cat.file.r <- read_delim(cat.file[i], "\t", col_names = T)
+    cat.file.r <- read_delim(cat.file[i], "\t", col_names = T) #, col_select = c(1,2,3, 'category')
     ##### For total genome
     # crate dataframe with hierarchy: cat.name, categories
-    subgroup <- c(subgroup, unique(cat.file.r$category))
-    group <- c(group, rep(cat.names[i], length(unique(cat.file.r$category))))
-    # create datafrane with vertices names and size
-    vertices.df <- rbind(vertices.df, as.data.frame(table(cat.file.r$category)))
+    subgroup <- unique(cat.file.r$category)
+    group <- rep(cat.names[i], length(unique(cat.file.r$category)))
+    # create dataframe with vertices names and size
+    vertices.df <- as.data.frame(table(cat.file.r$category))
     # add the leaf vertex with tot size of the group
     vertices.df <- rbind(vertices.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.r)))
     # generate column with percentages
-    vertex.perc <- as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))
-    vertices.df$perc <- c(vertex.perc$Freq, 100)
+    vertices.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))$Freq, 100)
     
     #### For selected region
     # filter the input table based on the selected region
     cat.file.sel <- dplyr::filter(cat.file.r, chr == chrom & start >= Start & end <= End)
     # crate dataframe with hierarchy: cat.name, categories
-    subgroup.sel <- c(subgroup.sel, unique(cat.file.sel$category))
-    group.sel <- c(group.sel, rep(cat.names[i], length(unique(cat.file.sel$category))))
+    subgroup.sel <- unique(cat.file.sel$category)
+    group.sel <- rep(cat.names[i], length(unique(cat.file.sel$category)))
     # create datafrane with vertices names and size
-    vertices.sel.df <- rbind(vertices.sel.df, as.data.frame(table(cat.file.sel$category)))
+    vertices.sel.df <- as.data.frame(table(cat.file.sel$category))
     # add the leaf vertex with tot size of the group
     vertices.sel.df <- rbind(vertices.sel.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.sel)))
     # generate column with percentages
-    vertex.sel.perc <- as.data.frame(round(prop.table(table(cat.file.sel$category))*100, 0))
-    vertices.sel.df$perc <- c(vertex.sel.perc$Freq, 100)
-  }
+    vertices.sel.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.sel$category))*100, 0))$Freq, 100)
+
   # change colnames vertices
   colnames(vertices.df) <- c("names", "size", "perc")
   colnames(vertices.sel.df) <- c("names", "size", "perc")
@@ -593,7 +585,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   # Make the plot
   p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) + 
     geom_node_circle(aes(fill = size), color = "white") +
-    geom_node_label(aes(label=paste(name, " ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
+    geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
     theme_void() + 
     theme(legend.position = "none",
           plot.title = element_text(size = 16, face = "bold")) +
@@ -603,7 +595,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   if (nrow(groups.sel.df) > 0){
   p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) + 
     geom_node_circle(aes(fill = size), color = "white") +
-    geom_node_label(aes(label=paste(name, " ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
+    geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
     theme_void() + 
     theme(legend.position = "none",
           plot.title = element_text(size = 16, face = "bold")) +
@@ -612,21 +604,27 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   #print(p2)
   
   p <- ggpubr::ggarrange(p1, p2, nrow = 1, ncol = 2)
-  print(p)
+  #print(p)
   } else {
     p <- ggpubr::ggarrange(p1, nrow = 1, ncol = 2)
-    print(p)
+    #print(p)
   }
+  plots[[i]] <- p
+  #print(plots[[i]])
+  }
+  
+  p.final <- ggpubr::ggarrange(plotlist=plots, nrow = ceiling(length(cat.file)/3), ncol = 3, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
+  print(p.final)
 }
 
 
 
 ## TEST function
-#categorical.pie.function(cat.file = dir(full.names = TRUE, pattern = config$cat.file),
-#                         cat.names = config$cat.names,
-#                         chr = 21,
- #                        Start = 1,
-  #                       End = 1000)
+#categorical.pie.function(cat.file = cat.file, #dir(full.names = TRUE, pattern = config$cat.file),
+ #                        cat.names = config$cat.names,
+  #                       chr = 21,
+   #                      Start = 1,
+    #                     End = 1000)
 
 
 ################### CIRCOS PLOT FROM BEDPE FILE
@@ -678,7 +676,7 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
   genes.ann <- dplyr::filter(genes.ann, chromosome_name == chrom & start_position >= zoom_start & end_position <= zoom_end) # filter just genes in the zoom region
   genes.ann$chromosome_name <- paste("zoom_", genes.ann$chromosome_name, sep="") # add zoo to the chromosome name
   
-  # Arrange the layout of the resulting image that maz combine multiple plots beased on the number of input bedpe files
+  # Arrange the layout of the resulting image that may combine multiple plots based on the number of input bedpe files
   layout(matrix(1:length(bedpe.file), length(bedpe.file), 2)) 
   
   # for every separate bedpe
