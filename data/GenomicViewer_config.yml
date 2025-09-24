@@ -1,0 +1,35 @@
+---
+
+default:
+
+    # Set here the parameters related to the input files path and extensions
+  # Data directory
+  #data.dir: "C:/Users/sarlago/Documents/R scripts/Shiny/ShinyTest/data/"
+  data.dir: "/data/"
+  # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type "  " or [""] in names.
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.ext: "treat_pileup.bw"
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"] # Comma separated, "quoted" names
+  # bedpe directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
+  bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2.bedpe"
+  bedpe.names: ["HiC arches"] # Comma separated, "quoted" names
+  # bed directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bed.dir: "GSE212908_ATAC_peaks"
+  bed.ext: "GSE212908_RAM012_013_015_peak_masterlist.bed"
+  bed.names: ["ATAC peaks"] # Comma separated, "quoted" names
+  # hic directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  hic.dir: "GSE212910_RAW_HiC"
+  hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM.hic"
+  hic.names: ["HiC cortex"] # Comma separated, "quoted" names
+  # GWAS directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  gwas.dir: "GWAScatalog_KidneyDisease"
+  gwas.ext: "relocatedCol.tsv.gz"
+  gwas.names: ["GWAS chronic kidney disease"]
+  # categorical bed file. If empty type "  " or [""] in names. Columns must be names and the one with category must be 'category'.
+  cat.dir: ""
+  cat.file: "regulatory_elements_hg38.bed"
+  cat.names: ["Regulatory Elements"] # Comma separated, "quoted" names
+  # file with selected genomic regions to be imported (bed format: chr, start end, name. No header). If empty type "  " or [""] in names.
+  reg.dir: ""
+  reg.file: "Example_region_table.bed"
