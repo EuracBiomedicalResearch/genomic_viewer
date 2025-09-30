@@ -359,7 +359,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     params = params
   )
   plotText(
-    label = bedpe.names, fontsize = 10*(conv+0.2), fontcolor = "black",
+    label = bedpe.names[i], fontsize = 10*(conv+0.2), fontcolor = "black",
     x = -0.5, y = paste(-0.5*conv, "b", sep=""), just = c("right", "top"),
     params = params
   )

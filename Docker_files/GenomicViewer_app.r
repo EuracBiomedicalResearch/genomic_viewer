@@ -14,6 +14,7 @@ library(readr)
 library(stringr)
 library(sqldf)
 library(ggpubr)
+
 library(circlize)
 library(ggraph)
 library(igraph)
@@ -24,14 +25,11 @@ library(ggchicklet) # github ok
 
 library(plotgardener)
 library(spiky)
-#library(TxDb.Hsapiens.UCSC.T2T.knownGene)
+library(TxDb.Hsapiens.UCSC.T2T.knownGene) # from local build
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(TxDb.Mmusculus.UCSC.mm39.knownGene)
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
-
-# for chromosomes plot
-# From github
 library(rtracklayer)
 library(ChIPpeakAnno) # bioconductor
 
@@ -84,10 +82,11 @@ ui <- page_sidebar(
     # graphics tags
     style = "background-color:#f2f0eb",
     tags$style(type='text/css',
-               ".selectize-dropdown-content{
-                font-size: 85%;}
+               ".selectize-dropdown-content{font-size: 85%;}
                .selectize-input { word-wrap : break-word;}
-               .selectize-input { word-break: break-word;}"),
+               .selectize-input { word-break: break-word;}
+               svg { font-family: 'Arial'}"
+               ),
     width = 300,
     # text input to choose genomic coordinates:
     helpText("Choose the reference genome and the genomic range to be visualized, then press GO."),
@@ -324,6 +323,7 @@ server <- function(input, output, session){
     #req(!is.null(tracks()))
     svgPanZoom(svglite:::inlineSVG(tracks()), 
                panEnabled = T, controlIconsEnabled = T, viewBox = T, width = "auto", height = "900px") #width = "auto", height = "auto",
+    
   })
   
   image <- reactive({
