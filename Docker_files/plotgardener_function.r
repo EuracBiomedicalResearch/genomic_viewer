@@ -434,7 +434,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
         y.coord = y.coord + 1.5} else { 
          plotTranscripts(
             y = "3b", height = 3,
-           params = params, labels = "gene"
+           params = params, labels = "both"
          )
           plotText(
            label = "Transcripts", fontsize = 10*(conv+0.2), fontcolor = "black",
