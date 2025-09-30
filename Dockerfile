@@ -15,7 +15,9 @@ RUN apt-get update \
  libglpk-dev \
  libicu-dev \
  libssl-dev \
- libxml2-dev 
+ libxml2-dev \
+ libtiff-dev \
+ libwebp-dev 
 
 # Install renv
 RUN R -e "install.packages('renv', repos = c(CRAN = 'https://cloud.r-project.org'))"
@@ -33,10 +35,14 @@ COPY Docker_files/renv/settings.json renv/settings.json
 RUN R -e "renv::restore()"
 
 RUN R -e "install.packages('R.utils', repos = c(CRAN = 'https://cloud.r-project.org'))"
+
+# Install from local T2T knowngenes package
+RUN R -e "install.packages('devtools', repos = c(CRAN = 'https://cloud.r-project.org'))"
+COPY Docker_files/T2T_txdb/ /shiny-app-GenomicViewer/T2T_txdb/
+RUN R -e "devtools::install('/shiny-app-GenomicViewer/T2T_txdb/TxDb.Hsapiens.UCSC.T2T.knownGene/inst/extdata/')"
+
 # Copy the Shiny app files
 COPY Docker_files/ /shiny-app-GenomicViewer/
-
-
 
 # Expose the application port
 EXPOSE 8180
