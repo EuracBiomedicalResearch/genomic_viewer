@@ -1,5 +1,5 @@
 
-## The following script will be used to generate plots for the statistical analysis of peaks and archs graphs
+## The following script will be used to generate plots for the statistical analysis of peaks and arches graphs
 
 ########################################## Barplot of total and selected region peaks number (bed)
 
@@ -7,7 +7,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
   chrom <- paste0("chr", chr)
   print("Calculating peaks nr")
   # Read bed files and peaks nr
-  bed.tab.list <- list() ## Capire se serve davvero storare questa info o se posso evitare
+  bed.tab.list <- list() ## 
   peaks.nr <- c() # For total nr of peaks
   peaks.nr.sel <- c() # For peaks nr in the selected region
   for (i in 1:length(bed.file)){
@@ -612,8 +612,15 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   plots[[i]] <- p
   #print(plots[[i]])
   }
-  
-  p.final <- ggpubr::ggarrange(plotlist=plots, nrow = ceiling(length(cat.file)/3), ncol = 3, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
+  # define nr of columns for final plot
+  if(length(cat.file) <= 9){
+    n.col =  3
+    n.row = 2
+  } else {
+    n.col  =  6
+    n.row = 4
+  }
+  p.final <- ggpubr::ggarrange(plotlist=plots, nrow = n.row, ncol = n.col, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
   print(p.final)
 }
 

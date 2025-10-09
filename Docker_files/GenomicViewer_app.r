@@ -91,11 +91,11 @@ ui <- page_sidebar(
     # text input to choose genomic coordinates:
     helpText("Choose the reference genome and the genomic range to be visualized, then press GO."),
       # Reference genome
-    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - human)", 
-                                                             "hg38 (GRCh38 - human)", 
-                                                             "T2T (CHM13 - human)",
-                                                             "mm10 (GRCm38 - mouse)",
-                                                             "mm39 (GRCm39 - mouse)"), selectize = F),
+    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - H.sapiens)", 
+                                                             "hg38 (GRCh38 - H.sapiens)", 
+                                                             "T2T (CHM13 - H.sapiens)",
+                                                             "mm10 (GRCm38 - M.musculus)",
+                                                             "mm39 (GRCm39 - M.musculus)"), selectize = F),
     card(tags$b("Option 1: Manually insert coordinates", style = "font-size: 90%; text-align:center"),  
       # Chr
     textInput("chr", "Choose chromosome:", value = "1"),
@@ -825,7 +825,7 @@ server <- function(input, output, session){
       # Specifiy if data not plotted in warning message
       large.data <- c(config$cat.names[which(file.size(cat.file) > 400e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")}) ### not working sistemare
+        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")}) ### not working 
       } 
       
     })
