@@ -138,8 +138,8 @@ ui <- page_sidebar(
   # GO button
   actionButton("go", tags$b("Go")),
   
-  # Download button 
-  downloadButton('plot_save', "Save"),
+  # Download button
+  actionButton("ask.download", "Save", icon = icon("download")),
   ),
   
   # Card
@@ -1255,38 +1255,87 @@ server <- function(input, output, session){
     
     ##----------------------- END BigWig autoscale options dialog
     
-    ##------------------------ Save plot as PDF
+    ##------------------------ Save plot as PDF or user selected format
     
-    output$plot_save <- downloadHandler(
-      filename = function() { "output.pdf" },
+    # Reactive to store the chosen file format
+    chosen.format <- reactiveVal(NULL)
+    
+    # Open modal to ask for format
+    observeEvent(input$ask.download, {
+      showModal(modalDialog(
+        title = "Choose download format",
+        radioButtons("file.format", "Format:",
+                     choices = c("PDF" = "pdf", "SVG" = "svg", "PNG" = "png", "JPEG" = "jpg")),
+        footer = tagList(
+          # Message for saving status
+          tags$div(id = "status", style = "font-weight:bold; color:grey; font-size:90%"),
+          tags$script(HTML("Shiny.addCustomMessageHandler('savingMessage', function(message) {
+                            document.getElementById('status').innerText = message.text;
+                            });")),
+          # Buttons
+          modalButton("Close"),
+          downloadButton("plot.save", "Confirm")
+        )
+      ))
+    })
+    
+    # When user confirms, store format and trigger download
+    observeEvent(input$file.format, {
+      req(input$file.format)
+      chosen.format(input$file.format)
+      print(chosen.format())
+    })
+    
+    # Actual download handler
+    output$plot.save <- downloadHandler(
+      filename = function() {
+        paste("chr", reactiveChr(), "_",reactiveChrstart(), "-", reactiveChrend(), ".", chosen.format(), sep="")
+      },
       content = function(file) {
-      genes.hgnc <- genes.hgnc()
-      pdf(file, width = 10, height = 8 )
+        req(chosen.format())
+        genes.hgnc <- genes.hgnc()
+        fmt <- chosen.format()
+        # Tell user the plot is saving
+        session$sendCustomMessage("savingMessage", list(text = "Saving... please wait."))
+        
+        if (fmt == "pdf") {
+          pdf(file, width = 12, height = 8 )
+        } else if (fmt == "svg") {
+          svg(file, width = 12, height = 8 )
+        } else if (fmt == "png") {
+          png(file, width =3000, height=2300, res = 300 )
+        } else if (fmt == "jpg") {
+          jpeg(file, width =3000, height=2300, res = 300 )
+        }
         plotgardener.shiny.function(bw.file = bw.file, 
-                                    hic.file = hic.file, 
-                                    bed.file = bed.file, 
-                                    bedpe.file = bedpe.file,
-                                    bw.names = config$bw.names,
-                                    hic.names = config$hic.names,
-                                    bed.names = config$bed.names,
-                                    bedpe.names = config$bedpe.names,
-                                    gwas.file = gwas.file,
-                                    gwas.names = config$gwas.names,
-                                    cat.file = cat.file,
-                                    cat.names = config$cat.names,
-                                    cat.collapse = reactiveCat(),
-                                    chr = reactiveChr(), #input$chr, 
-                                    start = reactiveChrstart(), #input$chrstart, 
-                                    end = reactiveChrend(), #input$chrend,
-                                    bw.mode = input$bw.mode,
-                                    bw.autoscale = grouped.bw.items(),
-                                    expand.transcripts = reactiveTranscript(),
-                                    genes.hgnc = genes.hgnc,
-                                    genome = gsub( " .*", "", input$ref.genome),
-                                    cytoband = Cytoband())
-         dev.off()
-      
+                                   hic.file = hic.file, 
+                                   bed.file = bed.file, 
+                                   bedpe.file = bedpe.file,
+                                   bw.names = config$bw.names,
+                                   hic.names = config$hic.names,
+                                   bed.names = config$bed.names,
+                                   bedpe.names = config$bedpe.names,
+                                   gwas.file = gwas.file,
+                                   gwas.names = config$gwas.names,
+                                   cat.file = cat.file,
+                                   cat.names = config$cat.names,
+                                   cat.collapse = reactiveCat(),
+                                   chr = reactiveChr(), #input$chr, 
+                                   start = reactiveChrstart(), #input$chrstart, 
+                                   end = reactiveChrend(), #input$chrend,
+                                   bw.mode = input$bw.mode,
+                                   bw.autoscale = grouped.bw.items(),
+                                   expand.transcripts = reactiveTranscript(),
+                                   genes.hgnc = genes.hgnc,
+                                   genome = gsub( " .*", "", input$ref.genome),
+                                   cytoband = Cytoband())
+        dev.off()
+        
+        # Tell user the plot has been saved
+        session$sendCustomMessage("savingMessage", list(text = "Saved!"))
+
       })
+
     ##------------------------ END OF Save plot as PDF
 }
 

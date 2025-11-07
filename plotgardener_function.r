@@ -66,8 +66,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
         # Sort scores according to samples names in alphabetical order so you loop on the correctly in the plot section
         maxScore[order(factor(names(maxScore)))]
     }
-    
-
 
     print(paste("Scale for bigwig files has been set to:", maxScore))
     
@@ -193,7 +191,7 @@ params <- pgParams(
     if(isEmpty(hicDataChromRegion)){} else {
       for (i in 1:length(hicDataChromRegion)){
         if(nrow(hicDataChromRegion[[i]][1]) <= 1){} else {
-          plotHicTriangle(
+          hicPlot <- plotHicTriangle(
             data = hicDataChromRegion[[i]],
             zrange = c(0, 100),
             params = params,
@@ -205,6 +203,12 @@ params <- pgParams(
             x = -0.5, y = paste(-1*conv,"b", sep=""), just = c("right", "bottom"),
             params = params)
           
+          ## Add heatmap legend
+          annoHeatmapLegend(
+            plot = hicPlot, x = 6.5, y = paste(-1.8*conv,"b", sep=""),
+            width = 0.10, height = 0.7, fontsize = 10*(conv+0.2),
+            just = c("right", "top"), fontcolor = "black"
+          )
           ## Increment y coord
           y.coord <- y.coord+(3.2*conv)
         }
