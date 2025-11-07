@@ -209,7 +209,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
    bed.peaks.list <- list()
    bed.peaks.list.s <- list()
     for (i in 1:length(bed.file)){
-      bed.peaks.list[[i]] <- import(bed.file[i], format = "BED", genome = genome)
+      bed.peaks.list[[i]] <- import(bed.file[i], format = "BED", genome = genome, colnames = c("chrom", "start", "end"))
       bed.peaks.list.s[[i]] <- subsetByOverlaps(bed.peaks.list[[i]], q)
       }
   } else {
@@ -308,7 +308,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   
   ################# WHOLE CHROMOSOME MANHATTAN
   ## Create page
-  pageCreate(width = 12, height = h, default.units = "cm", showGuides = T) 
+  pageCreate(width = 12, height = h, default.units = "cm", showGuides = F) 
   
   ## Define starting y coordinate
   y.coord <- h
@@ -613,7 +613,15 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   #print(plots[[i]])
   }
   
-  p.final <- ggpubr::ggarrange(plotlist=plots, nrow = ceiling(length(cat.file)/3), ncol = 3, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
+  # define nr of columns for final plot
+  if(length(cat.file) <= 9){
+    n.col =  3
+    n.row = 2
+  } else {
+    n.col  =  6
+    n.row = 4
+  }
+  p.final <- ggpubr::ggarrange(plotlist=plots, nrow = n.row, ncol = n.col, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
   print(p.final)
 }
 
