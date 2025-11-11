@@ -1301,7 +1301,7 @@ server <- function(input, output, session){
         if (fmt == "pdf") {
           pdf(file, width = 12, height = 8 )
         } else if (fmt == "svg") {
-          svg(file, width = 12, height = 8 )
+          svglite(file, width = 12, height = 8 )
         } else if (fmt == "png") {
           png(file, width =3000, height=2300, res = 300 )
         } else if (fmt == "jpg") {
