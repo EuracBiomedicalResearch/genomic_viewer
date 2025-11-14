@@ -1,5 +1,5 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, expand.transcripts, genes.hgnc, genome, cytoband){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, bw.autoscale, expand.transcripts, genes.hgnc, genome, cytoband){
   
   
   
@@ -34,18 +34,37 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
                     gene.id.column = "SYMBOL")
   } 
   
-  # For bigwigs that has to be compared using the same scale we should calculate the max scale to set
+  # Calculate the max y-axis scale value for bigwig depending on the user selected option. A value will be assigned to each bw.
+  # Default option will be to use a unique scale for each file
   
-  # read bw file to use later
   maxScore <- 10
   if(length(bw.file) > 0){
-    maxScore <- c()
-  for (i in 1:length(bw.file)){
-    maxScore <- c(maxScore, max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
-  }
-  if (!max(maxScore) == 0){
-    maxScore <- max(maxScore) } else {
-      maxScore <- 10
+    maxScore <- list()
+    nameScore <- c()
+    # set max y when autoscale is not selected (autoscale all samples together)
+    if(is.null(bw.autoscale)){
+      for (i in 1:length(bw.file)){
+        maxScore[[i]] <- max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
+      }
+      if (!max(unlist(maxScore)) == 0){
+        maxScore <- rep(list(c(0, max(unlist(maxScore)))), length(bw.file)) } else {
+          maxScore <- rep(list(c(0, 10)), length(bw.file))
+        }
+      # Individual autoscale checked
+    } else if (length(bw.autoscale) == length(bw.file)) {
+      maxScore <- rep(list(NULL), length(bw.file))
+      # Grouped autoscale selected
+    } else { #maxScore <- list()
+      for (l in 1:length(bw.autoscale)){
+        maxGroup <- sapply(bw.autoscale[[l]], function(x) max(readBigwig(bw.file[which(bw.names == x)], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
+        maxScore <- c(maxScore, rep(list(c(0, max(maxGroup))), length(bw.autoscale[[l]])))
+        nameScore <- c(nameScore, bw.names[which(bw.names %in% bw.autoscale[[l]])])
+      }
+      maxScore <- c(maxScore, rep(list(NULL), length(bw.file) - length(maxScore)))
+      nameScore <- c(nameScore, setdiff(bw.names, nameScore))
+      names(maxScore) <- as.factor(nameScore)
+      # Sort scores according to samples names in alphabetical order so you loop on the correctly in the plot section
+      maxScore[order(factor(names(maxScore)))]
     }
 
     print(paste("Scale for bigwig files has been set to:", maxScore))
@@ -140,7 +159,7 @@ params <- pgParams(
     assembly = genome,
     x = 0, just = c("left", "bottom"),
     width = 16, length = 16, default.units = "cm",
-    range = c(0, maxScore) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
+    #range = c(0, maxScore) # this line sets the range for bigwig tracks, when we want to plot all of the in the same range, otherwise one specific can be plotted for each separately.
 )
 
 # Define counter for y coordinate:
@@ -172,8 +191,9 @@ params <- pgParams(
     if(isEmpty(hicDataChromRegion)){} else {
       for (i in 1:length(hicDataChromRegion)){
         if(nrow(hicDataChromRegion[[i]][1]) <= 1){} else {
-          plotHicTriangle(
+          hicPlot <- plotHicTriangle(
             data = hicDataChromRegion[[i]],
+            zrange = c(0, 100),
             params = params,
             y = 3.2*conv,  height = 3*conv)
           
@@ -183,6 +203,12 @@ params <- pgParams(
             x = -0.5, y = paste(-1*conv,"b", sep=""), just = c("right", "bottom"),
             params = params)
           
+          ## Add heatmap legend
+          annoHeatmapLegend(
+            plot = hicPlot, x = 6.5, y = paste(-1.8*conv,"b", sep=""),
+            width = 0.10, height = 0.7, fontsize = 10*(conv+0.2),
+            just = c("right", "top"), fontcolor = "black"
+          )
           ## Increment y coord
           y.coord <- y.coord+(3.2*conv)
         }
@@ -205,11 +231,15 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
        data = bw.file[i],
        binSize = binsize,
        binCap = F,
-      linecolor = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
-      fill = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
+       scale = T,
+       fontsize = 8*(conv+0.2),
+       col = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
+       linecolor = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
+       fill = rep(paletteer_d("ggthemes::Hue_Circle"), 2)[i],
+       range = maxScore[[i]],
        params = params,
        y = paste(1.5*conv, "b", sep=""), 
-       height = 1.5*conv)
+       height = 1.4*conv)
    
      ## Add text labels
      plotText(
@@ -380,7 +410,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
                   fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
                   trans = "-log10",
                   sigLine = TRUE, col = "grey",
-                  lty = 2, range = c(0, 40),
+                  lty = 2, range = c(0, 10),
                   y = "0b",
                   height = 2*conv,
                   just = c("left", "top")

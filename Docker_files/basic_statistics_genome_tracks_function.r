@@ -308,7 +308,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   
   ################# WHOLE CHROMOSOME MANHATTAN
   ## Create page
-  pageCreate(width = 12, height = h, default.units = "cm", showGuides = T) 
+  pageCreate(width = 12, height = h, default.units = "cm", showGuides = F) 
   
   ## Define starting y coordinate
   y.coord <- h

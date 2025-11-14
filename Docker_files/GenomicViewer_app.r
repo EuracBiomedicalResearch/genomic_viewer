@@ -3,6 +3,7 @@
 # Load shiny libraries and graphical (CRAN)
 library(shiny)
 library(bslib)
+library(shinyjs)
 library(svglite)
 library(svgPanZoom)
 library(paletteer)
@@ -91,11 +92,11 @@ ui <- page_sidebar(
     # text input to choose genomic coordinates:
     helpText("Choose the reference genome and the genomic range to be visualized, then press GO."),
       # Reference genome
-    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - H.sapiens)", 
-                                                             "hg38 (GRCh38 - H.sapiens)", 
-                                                             "T2T (CHM13 - H.sapiens)",
-                                                             "mm10 (GRCm38 - M.musculus)",
-                                                             "mm39 (GRCm39 - M.musculus)"), selectize = F),
+    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - H. sapiens)", 
+                                                             "hg38 (GRCh38 - H. sapiens)", 
+                                                             "T2T (CHM13 - H. sapiens)",
+                                                             "mm10 (GRCm38 - M. musculus)",
+                                                             "mm39 (GRCm39 - M. musculus)"), selectize = F),
     card(tags$b("Option 1: Manually insert coordinates", style = "font-size: 90%; text-align:center"),  
       # Chr
     textInput("chr", "Choose chromosome:", value = "1"),
@@ -126,20 +127,48 @@ ui <- page_sidebar(
      selected = ""
      ),
   
-  #uiOutput("out"),
-  fluidRow( 
+  # Buttons to add, remove or export user defined coordinates
+  fluidRow(
     actionButton("add", "Add", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
     actionButton("remove", "Remove", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
     downloadButton("export", "Export", style = "width: 33%; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
-    column(width = 12, h6(tags$i("Add, remove or export coordinates to list"), style = "font-size: 80%"), style = "text-align:center")
-      )
+    column(width = 12, h6(tags$i("Add, remove or export coordinates."), style = "font-size: 80%"), style = "text-align:center; padding:3px 3px; margin-bottom: 10px"),
+    
+    # Button to upload a user defined file of saved coordinates.
+    tags$head(
+      tags$style("
+      .button-only-fileinput .shiny-file-input-progress
+      {
+        display: none;
+      }
+      .button-only-fileinput .btn-file {
+        padding: 4px 8px;
+        font-size: 88%;
+        color: black;
+        font-weight: 600;
+      }
+       .button-only-fileinput .form-control {
+       padding: 2px 2px;
+       font-size:88%;
+       }
+    ")
+    ),
+    
+    div(class = "button-only-fileinput", 
+        fileInput("upload.coord", label = NULL, buttonLabel = "Upload...", multiple = F, accept = c(".bed", ".tsv", ".txt"), placeholder = "Config table loaded"),
+        style="font-size:85%;padding: 1px 1px; margin-bottom: -17px; font-color: black"),
+    column(width = 12, h6(tags$i("Choose coordinates list from file."), style = "font-size: 80%"), style = "text-align:center; padding:3px 3px;"),
+    useShinyjs(),
+    column(width=12, align = "center", actionButton("reset.user.coord", "Reset", width = "40%",
+                                                    style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white;"))
+    ),
   ),
   
   # GO button
   actionButton("go", tags$b("Go")),
   
-  # Download button 
-  downloadButton('plot_save', "Save"),
+  # Download button
+  actionButton("ask.download", "Save", icon = icon("download")),
   ),
   
   # Card
@@ -212,12 +241,15 @@ ui <- page_sidebar(
             card_body(#class = "border-0 gap-1 align-items-bottom",
                       plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = T), hover = "chr.hover"),
                       verbatimTextOutput("chr.info"),
-                      span(tags$b("Advanced Options:"), style = "text-align: center;"),
+                      span(tags$b("Advanced Options:"), style = "text-align: center; margin-bottom: -10px;"),
                       # Search by gene
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
-                      textOutput('sel.gene'),
+                      #textOutput('sel.gene'),
                       # Select mode for bigwig plotting
-                      selectInput('bw.mode', 'Select bigWig plots mode', bw.mode, selectize=FALSE),
+                      column(width = 12, 
+                      selectInput('bw.mode', "Select bigwig plot mode", bw.mode, selectize=FALSE),
+                      # Bigwig autoscale group options
+                      actionButton("bw.autoscale", "Autoscale settings", width = "100%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: #f2f0eb; border-color: slategrey;")),
                       # Select mode for categories plotting
                       selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T),
                       # Expand transcript track option
@@ -311,6 +343,7 @@ server <- function(input, output, session){
                                                                           start = reactiveChrstart(), #input$chrstart, 
                                                                           end = reactiveChrend(), #input$chrend,
                                                                           bw.mode = input$bw.mode,
+                                                                          bw.autoscale = grouped.bw.items(),
                                                                           expand.transcripts = reactiveTranscript(),
                                                                           genes.hgnc = genes.hgnc,
                                                                           genome = gsub( " .*", "", input$ref.genome),
@@ -348,6 +381,7 @@ server <- function(input, output, session){
                                 start = reactiveChrstart(), #input$chrstart, 
                                 end = reactiveChrend(), #input$chrend,
                                 bw.mode = input$bw.mode,
+                                bw.autoscale = grouped.bw.items(),
                                 expand.transcripts = reactiveTranscript(),
                                 genes.hgnc = genes.hgnc,
                                 genome = gsub( " .*", "", input$ref.genome),
@@ -614,7 +648,7 @@ server <- function(input, output, session){
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadCat", i)]] <- downloadHandler(
-        filename = function(){paste0(config$cat.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".cat")},
+        filename = function(){paste0(config$cat.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".tsv")},
         content = function(file){
           write.table(datasetTables()[[3]][[i]], file, row.names = F, quote = F, sep = "\t")
         })
@@ -656,7 +690,7 @@ server <- function(input, output, session){
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadgwas", i)]] <- downloadHandler(
-        filename = function(){paste0(config$gwas.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".gwas")},
+        filename = function(){paste0(config$gwas.names[i],"_chr", reactiveChr(), "_", reactiveChrstart(), "-", reactiveChrend(),  ".tsv")},
         content = function(file){
           write.table(datasetTables()[[4]][[i]], file, row.names = F, quote = F, sep = "\t")
         })
@@ -916,7 +950,7 @@ server <- function(input, output, session){
     updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$gene_symbol, options = list(maxOptions = 12), server = TRUE)
   })
   
-  output$sel.gene <- renderText({input$gene.search})
+  #output$sel.gene <- renderText({input$gene.search})
 
   observeEvent(gene.names(),{
     if (!input$gene.search == ""){
@@ -946,9 +980,15 @@ server <- function(input, output, session){
     ##----------------------- END OF Update chr start end upon click on chr plot
   
     ##----------------------- User selected coordiates REGION TABLE
+    ##----------------------- START OF User selected coordinates REGION TABLE
     coord <- reactive({
-      if (!is.null(saved.coord)){
+      if (!is.null(saved.coord) & is.null(input$upload.coord)){
         coord <- saved.coord
+      } else if (!is.null(input$upload.coord)){
+        up.coord.path <- input$upload.coord
+        coord <- read_delim(up.coord.path$datapath, "\t", col_names = F, show_col_types = F)
+        coord <- apply(coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
+        coord <- gsub(" ", "", coord) # remove eventual white spaces
       }
     })
     # if there is a coord file update the list from whcih the used can select
@@ -973,7 +1013,21 @@ server <- function(input, output, session){
     })
     
     ################################## ACTIONS ON THE COORDINATES FROM THE USER DEFINED LIST ###############################  
+    
+    # initialize coordinates list based on user selection
     coord.list <- reactiveVal(value = saved.coord)
+    #print(coord.list)
+    observeEvent(input$upload.coord, {
+      user.coord <- coord.list(coord())
+      #print(coord.list)
+    })
+    
+    # Reset user defined region table
+    observeEvent(input$reset.user.coord, {
+      reset("upload.coord")
+      updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = saved.coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
+    })
+    
     #####----------------- ADD visualized coordinates to coordinates list
     ## Save coordinates to variables
     ## Chr
@@ -987,7 +1041,7 @@ server <- function(input, output, session){
     })
     ## Chr end
     chrendNew <- eventReactive(input$add, {
-       chrom.cen.df <- chrom.cen.df() #UNCOMMENT THIS LINE IN THE REAL CODE
+       chrom.cen.df <- chrom.cen.df()
       if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
       } else print(input$chrend)
     })
@@ -1094,14 +1148,213 @@ server <- function(input, output, session){
         write_delim(as.data.frame(str_split_fixed(coord.list , ":", n=4)), file = file, delim = "\t", col_names = F)
       })
     ##----------------------- END OF User selected coordiates REGION TABLE
+    
+    ##----------------------- START BigWig autoscale options dialog
+    
+    # Set reactive values with bw names to be listed
+    bw.items <- reactiveVal(c(config$bw.names))
+    
+    # Track number of groups and their IDs
+    group.count <- reactiveVal(0)
+    group.ids <- reactiveVal(character(0))
+    
+    # Initialize the individual scale to false and update it on interaction
+    individual.scale.state <- reactiveVal(F)
+    observeEvent(input$individual.scale, {
+      individual.scale.state(input$individual.scale)
+    })
+    
+    # Store final accepted settings
+    user.selection <- reactiveVal(NULL)
+    
+    # --- OPEN MODAL ---
+    observeEvent(input$bw.autoscale, {
+      showModal(modalDialog(
+        title =  tags$div("BigWig autoscale settings", style = "font-size:18px; font-weight:bold; margin-bottom:2px"),
+        h6("Choose one of the options below:", style = "margin-top: 0px;"),
+        tags$hr(),
+        # Option 1: Checkbox
+        fluidRow(
+          column(width = 5, h6("1) Set individual scale"), style = "text-align:left;"),
+          column(width = 7, checkboxInput("individual.scale", label = NULL, value = individual.scale.state(), width = "70%"), style = "align:left"),
+        ),
+        tags$hr(),
+        # Option 2: Autoscale groups
+        
+        conditionalPanel( 
+          condition = "!input.individual.scale",  # Hide if checkbox selected
+          fluidRow(column(width = 5, h6("2) Autoscale Groups")),
+                   column(width = 7, uiOutput("add.group.ui"), style = "align:left;")), # add group
+          uiOutput("groups.ui"), # store groups
+        ),
+        easyClose = TRUE,
+        footer = tagList(
+          modalButton("Cancel"),  # closes modal without saving
+          actionButton("confirm.enter", "Enter")  # confirm choices
+        )
+      ))
+    })
+    
+    # --- DYNAMIC UI for Add Group button ---
+    output$add.group.ui <- renderUI({
+      req(!isTRUE(individual.scale.state()))
+      
+      # Compute which items are still available overall
+      selected.values <- unlist(lapply(group.ids(), function(id) input[[id]]))
+      selected.values <- selected.values[!is.na(selected.values)]
+      
+      all.selected <- length(unique(selected.values)) >= length(bw.items())
+      
+      if (all.selected) {
+        # If all items are used, disable adding new groups
+        tags$span("All available items have been assigned — no more groups can be added.",
+                  style = "color: #888; font-style: italic;")
+      } else {
+        actionButton("add.group", "+ Add", style = "font-size:80%; padding: 5px 5px; border-color:slategrey")
+      }
+    })
+    
+    
+    # --- ADD GROUP ---
+    observeEvent(input$add.group, { 
+      # Compute max number of groups allowed 
+      max.groups <- length(bw.items()) 
+      # Only add a group if we haven't reached the maximum 
+      if (group.count() < max.groups) { 
+        # Uncheck individual scale when user starts adding groups 
+        updateCheckboxInput(session, "individual.scale", value = FALSE) 
+        id <- paste0("group.", group.count() + 1) 
+        group.count(group.count() + 1) 
+        group.ids(c(group.ids(), id)) 
+      } 
+    })
+    
+    # --- RENDER AUTOSCALE GROUP UI ---
+    output$groups.ui <- renderUI({
+      req(group.ids())
+      if (isTRUE(individual.scale.state())) return(NULL)
+      if (length(group.ids()) == 0) return (NULL)
+      # Collect all selected values across groups
+      selected.values <- unlist(lapply(group.ids(), function(id) input[[id]]))
+      selected.values <- selected.values[!is.na(selected.values)]
+      
+      # Each group can select from items not already chosen elsewhere,
+      # plus whatever it already selected (so it doesn’t disappear)
+      tagList(
+        lapply(group.ids(), function(id) {
+          other.selected <- unlist(lapply(setdiff(group.ids(), id), function(gid) input[[gid]]))
+          other.selected <- other.selected[!is.na(other.selected)]
+          remaining.choices <- setdiff(bw.items(), other.selected)
+          
+          selectizeInput(
+            inputId = id,
+            label = paste("Group", gsub("group.", "", id)),
+            choices = remaining.choices,
+            selected = input[[id]],
+            multiple = TRUE,
+            options = list(placeholder = "Select one or more samples...")
+          )
+        })
+      )
+      
+    })
+    
+    
+    # --- HANDLE "ENTER" ---
+    observeEvent(input$confirm.enter, { 
+      if (isTRUE(individual.scale.state())) { 
+        user.selection(list(mode = "individual"))
+      } else if (!isTRUE(individual.scale.state()) & length(group.ids()) > 0) { 
+        selected.groups <- lapply(group.ids(), function(id) input[[id]]) 
+        # Remove empty or NULL groups
+        selected.groups <- Filter(function(x) !is.null(x) && length(x) > 0, selected.groups)
+        if (length(selected.groups) > 0) {
+          names(selected.groups) <- paste0("Group ", seq_along(selected.groups)) 
+          user.selection(list(mode = "autoscale", groups = selected.groups))
+        } else {
+          user.selection(NULL)
+        }
+      }  else {
+        user.selection(NULL)
+      }
+      removeModal() 
+    })
+    
+    # --- REACTIVE OUTPUT: grouped items to be used for plotgardener plotting function ---
+    grouped.bw.items <- reactive({ 
+      # If no selection yet, return NULL 
+      if (is.null(user.selection()) || length(user.selection()) == 0) { 
+        return(NULL) } 
+      all.items <- bw.items() 
+      if (user.selection()$mode == "individual") { 
+        # each item in its own array 
+        return(lapply(all.items, function(x) c(x))) } 
+      # autoscale mode 
+      selected.groups <- user.selection()$groups # list of arrays 
+      if (is.null(selected.groups) || length(selected.groups) == 0) { 
+        return(NULL) # no groups selected 
+      } 
+      grouped.items <- unlist(selected.groups) 
+      ungrouped.items <- setdiff(all.items, grouped.items) 
+      # combine groups + single-item arrays for ungrouped 
+      autoscale.groups <- c(selected.groups, lapply(ungrouped.items, function(x) c(x))) 
+      
+      return(autoscale.groups)
+    })
   
     ##------------------------ Save plot as PDF
     
-    output$plot_save <- downloadHandler(
-      filename = function() { "output.pdf" },
+    
+    # Reactive to store the chosen file format
+    chosen.format <- reactiveVal(NULL)
+    
+    # Open modal to ask for format
+    observeEvent(input$ask.download, {
+      showModal(modalDialog(
+        title = "Choose download format",
+        radioButtons("file.format", "Format:",
+                     choices = c("PDF" = "pdf", "SVG" = "svg", "PNG" = "png", "JPEG" = "jpg")),
+        footer = tagList(
+          # Message for saving status
+          tags$div(id = "status", style = "font-weight:bold; color:grey; font-size:90%"),
+          tags$script(HTML("Shiny.addCustomMessageHandler('savingMessage', function(message) {
+                            document.getElementById('status').innerText = message.text;
+                            });")),
+          # Buttons
+          modalButton("Close"),
+          downloadButton("plot.save", "Confirm")
+        )
+      ))
+    })
+    
+    # When user confirms, store format and trigger download
+    observeEvent(input$file.format, {
+      req(input$file.format)
+      chosen.format(input$file.format)
+      print(chosen.format())
+    })
+    
+    # Actual download handler
+    output$plot.save <- downloadHandler(
+      filename = function() {
+        paste("chr", reactiveChr(), "_",reactiveChrstart(), "-", reactiveChrend(), ".", chosen.format(), sep="")
+      },
       content = function(file) {
-      genes.hgnc <- genes.hgnc()
-      pdf(file, width = 10, height = 8 )
+        req(chosen.format())
+        genes.hgnc <- genes.hgnc()
+        fmt <- chosen.format()
+        # Tell user the plot is saving
+        session$sendCustomMessage("savingMessage", list(text = "Saving... please wait."))
+        
+        if (fmt == "pdf") {
+          pdf(file, width = 12, height = 8 )
+        } else if (fmt == "svg") {
+          svglite(file, width = 12, height = 8 )
+        } else if (fmt == "png") {
+          png(file, width =3000, height=2300, res = 300 )
+        } else if (fmt == "jpg") {
+          jpeg(file, width =3000, height=2300, res = 300 )
+        }
         plotgardener.shiny.function(bw.file = bw.file, 
                                     hic.file = hic.file, 
                                     bed.file = bed.file, 
@@ -1119,12 +1372,16 @@ server <- function(input, output, session){
                                     start = reactiveChrstart(), #input$chrstart, 
                                     end = reactiveChrend(), #input$chrend,
                                     bw.mode = input$bw.mode,
+                                    bw.autoscale = grouped.bw.items(),
                                     expand.transcripts = reactiveTranscript(),
                                     genes.hgnc = genes.hgnc,
                                     genome = gsub( " .*", "", input$ref.genome),
                                     cytoband = Cytoband())
-         dev.off()
-      
+        dev.off()
+        
+        # Tell user the plot has been saved
+        session$sendCustomMessage("savingMessage", list(text = "Saved!"))
+        
       })
     ##------------------------ END OF Save plot as PDF
     
