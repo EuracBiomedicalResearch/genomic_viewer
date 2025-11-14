@@ -35,5 +35,5 @@ start /b docker run --rm -p 8180:8180 ^
   -v "%cd%/data:/data" ^
   shiny-docker-genomicviewer2 
   
-timeout /t 24 /nobreak > NUL 
+timeout /t 25 /nobreak > NUL 
 start http://0.0.0.0:8180 
