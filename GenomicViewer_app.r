@@ -3,6 +3,7 @@
 # Load shiny libraries and graphical (CRAN)
 library(shiny)
 library(bslib)
+library(shinyjs)
 library(svglite)
 library(svgPanZoom)
 library(paletteer)
@@ -50,8 +51,8 @@ options(shiny.port = 8180)
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-config <- config::get(file = "GenomicViewer_config.yml")
-#config <- config::get(file="C:/Users/sarlago/Documents/Projects/Hyperprofile/HyperProfile/ChromHMM/Shiny_wzoom_config_ChromHMM_hyperprofile_no3D.yml")
+#config <- config::get(file = "GenomicViewer_config.yml")
+config <- config::get(file="C:/Users/sarlago/Documents/Projects/Hyperprofile/HyperProfile/ChromHMM/Shiny_wzoom_config_ChromHMM_hyperprofile_no3D.yml")
 
 ## Read data
 # Set a BigWig file
@@ -117,6 +118,7 @@ ui <- page_sidebar(
     ), 
   
   card(tags$b("Option 2: Load saved coordinates", style = "font-size: 90%; text-align:center"),
+
   # List of user-defined coordinates
     selectizeInput(
      inputId = "select", 
@@ -126,13 +128,42 @@ ui <- page_sidebar(
      selected = ""
      ),
   
-  #uiOutput("out"),
-  fluidRow( 
+  # Buttons to add, remove or export user defined coordinates
+  fluidRow(
     actionButton("add", "Add", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
     actionButton("remove", "Remove", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
     downloadButton("export", "Export", style = "width: 33%; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
-    column(width = 12, h6(tags$i("Add, remove or export coordinates to list"), style = "font-size: 80%"), style = "text-align:center")
-      )
+    column(width = 12, h6(tags$i("Add, remove or export coordinates."), style = "font-size: 80%"), style = "text-align:center; padding:3px 3px; margin-bottom: 10px"),
+   
+  # Button to upload a user defined file of saved coordinates.
+    tags$head(
+    tags$style("
+      .button-only-fileinput .shiny-file-input-progress
+      {
+        display: none;
+      }
+      .button-only-fileinput .btn-file {
+        padding: 4px 8px;
+        font-size: 88%;
+        color: black;
+        font-weight: 600;
+        background-color:#f2f0eb;
+      }
+       .button-only-fileinput .form-control {
+       padding: 2px 2px;
+       font-size:88%;
+       }
+    ")
+  ),
+  
+  div(class = "button-only-fileinput", 
+      fileInput("upload.coord", label = NULL, buttonLabel = "Upload...", multiple = F, accept = c(".bed", ".tsv", ".txt"), placeholder = "Config table loaded"),
+      style="font-size:85%;padding: 1px 1px; margin-bottom: -17px; font-color: black"),
+  column(width = 12, h6(tags$i("Choose coordinates list from file."), style = "font-size: 80%"), style = "text-align:center; padding:3px 3px;"),
+  useShinyjs(),
+  column(width=12, align = "center", actionButton("reset.user.coord", "Reset", width = "40%",
+         style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white;"))
+    ),
   ),
   
   # GO button
@@ -212,15 +243,15 @@ ui <- page_sidebar(
             card_body(#class = "border-0 gap-1 align-items-bottom",
                       plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = T), hover = "chr.hover"),
                       verbatimTextOutput("chr.info"),
-                      span(tags$b("Advanced Options:"), style = "text-align: center;"),
+                      span(tags$b("Advanced Options:"), style = "text-align: center; margin-bottom: -10px;"),
                       # Search by gene
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
                       #textOutput('sel.gene'),
                       # Select mode for bigwig plotting
                       column(width = 12, 
-                      selectInput('bw.mode', "Select bigwig plot mode:", bw.mode, selectize=FALSE),
+                      selectInput('bw.mode', "Select bigwig plot mode", bw.mode, selectize=FALSE),
                       # Bigwig autoscale group options
-                      actionButton("bw.autoscale", "Autoscale settings", width = "100%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: #f2f0eb; border-color: slategrey;") , align = "center"),
+                      actionButton("bw.autoscale", "Autoscale settings", width = "100%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: #f2f0eb; border-color: slategrey;")),
                       # Select mode for categories plotting
                       selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T),
                       # Expand transcript track option
@@ -949,13 +980,18 @@ server <- function(input, output, session){
   })
     ##----------------------- END OF Update chr start end upon click on chr plot
   
-    ##----------------------- User selected coordiates REGION TABLE
+    ##----------------------- START OF User selected coordinates REGION TABLE
     coord <- reactive({
-      if (!is.null(saved.coord)){
+      if (!is.null(saved.coord) & is.null(input$upload.coord)){
         coord <- saved.coord
+      } else if (!is.null(input$upload.coord)){
+        up.coord.path <- input$upload.coord
+        coord <- read_delim(up.coord.path$datapath, "\t", col_names = F, show_col_types = F)
+        coord <- apply(coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
+        coord <- gsub(" ", "", coord) # remove eventual white spaces
       }
     })
-    # if there is a coord file update the list from whcih the used can select
+    # if there is a coord file update the list from wich the used can select
     observeEvent(coord(), {
       coord <- coord()
       updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
@@ -977,7 +1013,21 @@ server <- function(input, output, session){
     })
     
     ################################## ACTIONS ON THE COORDINATES FROM THE USER DEFINED LIST ###############################  
+    
+    # initialize coordinates list based on user selection
     coord.list <- reactiveVal(value = saved.coord)
+    #print(coord.list)
+    observeEvent(input$upload.coord, {
+      user.coord <- coord.list(coord())
+      #print(coord.list)
+    })
+    
+    # Reset user defined region table
+    observeEvent(input$reset.user.coord, {
+      reset("upload.coord")
+      updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = saved.coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
+    })
+
     #####----------------- ADD visualized coordinates to coordinates list
     ## Save coordinates to variables
     ## Chr
@@ -991,7 +1041,7 @@ server <- function(input, output, session){
     })
     ## Chr end
     chrendNew <- eventReactive(input$add, {
-       chrom.cen.df <- chrom.cen.df() #UNCOMMENT THIS LINE IN THE REAL CODE
+       chrom.cen.df <- chrom.cen.df() 
       if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
       } else print(input$chrend)
     })
@@ -1056,7 +1106,7 @@ server <- function(input, output, session){
     })
     
     
-    #####----------------- REMOVE visualized coordinates to coordinates list
+    #####----------------- REMOVE visualized coordinates from coordinates list
     ## Save coordinates to variables
     ## Chr
     chrRem <- eventReactive(input$remove, {
@@ -1069,7 +1119,7 @@ server <- function(input, output, session){
     })
     ## Chr end
     chrendRem <- eventReactive(input$remove, {
-       chrom.cen.df <- chrom.cen.df() #UNCOMMENT THIS LINE IN THE REAL CODE
+       chrom.cen.df <- chrom.cen.df() 
       if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
       } else print(input$chrend)
     })
