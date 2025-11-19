@@ -121,6 +121,7 @@ overlap_upset_plot <- function(peaklist,
   )
   plt <- ComplexUpset::upset(data = overlap_df,
                              intersect = peaklist_names,
+                             themes = theme(axis.title.x = element_blank()),
                              base_annotations = base_annotations)
   report_time(t1 = t1,
               func="overlap_upset_plot",
@@ -205,7 +206,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
   q=GRanges(seqnames=paste("chr", chr, sep=""),
             ranges=IRanges(start = Start, end = End))
   
-  if (!is.null(bed.file) & length(bed.file) > 0){
+  if (!is.null(bed.file) & length(bed.file) > 1 | length(bed.file) > 0 & length(bedpe.file) > 0){
    bed.peaks.list <- list()
    bed.peaks.list.s <- list()
     for (i in 1:length(bed.file)){
@@ -218,7 +219,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
     bed.names <- NULL
   }
   
-  if (!is.null(bedpe.file) & length(bedpe.file) > 0){
+  if (!is.null(bedpe.file) & length(bedpe.file) > 1 | length(bed.file) > 0 & length(bedpe.file) > 0){
     bedpe.peaks.list <- list()
     bedpe.peaks.list.s <- list()
       for (i in 1:length(bedpe.file)){

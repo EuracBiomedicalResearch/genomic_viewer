@@ -215,7 +215,7 @@ ui <- page_sidebar(
                 # GO button peaks nr
                 actionButton("run.stat1", "Run", width = "25%"),
                 # print upset plot for peaks intersections
-                fluidRow(plotOutput("upset", height = 300) %>% withSpinner(), verbatimTextOutput('warn.message2')),
+                fluidRow(plotOutput("upset", height = 400) %>% withSpinner(), verbatimTextOutput('warn.message2')),
                 # GO button upset
                 actionButton("run.stat2", "Run", width = "25%"),
                 # print piechart with peaks annotation
@@ -705,7 +705,7 @@ server <- function(input, output, session){
   })
   
   ######################################################## STATS TAB
-  vals <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
+  vals <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
   ## For bed files peak count
   observeEvent(input$run.stat1, {
     vals$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
@@ -747,7 +747,7 @@ server <- function(input, output, session){
       }
     }, res = 100)
   ## For upset plot
-    vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
     
     observeEvent(input$run.stat2, {
       vals2$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
@@ -767,7 +767,7 @@ server <- function(input, output, session){
          !is.null(vals2$bed.file) & length(vals2$bed.file) > 1 | !is.null(vals2$bedpe.file) & length(vals2$bedpe.file) > 1){
         peaks_intersection_venn_function(bed.file = vals2$bed.file, 
                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)], 
-                                       bedpe.file = vals$bedpe.file, 
+                                       bedpe.file = vals2$bedpe.file, 
                                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)], 
                                        chr = vals2$chr, 
                                        Start = vals2$start, 
@@ -797,7 +797,7 @@ server <- function(input, output, session){
     }, res = 100)
     
     ## For circos plot
-    vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
     
     observeEvent(input$run.stat6, {
       vals6$bedpe.file <- bedpe.file[which(file.size(bedpe.file) <= 400e+06)]
@@ -849,7 +849,7 @@ server <- function(input, output, session){
     
     
     ## For categories hierarchy plot
-    vals4 <- reactiveValues(cat.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    vals4 <- reactiveValues(cat.file=NULL, chr = "1", start = 28000000, end = 28500000)
     
     observeEvent(input$run.stat4, {
       vals4$cat.file <- cat.file[which(file.size(cat.file) <= 400e+06)]
@@ -874,7 +874,7 @@ server <- function(input, output, session){
     })
     
     ## For Manhattan plot
-    vals5 <- reactiveValues(gwas.file=NULL, chr = "1", start = 2800000, end = 2850000)
+    vals5 <- reactiveValues(gwas.file=NULL, chr = "1", start = 28000000, end = 28500000)
     
     observeEvent(input$run.stat5, {
       vals5$gwas.file <- gwas.file[which(file.size(gwas.file) <= 800e+06)]
