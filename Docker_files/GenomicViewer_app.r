@@ -239,9 +239,9 @@ ui <- page_sidebar(
       ##### Card with Chromosomes plot and other options --------------------------------------------------------
        card(card_header("Choose chromosome"),
             card_body(#class = "border-0 gap-1 align-items-bottom",
-                      plotOutput("chr.plot", click = clickOpts(id = "chr.click", clip = T), hover = "chr.hover"),
-                      verbatimTextOutput("chr.info"),
-                      span(tags$b("Advanced Options:"), style = "text-align: center; margin-bottom: -10px;"),
+                      column(width=12, plotOutput("chr.plot", height = "130px", click = clickOpts(id = "chr.click", clip = T), hover = "chr.hover")),
+                      div(verbatimTextOutput("chr.info"), style = "height:30px"),
+                      div(tags$b("Advanced Options:"), style = "text-align: center; margin-bottom: -10px;"),
                       # Search by gene
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
                       #textOutput('sel.gene'),
