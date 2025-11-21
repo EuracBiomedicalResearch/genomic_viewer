@@ -4,7 +4,6 @@ default:
 
     # Set here the parameters related to the input files path and extensions
   # Data directory
-  #data.dir: "C:/Users/sarlago/Documents/R scripts/Shiny/ShinyTest/data/"
   data.dir: "/data/"
   # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type "  " or [""] in names.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
