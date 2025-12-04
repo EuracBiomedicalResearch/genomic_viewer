@@ -12,7 +12,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   bed.tab.list <- list()
   if(length(bed.file) > 0){
     for (i in 1:length(bed.file)){
-      bed.tab <- read_delim(bed.file[i], "\t", col_names = F)
+      bed.tab <- read_delim(bed.file[i], "\t", col_names = F, col_types = list(X2 = col_integer(), X3 = col_integer()))
      colnames(bed.tab)[1:3] <- c("chr", "start", "end")
      bed.tab <- dplyr::filter(bed.tab, chr == chrom & start >= Start & end <= End)
       bed.tab.list[[i]] <- bed.tab
@@ -25,7 +25,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   bedpe.tab.list <- list()
   if(length(bedpe.file) > 0){
     for (i in 1:length(bedpe.file)){
-     bedpe.tab <- read_delim(bedpe.file[i], "\t", col_names = F)
+     bedpe.tab <- read_delim(bedpe.file[i], "\t", col_names = F, col_types = list(X2 = col_integer(), X3 = col_integer(), X5 = col_integer(), X6 = col_integer()))
      colnames(bedpe.tab)[1:6] <- c("chrA", "startA", "endA", "chrB", "startB", "endB")
      bedpe.tab <- dplyr::filter(bedpe.tab, chrA == chrom & startA >= Start & endA <= End | chrB == chrom & startB >= Start & endB <= End) # This way all the interactions that START or ENDS UP in the selected region will be give even if they STARt or FINISH outside of the rgion, to restrict this parameter you can substitute | with & between the two A and B conditions.
       bedpe.tab.list[[i]] <- bedpe.tab
@@ -38,7 +38,7 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   cat.tab.list <- list()
   if(length(cat.file) > 0){
     for (i in 1:length(cat.file)){
-      cat.tab <- read_delim(cat.file[i], "\t", col_names = F)
+      cat.tab <- read_delim(cat.file[i], "\t", col_names = F, col_types = list(X2 = col_integer(), X3 = col_integer()))
       colnames(cat.tab)[1:4] <- c("chr", "start", "end", "category")
       cat.tab <- dplyr::filter(cat.tab, chr == chrom & start >= Start & end <= End)
       cat.tab.list[[i]] <- cat.tab
@@ -52,8 +52,9 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   gwas.tab.list <- list()
   if(length(gwas.file) > 0){
    for (i in 1:length(gwas.file)){
-      gwas.tab <- read_delim(gwas.file[i],"\t", col_names = T)
+      gwas.tab <- read_delim(gwas.file[i],"\t", col_names = T, col_types = list(pos = col_integer(), p = col_double()))
       gwas.tab <- dplyr::filter(gwas.tab, chrom == chrom & pos >= Start & pos <= End) # This way all the SNPs in the selected range will be kept.
+      gwas.tab$p <- format(gwas.tab$p, scientific = T)
      gwas.tab.list[[i]] <- gwas.tab
    }
   } else {gwas.tab.list[[1]] <- data.frame(chrom = "", pos = "", p ="", snp = "")

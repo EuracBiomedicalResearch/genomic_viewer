@@ -78,10 +78,10 @@ bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 shiny::addResourcePath('www', '/shiny-app-GenomicViewer/www')
 # Define UI -----------------------------------------------------
 ui <- page_sidebar(
-  title = span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:10%;" )),
+  #title = span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:10%;" )),
   sidebar = sidebar(
     # graphics tags
-    style = "background-color:#f2f0eb",
+    style = "background-color:#f2f0eb; height: 100%;",
     tags$style(type='text/css',
                ".selectize-dropdown-content{font-size: 85%;}
                .selectize-input { word-wrap : break-word;}
@@ -90,53 +90,51 @@ ui <- page_sidebar(
                ),
     width = 300,
     # text input to choose genomic coordinates:
-    helpText("Choose the reference genome and the genomic range to be visualized, then press GO."),
+    span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:14%; margin-top:-50px" )),
       # Reference genome
     selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - H. sapiens)", 
                                                              "hg38 (GRCh38 - H. sapiens)", 
                                                              "T2T (CHM13 - H. sapiens)",
                                                              "mm10 (GRCm38 - M. musculus)",
                                                              "mm39 (GRCm39 - M. musculus)"), selectize = F),
-    card(tags$b("Option 1: Manually insert coordinates", style = "font-size: 90%; text-align:center"),  
-      # Chr
-    textInput("chr", "Choose chromosome:", value = "1"),
-      # coordinates
-    numericInput( 
-      "chrstart", 
-      "Start coordinate", 
-      value = 28000000, 
-      min = NA, 
-      max = NA 
-      ), 
-    numericInput( 
-      "chrend", 
-      "End coordinate", 
-      value = 28500000, 
-      min = NA, 
-      max = NA 
-      )
-    ), 
-  
-  card(tags$b("Option 2: Load saved coordinates", style = "font-size: 90%; text-align:center"),
-  # List of user-defined coordinates
-    selectizeInput(
-     inputId = "select", 
-     label = "Select from menu",
-     choices = saved.coord,
-     multiple = F,
-     selected = ""
-     ),
-  
-  # Buttons to add, remove or export user defined coordinates
-  fluidRow(
-    actionButton("add", "Add", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
-    actionButton("remove", "Remove", width = "33%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
-    downloadButton("export", "Export", style = "width: 33%; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
-    column(width = 12, h6(tags$i("Add, remove or export coordinates."), style = "font-size: 80%"), style = "text-align:center; padding:3px 3px; margin-bottom: 10px"),
+    card(tags$b("Insert coordinates:", style = "font-size: 90%; text-align:center"),  
+         # Chr
+         tags$style(HTML(".selectize-dropdown-content {max-height: 100px !important;  /* ~5 items */
+                                                    overflow-y: auto !important;   /* enable scrolling */
+                                                    }"
+         )),
+         div(style="display:flex; align-items:center; gap:8px; margin-top:-20px; margin-left:-7px;",
+             tags$label("chr", style="margin:0; padding-bottom:15px; width:19%; text-align:right;"),
+             selectizeInput('chr', NULL, selected = "1", choices = c(as.character(seq(1:22)), "X", "Y"), multiple = F)
+         ),
+         # coordinates
+         div(style="display:flex; align-items:center; gap:8px; margin-top:-30px; margin-left:-7px;",
+             tags$label("start", style="margin:0; padding-bottom:15px; width:16%; text-align:right;"),  
+             numericInput( 
+               "chrstart", 
+               NULL, 
+               value = 28000000, 
+               min = 1, 
+               max = NA,
+               width = "100%"
+             )
+         ), 
+         div(style="display:flex; align-items:center; gap:8px; margin-top:-30px; margin-bottom:-5px; margin-left:-7px;",
+             tags$label("end", style="margin:0; padding-bottom:15px; width:19%; text-align:right;"),
+             numericInput( 
+               "chrend", 
+               NULL, 
+               value = 28500000, 
+               min = 1, 
+               max = NA,
+               width = "100%" 
+             )
+         )),
     
-    # Button to upload a user defined file of saved coordinates.
-    tags$head(
-      tags$style("
+    card(tags$b("Load coordinates:", style = "font-size: 90%; text-align:center"),
+         # Button to upload a user defined file of saved coordinates.
+         tags$head(
+           tags$style("
       .button-only-fileinput .shiny-file-input-progress
       {
         display: none;
@@ -146,52 +144,101 @@ ui <- page_sidebar(
         font-size: 88%;
         color: black;
         font-weight: 600;
+        background-color:#f2f0eb;
       }
        .button-only-fileinput .form-control {
        padding: 2px 2px;
        font-size:88%;
        }
     ")
+         ),
+         div(class = "button-only-fileinput", 
+             fileInput("upload.coord", label = NULL, buttonLabel = "Upload...", multiple = F, accept = c(".bed", ".tsv", ".txt"), placeholder = "Config table loaded"),
+             style="font-size:85%; padding: 1px 1px; margin-bottom: -17px; font-color: black; margin-top:-20px;"),
+         
+         # List of user-defined coordinates
+         div(style="align-items:center; gap:10px; margin-top:-30px; margin-bottom:-10px;",
+             tags$label("Select form menu", style="margin:0; padding-bottom:2px; padding-top:10px; text-align:left; font-size:90%;"),
+             selectizeInput(
+               inputId = "select", 
+               label = NULL,
+               choices = saved.coord,
+               multiple = F,
+               selected = ""
+             )),
+         # Buttons to add, remove or export user defined coordinates
+         fluidRow(div(style = "margin-left:2px; margin-right:7px; margin-top:-20px;",
+                      div(style = "display:flex; justify-content:space-between; gap:0px;",
+                          actionButton("add", "Add", width = "33%", style = "flex:1; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
+                          actionButton("remove", "Remove", width = "33%", style = "flex:1; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white"),
+                          downloadButton("export", "Export", style = "flex:1; width: 33%; font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white")
+                      )),
+                  # Reset button
+                  useShinyjs(),
+                  column(width=12, align = "center", actionButton("reset.user.coord", "Reset", width = "40%",
+                                                                  style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white; margin-top:20px;"))
+         ),
     ),
     
-    div(class = "button-only-fileinput", 
-        fileInput("upload.coord", label = NULL, buttonLabel = "Upload...", multiple = F, accept = c(".bed", ".tsv", ".txt"), placeholder = "Config table loaded"),
-        style="font-size:85%;padding: 1px 1px; margin-bottom: -17px; font-color: black"),
-    column(width = 12, h6(tags$i("Choose coordinates list from file."), style = "font-size: 80%"), style = "text-align:center; padding:3px 3px;"),
-    useShinyjs(),
-    column(width=12, align = "center", actionButton("reset.user.coord", "Reset", width = "40%",
-                                                    style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white;"))
-    ),
-  ),
-  
-  # GO button
-  actionButton("go", tags$b("Go")),
-  
-  # Download button
-  actionButton("ask.download", "Save", icon = icon("download")),
-  ),
+    div(style = "margin-left:5px; margin-rigth:5px; display:flex; justify-content:space-between; gap:2px;",
+        # GO button
+        tags$style(HTML("  #go {
+    background-color: #494949;  
+    color: white;               
+    border: 1px solid #494949;    
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  #go:hover {
+    background-color: #f2f0eb;
+    color: #494949;           
+    border-color: #f2f0eb;   
+    border: 1px solid #494949;    
+    border-radius: 4px;
+  }
+")),
+        actionButton("go", tags$b("Go"), style = "flex:1;"),
+        
+        # Download button
+        actionButton("ask.download", "Save", icon = icon("download"), style = "flex:1;"),
+    )),
   
   # Card
   page_fillable(
     layout_columns(
       navset_card_underline(
             title = "Selected genomic region",
-            header = h6(textOutput("sel.coord"), style = "font-size:14px; padding:0px 0px;"), 
+            div(style = "overflow-y: hidden;", h6(textOutput("sel.coord"), style = "font-size:14px; padding:8px 8px;")), 
               # Panel with plot ----------------------------------------------------------------------------------
-              nav_panel("Plot", class = "gap-2 p-0 border-0 align-items-top",
-                        svgPanZoomOutput(outputId = "res", width = "auto", height = "900px") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
-                        imageOutput("plot.test", width = "auto", height = "10px", inline=T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),
-                        plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
-                        fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
-                        column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
-                        column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
-                        column(width = 1,actionButton("z10out", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
-                        column(width = 2, h6(tags$b("Zoom-in:")), style = "padding: 3px 5px; text-align:right"),
-                        column(width = 1,actionButton("z2in", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
-                        column(width = 1,actionButton("z5in", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
-                        column(width = 1,actionButton("z10in", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px")
-              )
+            nav_panel("Plot", class = "gap-2 p-0 border-0 align-items-top margin-bottom-240px",
+                      div(
+                        style = "display:flex; flex-direction:column; height:100%;",
+                        # Warning message in case there is no data
+                        tags$head(tags$style(".shiny-output-error{visibility: hidden;}")),
+                        tags$head(tags$style(".shiny-output-error:after{content: 'There is no data in this range. Try with different coordinates.'; visibility: visible; color: slategrey; position: absolute; top: 10px; left: 70px;}")),
+                        # Main plot
+                        tags$head(tags$style(HTML("#res svg g#svg-pan-zoom-controls {
+                                                    transform: translate(880px, 300px) scale(0.5) !important;
+                                                  }"))),
+                        # Main plot
+                        div(
+                          style = "flex-grow:1; overflow-y:auto;",
+                          svgPanZoomOutput(outputId = "res", width = "auto", height = "auto") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
+                          imageOutput("plot.test", inline = T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),#, width = "auto", height = "10px", inline=T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),
                         ),
+                        # Zoom section
+                        div(id = "stickyBottomPanel", style="display:flex; flex-direction:column; width:100%",
+                            plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
+                            fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
+                                     column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                                     column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                                     column(width = 1,actionButton("z10out", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
+                                     column(width = 2, h6(tags$b("Zoom-in:")), style = "padding: 3px 5px; text-align:right"),
+                                     column(width = 1,actionButton("z2in", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                                     column(width = 1,actionButton("z5in", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                                     column(width = 1,actionButton("z10in", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px")
+                            ) ) )
+            ),
               # Panel with Table of data -------------------------------------------------------------------------
               nav_panel("Data", class = "gap-2 p-3 border-0 align-items-top",
                       # print table preview and download button: bed
@@ -243,23 +290,21 @@ ui <- page_sidebar(
                       div(verbatimTextOutput("chr.info"), style = "height:20px; font-size: 80%;"),
                       div(tags$b("Advanced Options:"), style = "text-align: center; margin-bottom: -10px;"),
                       # Search by gene
-                      selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0)),
+                      selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0), width = "100%"),
                       #textOutput('sel.gene'),
                       # Select mode for bigwig plotting
                       column(width = 12, 
-                      selectInput('bw.mode', "Select bigwig plot mode", bw.mode, selectize=FALSE),
+                      selectInput('bw.mode', "Select bigwig plot mode", bw.mode, selectize=FALSE, width = "100%"),
                       # Bigwig autoscale group options
                       actionButton("bw.autoscale", "Autoscale settings", width = "100%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: #f2f0eb; border-color: slategrey;")),
                       # Select mode for categories plotting
-                      selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T),
+                      selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T, width = "100%"),
                       # Expand transcript track option
                       checkboxInput("checkbox", "Expand transcripts", FALSE))
                 ),
        col_widths = c(9, 3)
               )
-
               )
-   
 
 )
 
@@ -277,6 +322,13 @@ server <- function(input, output, session){
   chrom.cen.df <- eventReactive(input$ref.genome, {
   chrom.cen.path <- paste(config_gen$chrom.cen.dir, "/chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep="")
   chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
+  })
+  
+  ### For chromosome id drop down menu
+  observeEvent(chrom.cen.df(), {
+    chrom.cen.df <- chrom.cen.df()
+    updateSelectizeInput(session = getDefaultReactiveDomain(), "chr", selected = gsub("chr", "", chrom.cen.df$chr)[1], choices = gsub("chr", "", chrom.cen.df$chr))#, options = list(maxOptions = 12), server = TRUE)
+    print(input$chr)
   })
   
   ### For cytoband
@@ -300,16 +352,32 @@ server <- function(input, output, session){
   reactiveChr <- eventReactive(input$go, {
     print(input$chr)
   })
-    ## Chr start
+  ## Chr start
   reactiveChrstart <- eventReactive(input$go, {
-    if (input$chrstart <= 0) {print(1)} else {
-    print(input$chrstart)}
+    if (is.na(input$chrstart) | input$chrstart <= 0) { print(1) } 
+    else {print(input$chrstart)}
   })
   ## Chr end
   reactiveChrend <- eventReactive(input$go, {
     chrom.cen.df <- chrom.cen.df()
-    if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
-      } else print(input$chrend)
+    start <- reactiveChrstart()
+    if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+    } else if (is.na(input$chrend) | input$chrend < 500) { 
+      print(start + 500)
+    } else print(input$chrend)
+  })
+  ## Update Chr start end when unwanted values are entered
+  observeEvent(input$go, {
+    # handle start
+    if (is.na(input$chrstart) | input$chrstart <= 0){
+      updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
+      start <- 1} else {start <- print(input$chrstart)}
+    # handle end
+    chrom.cen.df <- chrom.cen.df()
+    if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) {
+      updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+    } else if (is.na(input$chrend) | input$chrend - start <= 500 ) {
+      updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = start + 500)}
   })
   ## Categories to expand
   reactiveCat <- reactive({
@@ -361,7 +429,9 @@ server <- function(input, output, session){
   
   image <- reactive({
     genes.hgnc <- genes.hgnc()
-    req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
+    cond <- req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
+    if (!cond) return(NULL)
+    
     outfile <- tempfile(fileext='.png')
     png(outfile, width =1200, height=900, res = 120)
     plotgardener.shiny.function(bw.file = bw.file, 
@@ -393,11 +463,9 @@ server <- function(input, output, session){
   })
   
   output$plot.test <- renderImage({
-#    req(!is.null(image()))
+    req(image())
     image()
   }, deleteFile = F)
-  
- 
 
   ##-------------------- Output zooming region plot:
   
@@ -406,7 +474,7 @@ server <- function(input, output, session){
    p <- ggplot() + 
       geom_rect(aes(xmin = input$chrstart - x.ext, xmax = input$chrend + x.ext, ymin = 10, ymax = 11), fill = "grey") +
       geom_rect(aes(xmin = input$chrstart, xmax = input$chrend, ymin = 10, ymax = 11), fill = "salmon", colour = "darkred") +
-     xlab("Select a region to ZOOM") +
+     #xlab("Select a region to ZOOM") +
       theme_void() +
       theme(axis.text.x = element_text(size = 12),
             axis.ticks.x = element_line(),
@@ -416,7 +484,7 @@ server <- function(input, output, session){
     p
   },
   width = "auto",
-  height = 50
+  height = 35
  ) 
   
   ##-------------------- Zooming when click on zoom buttons:
@@ -925,15 +993,32 @@ server <- function(input, output, session){
     
   }, height = 150, width = "auto")
     
-    ## Hover output
-
+  ## Hover output
+  
   output$chr.info <- renderText({
     chrom.cen.df <- chrom.cen.df()
     if(!is.null(input$chr.hover)){
       hover=input$chr.hover
-      paste0(chrom.cen.df$chr[round(as.numeric(hover[1],0))], ": click to select")
+      if (floor(as.numeric(hover[1],0)) >= 1) {
+        if(as.numeric(hover[2]) <= chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[floor(as.numeric(hover[1],0))])]) {
+          paste0(chrom.cen.df$chr[round(floor(as.numeric(hover[1],0)))], ": click to select")
+        } }
     }
     
+  })
+  
+  ## Update chr start end upon click on chr plot
+  
+  observeEvent(input$chr.click, {
+    chrom.cen.df <- chrom.cen.df()
+    # We'll use the input$controller variable multiple times, so save it as x for convenience.
+    x2 <- input$chr.click
+    if (x2$x >= 1){
+      if(x2$y <= chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])]){
+        updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", chrom.cen.df$chr[x2$x]))
+        updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
+        updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])])
+      } }
   })
   ##--------------------- END OF Chromosome plot and additional options
   
@@ -968,29 +1053,38 @@ server <- function(input, output, session){
   })
   ##------------------------ END OF Expand transcripts checkbox
   
-  ##------------------------ Update chr start end upon click on chr plot
-    observeEvent(input$chr.click, {
-      chrom.cen.df <- chrom.cen.df()
-    # We'll use the input$controller variable multiple times, so save it as x for convenience.
-    x2 <- input$chr.click
-    updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", chrom.cen.df$chr[x2$x]))
-    updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
-    updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])])
-  })
-    ##----------------------- END OF Update chr start end upon click on chr plot
-  
     ##----------------------- User selected coordiates REGION TABLE
     ##----------------------- START OF User selected coordinates REGION TABLE
-    coord <- reactive({
-      if (!is.null(saved.coord) & is.null(input$upload.coord)){
-        coord <- saved.coord
-      } else if (!is.null(input$upload.coord)){
-        up.coord.path <- input$upload.coord
-        coord <- read_delim(up.coord.path$datapath, "\t", col_names = F, show_col_types = F)
-        coord <- apply(coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
-        coord <- gsub(" ", "", coord) # remove eventual white spaces
+  coord <- reactive({
+    if (!is.null(saved.coord) & is.null(input$upload.coord)){
+      coord <- saved.coord
+    } else if (!is.null(input$upload.coord)){
+      up.coord.path <- input$upload.coord
+      # test format of input file:
+      coord <- tryCatch(
+        read_delim(up.coord.path$datapath, "\t", col_names = F, show_col_types = F),
+        error = function(e) NULL
+      )
+      # If reading failed
+      if (is.null(df)) {
+        showNotification("Could not read the file. Make sure it's a tab-separated file.", type = "error")
+        return()
       }
-    })
+      # If reading good: Validate column classes
+      valid.2col <- (ncol(coord) == 2 && is.character(coord[[1]]) && is.numeric(coord[[2]]))
+      valid.3col <- (ncol(coord) > 2 && is.character(coord[[1]]) && is.numeric(coord[[2]]) && is.numeric(coord[[3]]))
+      # ---- Warning if not valid ----
+      if (!(valid.2col || valid.3col)) {
+        showNotification("Invalid format: must contain at least 3 columns (string, number, number).", type = "warning", duration = 7)
+        return()
+      }
+      # ---- If valid, continue processing ----
+      showNotification("File format accepted!", type = "message")
+      # read the uploaded region table
+      coord <- apply(coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
+      coord <- gsub(" ", "", coord) # remove eventual white spaces
+    }
+  })
     # if there is a coord file update the list from whcih the used can select
     observeEvent(coord(), {
       coord <- coord()
@@ -1036,13 +1130,20 @@ server <- function(input, output, session){
     })
     ## Chr start
     chrstartNew <- eventReactive(input$add, {
-      if (input$chrstart <= 0) {print(1)} else {
-        print(input$chrstart)}
+      if (!is.na(input$chrstart) & input$chrstart <= 0) {print(1)
+      } else if (is.na(input$chrstart)) {print(1)}
+      else {print(input$chrstart)}
     })
     ## Chr end
     chrendNew <- eventReactive(input$add, {
-       chrom.cen.df <- chrom.cen.df()
-      if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      chrom.cen.df <- chrom.cen.df()
+      if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      } else if (!is.na(input$chrend) & input$chrend < 0) {
+        chrstartNew <- chrstartNew()
+        print(chrstartNew + 500)
+      } else if (is.na(input$chrend)){
+        chrstartNew <- chrstartNew()
+        print(chrstartNew + 500)
       } else print(input$chrend)
     })
     
