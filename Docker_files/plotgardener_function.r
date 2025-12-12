@@ -1,5 +1,5 @@
 
-plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, bw.autoscale, expand.transcripts, genes.hgnc, genome, cytoband){
+plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file, bw.names, hic.names, bed.names, bedpe.names, gwas.file, gwas.names, cat.file, cat.names, cat.collapse, chr, start, end, bw.mode, bw.autoscale, expand.transcripts, genes.hgnc, genome, cytoband, ideogram){
   
   
   
@@ -438,11 +438,11 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     }
     
     ## Add heatmap legend just once
-    annoHeatmapLegend(
-      plot = man.plot, fontcolor = "black",
-      x = 6.5, y = "-0.9b", just = c("left", "top"),
-      width = 0.10, height = 0.5, fontsize = 10*(conv+0.2), digits = 1, scientific = T
-    )
+   # annoHeatmapLegend(
+    #  plot = man.plot, fontcolor = "black",
+    #  x = 6.5, y = "-0.9b", just = c("left", "top"),
+    #  width = 0.10, height = 0.5, fontsize = 10*(conv+0.2), digits = 1, scientific = T
+    #)
     }
     print(y.coord)
 
@@ -511,67 +511,70 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
 #####------------------------------------------------ CHROMOSOME IDEOGRAM
 # Plot chromosome ideogram:
 
-## Plot and place ideogram
-  if (genome[1] %in% c("hg19", "hg38", "mm10")){
+  if(ideogram == TRUE){
     
-ideogramPlot <- plotIdeogram(
-  chrom = paste("chr", chr, sep=""), assembly = genome,
-  x = 0.75, y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5,
-  just = c("left", "bottom"),
-  default.units = "cm")
-
-## Increment y coord
-y.coord <- y.coord+0.5
-
-## Add highlight region
-region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
-annoHighlight(
-  plot = ideogramPlot, params = region,
-  fill = "darkred",
-  y = "-0.6b", height = 0.7, just = c("left", "top"), default.units = "cm"
-)
-
-  } else {
-    ## Define region and cytoband data
-      region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
-     cytoband_data <- dplyr::filter(cytoband, seqnames == paste("chr", chr, sep=""))
-     ## Plot cytoband as ggplot object and add zoom highlight
-     ideo <- ggplot(cytoband_data, aes(x = seqnames, ymin = start, ymax = end, fill = gieStain)) +
-      geom_rect(aes(xmin = 0, xmax = 2)) +
-      ggchicklet:::geom_rrect(aes(xmin=0, xmax =2, ymin=0, ymax=max(end)), fill="transparent", color="slategray") +
-      coord_flip() + # Optional: Flip coordinates for a vertical ideogram
-      theme_void() +# Optional: Remove default ggplot theme elements
-      theme(legend.position = "none") +
-      scale_fill_manual(values = c(paletteer_d("RColorBrewer::Greys")[1:length(grep("gneg*|gpos*", unique(cytoband_data$gieStain)))], rev(paletteer_dynamic("cartography::pastel.pal",5 ) [1:(length( unique(cytoband_data$gieStain))-length(grep("gneg*|gpos*", unique(cytoband_data$gieStain))))]))) +
-      annotate(geom = "rect", xmin = 0, xmax = 2, ymin = region$chromstart, ymax = region$chromend, color = "darkred", fill = "darkred", alpha = 0.5)
+    ## Plot and place ideogram
+    if (genome[1] %in% c("hg19", "hg38", "mm10")){
       
-     ideogramPlot <- plotGG(ideo,
-           x = 0.75 , y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5, params = region,
-           just = c("left", "bottom"),
-           default.units = "cm")
-     
-     ideogramPlot$chrom <- paste("chr", chr, sep="")
-     ## Increment y coord
-     y.coord <- y.coord+0.5
-
+      ideogramPlot <- plotIdeogram(
+        chrom = paste("chr", chr, sep=""), assembly = genome,
+        x = 0.75, y = "1.75b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5,
+        just = c("left", "bottom"),
+        default.units = "cm")
+      
+      ## Increment y coord
+      y.coord <- y.coord+0.5
+      
+      ## Add highlight region
+      region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
+      annoHighlight(
+        plot = ideogramPlot, params = region,
+        fill = "darkred",
+        y = "-0.6b", height = 0.7, just = c("left", "top"), default.units = "cm"
+      )
+      
+    } else {
+      ## Define region and cytoband data
+      region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
+      cytoband_data <- dplyr::filter(cytoband, seqnames == paste("chr", chr, sep=""))
+      ## Plot cytoband as ggplot object and add zoom highlight
+      ideo <- ggplot(cytoband_data, aes(x = seqnames, ymin = start, ymax = end, fill = gieStain)) +
+        geom_rect(aes(xmin = 0, xmax = 2)) +
+        ggchicklet:::geom_rrect(aes(xmin=0, xmax =2, ymin=0, ymax=max(end)), fill="transparent", color="slategray") +
+        coord_flip() + # Optional: Flip coordinates for a vertical ideogram
+        theme_void() +# Optional: Remove default ggplot theme elements
+        theme(legend.position = "none") +
+        scale_fill_manual(values = c(paletteer_d("RColorBrewer::Greys")[1:length(grep("gneg*|gpos*", unique(cytoband_data$gieStain)))], rev(paletteer_dynamic("cartography::pastel.pal",5 ) [1:(length( unique(cytoband_data$gieStain))-length(grep("gneg*|gpos*", unique(cytoband_data$gieStain))))]))) +
+        annotate(geom = "rect", xmin = 0, xmax = 2, ymin = region$chromstart, ymax = region$chromend, color = "darkred", fill = "darkred", alpha = 0.5)
+      
+      ideogramPlot <- plotGG(ideo,
+                             x = 0.75 , y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5, params = region,
+                             just = c("left", "bottom"),
+                             default.units = "cm")
+      
+      ideogramPlot$chrom <- paste("chr", chr, sep="")
+      ## Increment y coord
+      y.coord <- y.coord+0.5
+      
+    }
+    y.coord = y.coord -0.85
+    print(y.coord)
+    ## Add zoom-in lines
+    annoZoomLines(params = region, 
+                  plot = ideogramPlot, 
+                  y0 = y.coord+0.4, x1 = c(0, 16), y1 = y.coord, default.units = "cm", just = c("left", "bottom")
+    )
+    
+    
+    ## Plot chromosome name
+    #plotText(
+    #  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
+    #  x = 4.5, y = "0.5b", just = "right")
+    #y.coord <- y.coord+0.5
+    # COmmented because redundant with GenomeLabel
+    
+    
   }
-  
-
-## Plot chromosome name
-#plotText(
-#  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
-#  x = 4.5, y = "0.5b", just = "right")
-#y.coord <- y.coord+0.5
-# COmmented because redundant with GenomeLabel
-
-print(y.coord)
-
-
-## Add zoom-in lines
-annoZoomLines(params = region, 
-  plot = ideogramPlot, 
-  y0 = y.coord, x1 = c(0, 16), y1 = y.coord+0.75, default.units = "cm", just = c("left", "bottom")
-)
 
 }
 

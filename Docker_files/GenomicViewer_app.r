@@ -300,7 +300,9 @@ ui <- page_sidebar(
                       # Select mode for categories plotting
                       selectInput('cat.mode', 'Select categories to expand', choices = config$cat.names, multiple = T, width = "100%"),
                       # Expand transcript track option
-                      checkboxInput("checkbox", "Expand transcripts", FALSE))
+                      checkboxInput("checkbox", "Expand transcripts", FALSE),
+                      # Show/Hide chromosome ideogram option
+                      checkboxInput("checkideo", "Show chromosome ideogram", TRUE))
                 ),
        col_widths = c(9, 3)
               )
@@ -415,7 +417,8 @@ server <- function(input, output, session){
                                                                           expand.transcripts = reactiveTranscript(),
                                                                           genes.hgnc = genes.hgnc,
                                                                           genome = gsub( " .*", "", input$ref.genome),
-                                                                          cytoband = Cytoband())
+                                                                          cytoband = Cytoband(),
+                                                                          ideogram = reactiveIdeogram())
     # } else {return(NULL)}
       
     })
@@ -455,7 +458,8 @@ server <- function(input, output, session){
                                 expand.transcripts = reactiveTranscript(),
                                 genes.hgnc = genes.hgnc,
                                 genome = gsub( " .*", "", input$ref.genome),
-                                cytoband = Cytoband())
+                                cytoband = Cytoband(),
+                                ideogram = reactiveIdeogram())
     dev.off()
     list(src = outfile,
          alt = "genomic viewer image")
@@ -1053,6 +1057,12 @@ server <- function(input, output, session){
   })
   ##------------------------ END OF Expand transcripts checkbox
   
+  ##------------------------ Show chromosome Ideogram checkbox
+  reactiveIdeogram <- eventReactive(input$checkideo, {
+    print(input$checkideo)
+  })
+  ##------------------------ END OF chromosome Ideogram checkbox
+  
     ##----------------------- User selected coordiates REGION TABLE
     ##----------------------- START OF User selected coordinates REGION TABLE
   coord <- reactive({
@@ -1477,7 +1487,8 @@ server <- function(input, output, session){
                                     expand.transcripts = reactiveTranscript(),
                                     genes.hgnc = genes.hgnc,
                                     genome = gsub( " .*", "", input$ref.genome),
-                                    cytoband = Cytoband())
+                                    cytoband = Cytoband(),
+                                    ideogram = reactiveIdeogram())
         dev.off()
         
         # Tell user the plot has been saved
