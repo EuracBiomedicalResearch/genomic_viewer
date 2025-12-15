@@ -73,7 +73,8 @@ Which file formats can be exported.
 
 ## Tutorial
 
-This section contains an easy tutorial exaplaining how to use ***Genomic Viewer*** principal functionality through a practical example with real data.
+This section contains an easy tutorial explaining how to use ***Genomic Viewer*** principal functionality through a practical example with real data.
+
 In this tutorial you will learn how to:
 - Correctly set navigation and graphical parameters to visualize genomic tracks.
 - Generate a plot with diverse genomic data.
@@ -82,6 +83,15 @@ In this tutorial you will learn how to:
 - Evaluate data based on the stats.
 - Formulate biological hypothesis driven by data integration.
 
+<h4><strong>Usage example data</strong></h4>
+
+The genomic data to be loaded must be entered through the `GenomicViewer_config.yml` configuration file as described in the [Configuration section](#configruation).
+In this tutorial we will exploit as usage example the default data that are loaded by default in the pre-compiled *configuration file* that is saved upon ***Genomic Viewer*** installation.
+These are publicly available data from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)*. See [References and Links](#references-links) for data availability.
+
+
+
+
 ## Getting Help
 
 For **general support** questions, **reporting a bug** or **suggest a new feature** you can create an issue in our [Github repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
@@ -89,3 +99,14 @@ For **general support** questions, **reporting a bug** or **suggest a new featur
 For **confidential reports** you can contact us by [email](mailto:sara.lago@eurac.edu).
 
 ## References and Links
+
+<h4><strong>Data Availability</strong></h4>
+
+ The data employed in the *usage example tutorial* are publicly available from [GEO](https://www.ncbi.nlm.nih.gov/geo/) and [GWAS catalog](https://www.ebi.ac.uk/gwas/) under the accession numbers listed below:
+
+- HiC (GEO GSE212910)
+- ATAC-seq (GEO GSE212908)
+- CKD GWAS (GWAS Catalog 26831199)
+
+Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables). 
+
