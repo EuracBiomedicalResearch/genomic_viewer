@@ -170,8 +170,8 @@ For more details about genomic navigation refer to the <em>Genomic Navigation</e
 - Generate and visualize genomic screenshots of a selected region;
 - Subset the original data to the visualized genomic range, having those available for external use; and 
 - Obtain quantitative and descriptive information useful for the biological interpretation of the tracks.
-<br>
-Further description of each panel is available at the *Central Panels* in the [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage) paragraph.
+<br></br>
+Further description of each panel is available at the <em>Central Panels</em> in the [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage) paragraph.
 
 
 <h5> <strong>6. Export results and coordinates</strong> </h5>
