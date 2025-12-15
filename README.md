@@ -138,11 +138,11 @@ Data and their annotation are loaded through a configuration file named `Genomic
 A default configuration file is pre-filled and ready-to-use with information relative to an example dataset retrieved from public data (accession numbers GEO: GSE212908, GSE212910, GAWS catalog: 26831199 and UCSC Table Browser Regulatory elements). 
 <strong><em>Note:</em></strong> example data are restricted to <strong><em>chr5</em></strong> as tester lightweight sample.
 
-For more details about how to fill the <em>Configuration file</em> see the [Configuration section](assets/genomicviewer-reference-manual.html#configuration).
+For more details about how to fill the <em>Configuration file</em> see the [Configuration section](assets/genomicviewer-reference-manual.md#configuration).
 <strong><em>Genomic Viewer</em></strong> determines the data type and label based on the configuration file entries. 
 
-See [File Formats](assets/genomicviewer-reference-manual.html#file-formats) for information about the accepted data formats in the [Configuration section](#configuration).
-Additional configurations like track plots alternatives, transcript or gene label annotation and chromosome display are available from the graphical interface and are thoroughly described in the [Features and Usage section](assets/genomicviewer-reference-manual.html#features-and-usage).
+See [File Formats](assets/genomicviewer-reference-manual.md#file-formats) for information about the accepted data formats in the [Configuration section](#configuration).
+Additional configurations like track plots alternatives, transcript or gene label annotation and chromosome display are available from the graphical interface and are thoroughly described in the [Features and Usage section](assets/genomicviewer-reference-manual.md#features-and-usage).
 Make sure that the data you want to load are saved in the `/data` directory that was created upon <strong><em>GenomicViewer</em></strong> installation. Pay attention to load only data files with matched reference genome. 
 
 
@@ -156,7 +156,7 @@ Pay attention to load data tracks that are mapped to the same reference genome, 
 When you first launch the <strong><em>Genomic Viewer</em></strong> application, it automatically loads the default reference genome (currently hg19). 
 For instructions on changing to another reference genome, refer to <em>Reference Genomes</em> paragraph in the 
 
-[Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage).
+[Features and Usage section](./genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>4. Navigate</strong> </h4>
 The genomic range to be visualized can be specified in different ways thanks to multiple navigation controls provided by <strong><em>Genomic Viewer</em></strong> graphical interface.
@@ -164,7 +164,7 @@ Among the available options there is the manual inserting of genomic coordinates
 Zooming options also allow to adjust the view dynamically. Once the genomic screenshot is generate through the <strong>Go button</strong>, a chromosome ideogram will show the position and extent of the displayed region.
 For more details about genomic navigation refer to the <em>Genomic Navigation</em> paragraph in the 
 
-[Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage).
+[Features and Usage section](./genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>5. Explore datasets</strong> </h4>
 <strong><em>Genomic Viewer</em></strong> provides three different navigation tabs named <strong>Plot</strong>, <strong>Data</strong> and <strong>Stats</strong>, allowing the user to: 
@@ -172,7 +172,7 @@ For more details about genomic navigation refer to the <em>Genomic Navigation</e
 - Subset the original data to the visualized genomic range, having those available for external use; and 
 - Obtain quantitative and descriptive information useful for the biological interpretation of the tracks.
 
-Further description of each panel is available at the <em>Central Panels</em> in the [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage) paragraph.
+Further description of each panel is available at the <em>Central Panels</em> in the [Features and Usage section](./genomicviewer-reference-manual.md#features-and-usage) paragraph.
 
 <h4> <strong>6. Export results and coordinates</strong> </h4>
 <strong><em>Genomic Viewer</em></strong> allows to export and save different outputs generated during a working session:
@@ -180,7 +180,7 @@ Further description of each panel is available at the <em>Central Panels</em> in
 - A custom list of coordinates dynamically created during the working session can be exported and saved thanks to the options in the <strong>Load coordinates</strong> panel;
 - Subset of the raw data matching the selected genomic region can be downloaded as individual files for the <strong>Data</strong> navigation panel. 
 
-A more in detail description of these functions is reported in the [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage).
+A more in detail description of these functions is reported in the [Features and Usage section](./genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>7. Share your session</strong> </h4>
 The idea of providing all the input datasets through a configuration file starts from the need to have an way to restore and share working sessions among users and collaborators.
@@ -243,7 +243,7 @@ Further details are available in the [Features and Usage section](#features-and-
 
 <div>
   
-A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** built-in test data is described in the [Tutorial](./genomicviewer-reference-manual.html#tutorial) section of the reference manual.                                                                      
+A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** built-in test data is described in the [Tutorial](./genomicviewer-reference-manual.md#tutorial) section of the reference manual.                                                                      
 
 ------------------------------------------------------------------------
 
