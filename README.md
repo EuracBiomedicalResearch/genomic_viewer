@@ -29,7 +29,7 @@ output:
 
 ------------------------------------------------------------------------
 
-[Go to Overview](#overview)
+## Overview
 
 <details open>
 <summary>&nbsp;</summary>
