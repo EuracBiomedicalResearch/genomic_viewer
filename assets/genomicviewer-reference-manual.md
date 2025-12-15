@@ -2,7 +2,7 @@
 
 # Genomic Viewer Reference Manual
 
-<img src="GV_scheme.png" width="225"/>
+<img src="GV_scheme.png"/>
 
 **Version:** 1.0.0\
 **Description:** Genomic Viewer is a cross-platform application for visualizing and analyzing genomic data hosted in a Docker container.
