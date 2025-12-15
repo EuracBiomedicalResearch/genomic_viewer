@@ -33,12 +33,17 @@ Document all configurable items:
 - Environment variables
 - Integration with external tools
 
+------------------------------------------------------------------------
+
 ## Features and usage
 
 Explain major features in dedicated subsections.
 
 ### Data Import
 How to load files, accepted formats, drag-and-drop support.
+
+### Reference Genome
+How to choose reference genome and which are the available options and the affeted sections in the viewer.
 
 ### Visualization
 Plots, settings, export options.
@@ -69,7 +74,11 @@ Which file formats can be exported.
 | Go button          | generate plot according to the selected options                                                                                                      |
 | Save button        | Export plot choosing among different formats: .svg, .pdf, .png, .jpg  
 
+------------------------------------------------------------------------
+
 ## File Formats
+
+------------------------------------------------------------------------
 
 ## Tutorial
 
@@ -83,7 +92,7 @@ In this tutorial you will learn how to:
 - Evaluate data based on the stats.
 - Formulate biological hypothesis driven by data integration.
 
-### Usage example data
+### Loading usage example data
 
 The genomic data to be loaded must be entered through the `GenomicViewer_config.yml` configuration file as described in the [Configuration section](#configruation).
 In this tutorial we will exploit as usage example the data that are loaded by default in the pre-compiled *configuration file* that is saved upon ***Genomic Viewer*** installation.
@@ -91,16 +100,24 @@ These are publicly available data from the *Human Kidney cortex* and *Chronic Ki
 *Note:* The dataset which is made available upon ***Genomic Viewer*** installation only includes *chromosome 5* as lightweight sample. For the user that wants full data accessibility please see [References and Links](#references-links)
 and download data form source databases. Save the files in the `./data` folder and update the **configuration file** with the correct file paths and labels.
 
-![GV configuration file and data](GV_configuration_example.png)
+<img src="GV_configuration_example.png" alt="GV configuration file and data" width="80%">
 
-### 
+### Genome selection and navigation
 
+Before starting the inspection of the data tracks it is essential to select the correct reference genome. When ***Genomic Viewer*** is started it loads by default the human *reference genome hg19* (GRCh19).
+The usage example data are mapped to the human *reference genome hg38* (GRCh38). Therefore the first thing to do to ensure correct annotation of the data is to choose the right version of the genome from the top left drop-down menu.
+
+<img src="GV_ref_genome.png" alt="GV configuration file and data" width="20%">
+
+------------------------------------------------------------------------
 
 ## Getting Help
 
 For **general support** questions, **reporting a bug** or **suggest a new feature** you can create an issue in our [Github repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
 
 For **confidential reports** you can contact us by [email](mailto:sara.lago@eurac.edu).
+
+------------------------------------------------------------------------
 
 ## References and Links
 
@@ -113,4 +130,6 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 - CKD GWAS (GWAS Catalog 26831199)
 
 Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables). 
+
+------------------------------------------------------------------------
 
