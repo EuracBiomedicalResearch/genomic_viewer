@@ -133,7 +133,7 @@ Recommended actions for the user <em>before</em> installing <strong><em>Genomic 
 <div>
 A short hands-on section showing a simple workflow.
 
-<h5><strong>1. Configure and Load data</strong></h5>
+<h4><strong>1. Configure and Load data</strong></h4>
 Data and their annotation are loaded through a configuration file named `GenomicViewer_config.yml` which is automatically saved in the `/data` folder during <strong>Genomic Viewer</strong> installation in the user selected location.<br>
 A default configuration file is pre-filled and ready-to-use with information relative to an example dataset retrieved from public data (accession numbers GEO: GSE212908, GSE212910, GAWS catalog: 26831199 and UCSC Table Browser Regulatory elements). 
 <strong><em>Note:</em></strong> example data are restricted to <strong><em>chr5</em></strong> as tester lightweight sample.
@@ -146,11 +146,11 @@ Additional configurations like track plots alternatives, transcript or gene labe
 Make sure that the data you want to load are saved in the `/data` directory that was created upon <strong><em>GenomicViewer</em></strong> installation. Pay attention to load only data files with matched reference genome. 
 
 
-<h5> <strong>2. Launch Genomic Viewer</strong> </h5>
+<h4> <strong>2. Launch Genomic Viewer</strong> </h4>
 Launch <strong><em>Genomic Viewer</em></strong> from the <strong>GV</strong> desktop icon that is created upon installation.<br>
 After loading all the required R packages <strong><em>Genomic Viewer</em></strong> interface will open as a new tab in your default web browser.
 
-<h5> <strong>3. Select a reference genome</strong> </h5>
+<h4> <strong>3. Select a reference genome</strong> </h4>
 <strong><em>Genomic Viewer</em></strong> shows data aligned to the genomic coordinates of a selected reference genome. It is essential to choose the correct reference genome to avoid mislabeling of gene/transcript annotation tracks and coordinates.
 Pay attention to load data tracks that are mapped to the same reference genome, and choose the reference accordingly.
 When you first launch the <strong><em>Genomic Viewer</em></strong> application, it automatically loads the default reference genome (currently hg19). 
@@ -158,7 +158,7 @@ For instructions on changing to another reference genome, refer to <em>Reference
 
 [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage).
 
-<h5> <strong>4. Navigate</strong> </h5>
+<h4> <strong>4. Navigate</strong> </h4>
 The genomic range to be visualized can be specified in different ways thanks to multiple navigation controls provided by <strong><em>Genomic Viewer</em></strong> graphical interface.
 Among the available options there is the manual inserting of genomic coordinates, upload of predefined coordinate sets, navigation by gene name or entire chromosomes overview.
 Zooming options also allow to adjust the view dynamically. Once the genomic screenshot is generate through the <strong>Go button</strong>, a chromosome ideogram will show the position and extent of the displayed region.
@@ -166,7 +166,7 @@ For more details about genomic navigation refer to the <em>Genomic Navigation</e
 
 [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage).
 
-<h5> <strong>5. Explore datasets</strong> </h5>
+<h4> <strong>5. Explore datasets</strong> </h4>
 <strong><em>Genomic Viewer</em></strong> provides three different navigation tabs named <strong>Plot</strong>, <strong>Data</strong> and <strong>Stats</strong>, allowing the user to: 
 - Generate and visualize genomic screenshots of a selected region;
 - Subset the original data to the visualized genomic range, having those available for external use; and 
@@ -174,7 +174,7 @@ For more details about genomic navigation refer to the <em>Genomic Navigation</e
 
 Further description of each panel is available at the <em>Central Panels</em> in the [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage) paragraph.
 
-<h5> <strong>6. Export results and coordinates</strong> </h5>
+<h4> <strong>6. Export results and coordinates</strong> </h4>
 <strong><em>Genomic Viewer</em></strong> allows to export and save different outputs generated during a working session:
 - The visualized genomic screenshot can be exported preserving all the user-defined settings as publication-quality plot in different file formats through the <strong>Save button</strong>;
 - A custom list of coordinates dynamically created during the working session can be exported and saved thanks to the options in the <strong>Load coordinates</strong> panel;
@@ -182,7 +182,7 @@ Further description of each panel is available at the <em>Central Panels</em> in
 
 A more in detail description of these functions is reported in the [Features and Usage section](./genomicviewer-reference-manual.html#features-and-usage).
 
-<h5> <strong>7. Share your session</strong> </h5>
+<h4> <strong>7. Share your session</strong> </h4>
 The idea of providing all the input datasets through a configuration file starts from the need to have an way to restore and share working sessions among users and collaborators.
 
 Importing a session created by a different user is as simple as copying the same configuration `GenomicViewer_config.yml` file within your own `/data` folder as long as you have access to the same data files.
@@ -199,7 +199,7 @@ Several configuration files can be stored separately to keep track of multiple w
 <div>
 Brief description of the <strong><em>Genomic Viewer</em></strong> graphical interface structure. 
 
-<h5><strong>Main Window</strong></h5>
+<h4><strong>Main Window</strong></h4>
 
 The main widow of <strong><em>Genomic Viewer</em></strong> application is structured to have two lateral sidebars with actionable options and tools and a larger central area which is meant to display the results.
 It can be summerized into three sections:
@@ -210,7 +210,7 @@ It can be summerized into three sections:
 
 ![GV Main Window with sections](assets/GV_main_window_sections.png)
 
-<h5><strong>Sidebars</strong></h5>
+<h4><strong>Sidebars</strong></h4>
 
 ***Left sidebar:***
 The left sidebar provides several functions for choosing the working reference genome and navigating through it.It is essential to select a reference genome that matches all the loaded data defined in the configuration file.
@@ -222,7 +222,7 @@ The right sidebar provides advanced options for genomic navigation and graphical
 It is fundamental to set first the correct reference genome, as the chromosomes and genes ID and coordinates change accordingly.
 The graphical settings that can be controlled form the right sidebar are the bigwig profile tracks plotting mode, if the genomic label track will display genes or transcript isoforms and if to display or not the chromosome ideagram at the plot bottom.
 
-<h5><strong>Central Navigation Panels</strong></h5>
+<h4><strong>Central Navigation Panels</strong></h4>
 
 The central area is the core of ***Genomic Viewer*** as it is where its outputs are displayed. It allows the user to navigate across three different panels showing respectively:
 - The *Plot* relative to the selected genomic region displaying all the tracks that were loaded through the configuration file. A *zoom* action bar is also available to resize the image and adjust the genomic range around the
