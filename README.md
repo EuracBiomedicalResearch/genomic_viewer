@@ -1,9 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
----
 
 # Genomic Viewer
 
@@ -71,7 +65,7 @@ analysis for data inspection.
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">Installation Instructions</summary>
 
 <div>
-Recommended actions for the user *before* installing ***Genomic Viewer*** and Step-by-step instructions on how to get the application running.
+Recommended actions for the user <em>before</em> installing <strong><em>Genomic Viewer</em></strong> and Step-by-step instructions on how to get the application running.
 <br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Windows**</span>
@@ -190,6 +184,7 @@ A more in detail description of these functions is reported in the [Features and
 
 <h5> <strong>7. Share your session</strong> </h5>
 The idea of providing all the input datasets through a configuration file starts from the need to have an way to restore and share working sessions among users and collaborators.
+
 Importing a session created by a different user is as simple as copying the same configuration `GenomicViewer_config.yml` file within your own `/data` folder as long as you have access to the same data files.
 Several configuration files can be stored separately to keep track of multiple working sessions. Just remember to check that the correct reference genome is selected upon starting the <strong><em>Genomic Viewer</em></strong> application from a previous session.
 
@@ -202,11 +197,11 @@ Several configuration files can be stored separately to keep track of multiple w
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">User Interface Overview</summary>
 
 <div>
-Brief description of the ***Genomic Viewer*** graphical interface structure. 
+Brief description of the <strong><em>Genomic Viewer</em></strong> graphical interface structure. 
 
-<h5>**Main Window**</h5>
+<h5><strong>Main Window</strong></h5>
 
-The main widow of ***Genomic Viewer*** application is structured to have two lateral sidebars with actionable options and tools and a larger central area which is meant to display the results.
+The main widow of <strong><em>Genomic Viewer</em></strong> application is structured to have two lateral sidebars with actionable options and tools and a larger central area which is meant to display the results.
 It can be summerized into three sections:
 
 - *Left sidebar*, with reference genome, coordinates selection and action buttons;
@@ -215,7 +210,7 @@ It can be summerized into three sections:
 
 ![GV Main Window with sections](assets/GV_main_window_sections.png)
 
-<h5> **Sidebars** </h5>
+<h5><strong>Sidebars</strong></h5>
 
 ***Left sidebar:***
 The left sidebar provides several functions for choosing the working reference genome and navigating through it.It is essential to select a reference genome that matches all the loaded data defined in the configuration file.
@@ -227,7 +222,8 @@ The right sidebar provides advanced options for genomic navigation and graphical
 It is fundamental to set first the correct reference genome, as the chromosomes and genes ID and coordinates change accordingly.
 The graphical settings that can be controlled form the right sidebar are the bigwig profile tracks plotting mode, if the genomic label track will display genes or transcript isoforms and if to display or not the chromosome ideagram at the plot bottom.
 
-<h5> **Central Navigation Panels** </h5>
+<h5><strong>Central Navigation Panels</strong></h5>
+
 The central area is the core of ***Genomic Viewer*** as it is where its outputs are displayed. It allows the user to navigate across three different panels showing respectively:
 - The *Plot* relative to the selected genomic region displaying all the tracks that were loaded through the configuration file. A *zoom* action bar is also available to resize the image and adjust the genomic range around the
 visualized range;
@@ -237,7 +233,6 @@ visualized range;
 
 
 Further details are available in the [Features and Usage section](#features-and-usage).
-<br><br>
 
 ![GV navigation panels](assets/GV_navigation_panels.png)
 
@@ -247,7 +242,8 @@ Further details are available in the [Features and Usage section](#features-and-
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">Tutorial</summary>
 
 <div>
-A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** built-in test data is described in the [Tutorial](./genomicviewer-reference-manual.html #tutorial) section of the reference manual.                                                                      
+  
+A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** built-in test data is described in the [Tutorial](./genomicviewer-reference-manual.html#tutorial) section of the reference manual.                                                                      
 
 ------------------------------------------------------------------------
 
