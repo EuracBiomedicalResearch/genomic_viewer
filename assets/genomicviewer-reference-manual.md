@@ -83,7 +83,7 @@ In this tutorial you will learn how to:
 - Evaluate data based on the stats.
 - Formulate biological hypothesis driven by data integration.
 
-<h4><strong>Usage example data</strong></h4>
+### Usage example data
 
 The genomic data to be loaded must be entered through the `GenomicViewer_config.yml` configuration file as described in the [Configuration section](#configruation).
 In this tutorial we will exploit as usage example the default data that are loaded by default in the pre-compiled *configuration file* that is saved upon ***Genomic Viewer*** installation.
@@ -100,7 +100,7 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 
 ## References and Links
 
-<h4><strong>Data Availability</strong></h4>
+### Data Availability
 
  The data employed in the *usage example tutorial* are publicly available from [GEO](https://www.ncbi.nlm.nih.gov/geo/) and [GWAS catalog](https://www.ebi.ac.uk/gwas/) under the accession numbers listed below:
 
