@@ -2,7 +2,7 @@
 
 # Genomic Viewer Reference Manual
 <div align="center">
-<img src="assets/GV_scheme.png" width="60%"/>
+<img src="GV_scheme.png" width="60%"/>
 </div>
 
 **Version:** 1.0.0\
