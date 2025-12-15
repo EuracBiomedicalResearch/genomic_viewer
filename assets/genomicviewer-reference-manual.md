@@ -73,7 +73,7 @@ Which file formats can be exported.
 
 ## Tutorial
 
-This section contains an easy tutorial explaining how to use ***Genomic Viewer*** principal functionality through a practical example with real data.
+This section contains an easy tutorial explaining how to use ***Genomic Viewer*** through a practical example with real data.
 
 In this tutorial you will learn how to:
 - Correctly set navigation and graphical parameters to visualize genomic tracks.
@@ -86,10 +86,14 @@ In this tutorial you will learn how to:
 ### Usage example data
 
 The genomic data to be loaded must be entered through the `GenomicViewer_config.yml` configuration file as described in the [Configuration section](#configruation).
-In this tutorial we will exploit as usage example the default data that are loaded by default in the pre-compiled *configuration file* that is saved upon ***Genomic Viewer*** installation.
-These are publicly available data from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)*. See [References and Links](#references-links) for data availability.
+In this tutorial we will exploit as usage example the data that are loaded by default in the pre-compiled *configuration file* that is saved upon ***Genomic Viewer*** installation.
+These are publicly available data from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)*. 
+*Note:* The dataset which is made available upon ***Genomic Viewer*** installation only includes *chromosome 5* as lightweight sample. For the user that wants full data accessibility please see [References and Links](#references-links)
+and download data form source databases. Save the files in the `./data` folder and update the **configuration file** with the correct file paths and labels.
 
+![GV configuration file and data](GV_configuration_example.png)
 
+### 
 
 
 ## Getting Help
