@@ -139,7 +139,7 @@ Recommended actions for the user *before* installing ***Genomic Viewer*** and St
 <div>
 A short hands-on section showing a simple workflow.
 
-<h5> **1. Configure and Load data** </h5>
+<h5><strong><em>1. Configure and Load data</strong></em></h5>
 Data and their annotation are loaded through a configuration file named `GenomicViewer_config.yml` which is automatically saved in the `/data` folder during ***Genomic Viewer*** installation in the user selected location.<br>
 A default configuration file is pre-filled and ready-to-use with information relative to an example dataset retrieved from public data (accession numbers GEO: GSE212908, GSE212910, GAWS catalog: 26831199 and UCSC Table Browser Regulatory elements). 
 **Note:** example data are restricted to **chr5** as tester lightweight sample.
