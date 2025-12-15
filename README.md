@@ -46,8 +46,7 @@ analysis for data inspection.
 
 ------------------------------------------------------------------------
 
-## System Requirements {#system-requirements}
-
+## System Requirements
 <details open>
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">Software and Hardware</summary>
 
@@ -66,7 +65,7 @@ analysis for data inspection.
 
 ------------------------------------------------------------------------
 
-## Installation {#installation}
+## Installation
 
 <details open>
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">Installation Instructions</summary>
@@ -132,7 +131,7 @@ Recommended actions for the user *before* installing ***Genomic Viewer*** and St
 
 ------------------------------------------------------------------------
   
-## Getting Started {#getting-started}
+## Getting Started
 
 <details open>
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">Quick Start</summary>
@@ -246,7 +245,7 @@ A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** bu
 
 ------------------------------------------------------------------------
 
-## Source Code {#source-code}
+## Source Code
 
 ***Genomic Viewer*** and its [Electron](https://www.electronjs.org/) built ***GUI installer*** source code are freely available through [GitHub](https://github.com/sarlago) under MIT Licence.
 
