@@ -45,6 +45,8 @@ How to load files, accepted formats, drag-and-drop support.
 ### Reference Genome
 How to choose reference genome and which are the available options and the affeted sections in the viewer.
 
+### Navigation
+
 ### Visualization
 Plots, settings, export options.
 
@@ -54,7 +56,7 @@ All computational or analytical modules.
 ### Export Functionality
 Which file formats can be exported.
 
-### Central Panels {#central-panels}
+### Central Panels
 - Plot viewer
 - Data viewer
 - Stats panel
@@ -104,10 +106,19 @@ and download data form source databases. Save the files in the `./data` folder a
 
 ### Genome selection and navigation
 
-Before starting the inspection of the data tracks it is essential to select the correct reference genome. When ***Genomic Viewer*** is started it loads by default the human *reference genome hg19* (GRCh19).
+Before starting to inspect the data tracks it is essential to select the correct reference genome. When ***Genomic Viewer*** is started it loads by default the human *reference genome hg19* (GRCh19).
 The usage example data are mapped to the human *reference genome hg38* (GRCh38). Therefore the first thing to do to ensure correct annotation of the data is to choose the right version of the genome from the top left drop-down menu.
 
-<img src="GV_ref_genome.png" alt="GV configuration file and data" width="20%">
+<img src="GV_ref_genome.png" alt="GV reference genome selection" width="20%">
+
+To next navigate across the genome there are several options, described in detail in the *Navigation section* of [Features and Usage](#features-and-usage). For this tutorial we will select one of the saved coordinates available
+from the *Load Coordinates* panel in the left sidebar. By clicking on the first entry in the list, the corresponding coordinates (relative to the gene SLC34A1) are passed to the tool and the *Insert Coordinates* panel will automatically update.
+
+<img src="GV_region_table_example.png" alt="GV coordinates selection from custom list" width="30%">
+
+Make sure that the *Plot* navigation tab is selected form the main central window. Next click the *Go button* to generate the corresponding genomic screenshot plot.
+
+
 
 ------------------------------------------------------------------------
 
