@@ -51,9 +51,10 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   print("reading GWAS tables")
   gwas.tab.list <- list()
   if(length(gwas.file) > 0){
+    in.chrom <- chrom
    for (i in 1:length(gwas.file)){
       gwas.tab <- read_delim(gwas.file[i],"\t", col_names = T, col_types = list(pos = col_integer(), p = col_double()))
-      gwas.tab <- dplyr::filter(gwas.tab, chrom == chrom & pos >= Start & pos <= End) # This way all the SNPs in the selected range will be kept.
+      gwas.tab <- dplyr::filter(gwas.tab, chrom == in.chrom & pos >= Start & pos <= End) # This way all the SNPs in the selected range will be kept.
       gwas.tab$p <- format(gwas.tab$p, scientific = T)
      gwas.tab.list[[i]] <- gwas.tab
    }
