@@ -302,7 +302,7 @@ ui <- page_sidebar(
                       # Expand transcript track option
                       checkboxInput("checkbox", "Expand transcripts", FALSE),
                       # Show/Hide chromosome ideogram option
-                      checkboxInput("checkideo", "Show chromosome ideogram", TRUE))
+                      checkboxInput("checkideo", "Chromosome Ideogram", TRUE))
                 ),
        col_widths = c(9, 3)
               )
@@ -965,7 +965,7 @@ server <- function(input, output, session){
                               Chr = vals5$chr, 
                               start = vals5$start, 
                               end = vals5$end, 
-                              sign.p = 5e-10,
+                              sign.p = 10e-8,
                               chr.len.df = chrom.cen.df(),
                               gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)],
                               genome = gsub( " .*", "", input$ref.genome))
