@@ -107,7 +107,7 @@ and download data form source databases. Save the files in the `./data` folder a
 ### Biological question
 
 When loading custom datasets in ***Genomic Viewer*** the choice can be driven by either **technical or biological** questions. The visualization of genomic tracks can indeed validate the quality of both sequencing raw data and some downstream analysis,
-like [peak calling](https://www.sciencedirect.com/science/article/pii/S1046202320300591). In addition, it is also very useful for investigation biological questions.
+like **peak calling**[[1]](#ref1). In addition, it is also very useful for investigation biological questions.
 Considering the data that are loaded as usage example in the present tutorial, an interesting biological question can be to *identify SNPs (from the GWAS data) found in CKD patients that are associated to relevant genes for kidney function*.
 
 ### Genome selection, navigation and plot inspection
@@ -127,6 +127,8 @@ in the upper right sidebar.
 Upon click you will see that the coordinates are passed to the *Load coordinates* panel on the left sidebar. Make sure that the *Plot* navigation tab is selected form the main central window. 
 Next click the *Go button* to generate the corresponding genomic screenshot plot.
 
+<img src="GV_navigation_tabs.png" alt="GV navigation tabs Plot selected" width="20%">
+
 <img src="GV_chr5_overview.png" alt="GV overview of chromosome 5 example genomic tracks" width="80%">
 
 From a quick look at the generated plot, a cluster of significant SNPs close to the right chromosome end appear from the GWAS data. It is worthy to take a close look.
@@ -137,9 +139,6 @@ By clicking on the first entry in the list, the corresponding coordinates (relat
 <img src="GV_region_table_example.png" alt="GV coordinates selection from custom list" width="25%">
 
 As before, make sure that the *Plot* navigation tab is selected form the main central window. Next click the *Go button* to generate the corresponding genomic screenshot plot.
-
-<img src="GV_navigation_tabs.png" alt="GV navigation tabs Plot selected" width="20%">
-
 If you are not satisfied of the output you can adjust the selected genomic range by zooming-in and out through the zoom panel at the bottom of the *Plot tab* and
 eventually save the new coordinates in the region table by clicking on the *Add button*.
 
@@ -206,8 +205,8 @@ trends, and regions of interest. In turn it allows to both answer to simple biol
 In the current example we were exploiting public data from the human kidney cortex and from patients with CKD to identify single nucleotide variants that can impact on the correct gene expression and functionality 
 in the context of renal health. Through a simple overview of the *chromosome 5* it was possible to identify a cluster of SNPs signifcantly correlating to CKD.
 By a closer investigation of this region it becomes evident that at least 6 of the most significant SNPs fall inside *SLC34A1 gene*. This gene encodes for a renal‐specific sodium–phosphate 
-cotransporter responsible for the readsorption of filtered sodium and phosphate and expressed in the proximal tubule within the renal cortex (Fearn et al. 2018).
-The clinical relevance of this gene product is supported by recent literature observing its downregulation in coditions of acute kidney injury (AKI) (Wilflingseder et al. 2020).
+cotransporter responsible for the readsorption of filtered sodium and phosphate and expressed in the proximal tubule within the renal cortex (Fearn et al. 2018)[[2]](#ref2).
+The clinical relevance of this gene product is supported by recent literature observing its downregulation in coditions of acute kidney injury (AKI)(Wilflingseder et al.)[[3]](#ref3).
 For a user that would like to further investigate a molecular mechanism linking SNPs to SLC34A1 deregulation, the example data loaded into ***Genomic Viewer*** suggest that in healty condition SLC34A1 is in a context of open chromatin, and is in gene rich region with multiple regulatory elements.
 Especially there is an overlap between the SNPs and an enhaner element, but also with several promoters. In turn HiC data revel the presence of a chromatin loop that connects the region upstream to SLC34A1 promtoer with 
 distal elements. Altogether, these information can suggest that the presence of SNPs in the SLC34A1 locus can alter the function of epigenetic regulatory elements and the expression of the gene.
@@ -238,6 +237,9 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables). 
 
 ### Literature
+1.<a id="ref1"></a> Nakato R, Sakata T. Methods for ChIP-seq analysis: A practical workflow and advanced applications. Methods 2021;187:44–53.
+2.<a id="ref2"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical, and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715
+3.<a id="ref3"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun 2020;11:3383.
 
 ------------------------------------------------------------------------
 
