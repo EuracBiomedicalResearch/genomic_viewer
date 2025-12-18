@@ -37,6 +37,108 @@ Document all configurable items:
 
 ## File Formats
 
+The following section will describe the file formats that can be imported in **Genomic viewer**, mentioning if there are specific requirements and for which track plot they are useful.
+
+### bigwig
+
+Most of the 2D NGS datasets are normally stored in bigWig file formats, a bigWig file represents values along the genome, such as read coverage, signal intensity, or enrichment scores.
+BigWigs are indexed binary files allowing the fast access of selected portions of the file corresponding to a browsed genomic region. 
+
+The most common data types that can be loaded through a bigWig file are ChIP-seq, CUT&Tag, ATAC-seq, RNA-seq and any genome-wide quantitative signal dataset.
+
+For more details about the feature and creation of these files you can browse the [bigWig track format](https://genome.ucsc.edu/goldenpath/help/bigWig.html) webpage on the *UCSC web portal*.
+
+### bed
+
+[Bed files](https://www.ensembl.org/info/website/upload/bed.html) are normally used to store genomic ranges annotations, which can be for instance ChIP-seq or ATAC-seq peaks. 
+Bed files con contain a variable number of columns with essential and optional information. For the purposes of ***Genomic Viewer*** only three tab separated fields are strictly 
+necessary: **chromosome name**, **start**, **end**. 
+As in the example below:
+
+```
+chr1  213941196  213942363
+chr1  213942363  213943530
+chr1  213943530  213944697
+```
+Make sure that your file does not have a header with column names (like `chr`, `start`, `end`, or a comment `#`) to ensure proper reafing of the file.
+Additional columns are allowed, those will be displayed in the *Data* navigation tab, but are ignored for plotting.
+
+### Categorical bed
+
+In addition to the standard .bed file, ***Genomic Viewer*** also accepts **categorical .bed files** which are structured as the **standard bed** but have an additional required column, 
+assigning the corresponding genomic range to a user-defined ***category***. In addition, differently from standard bed files, *categorical bed columns* are named with a header, as in the example below. 
+Categorical bed can be used for example to classify peaks or functional genomic elements. For instance, several **functional elements** coordinates (like the ones provided for in the [tutorial](#tutorial)) can be downloaded from 
+[**UCSC Table Browser**](https://genome.ucsc.edu/cgi-bin/hgTables).
+The resulting file should look like this:
+
+```
+chr	start	end	category
+chr1	155188536	155192004	h38_CpGIslands
+chr1	2226773	2229734	h38_CpGIslands
+chr1	36306229	36307408	h38_CpGIslands
+chr1	47708822	47710847	h38_CpGIslands
+chr1	53737729	53739637	h38_CpGIslands
+chr1	101302963	101302972	h38_TSSpeaks
+chr1	101304214	101304218	h38_TSSpeaks
+```
+
+Note that a same genomic range can belong to two different categories, in this case the entry must be repeated two times, with a single value in the category field. 
+Additional columns will be ignored for plotting but are kept in the *Data* navigation tab.
+
+*Categorical bed* format is highly flexible, allowing many different types of data to be organized according to this structure and can be adapted to a wide range of use cases.
+
+### HiC
+
+3D contacts files, like HiC, stored in [hic file format](https://genome.ucsc.edu/goldenpath/help/hic.html). 
+These is a binary format allowing for fast access to contact matrix heatmaps and is used for displaying chromatin conformation data in a browser.
+*.hic* files are generally large file and can store the information at different resolutions and normalizations. It is suggested to include a column with *KR normalization*. 
+To know more about .hic *normalization methods* you can refer to the [*Normalization of Hi-C Maps*](https://gcmapexplorer.readthedocs.io/en/latest/cmapNormalization.html) article.
+Based on their availability in the source data file, ***Genomic Viewer*** reads **.hic** files at different resolutions depending on the size of the requested genomic window to plot. T
+his ensures a faster access to the data and more lightweight outputs.
+
+### bedpe
+
+3D contacts can be represented not only as a heatmap or matrix, but also as arches connecting two distal genomic regions. 
+This type of information is stored in the [.bedpe file format](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format). 
+Normally **bedpe files** are 6 columns files with *chr*, *start*, *end* fields of the two anchor and bait regions, however optional columns can be added. 
+In the latter case 7th column must contain the name or id of the row in string format, the 8th column is a number representing the score and the 9th column represents the strand. 
+Mis-formatting of these columns will result in an error. Column header is optional and wil not affect the output.
+
+An example of the minimal *.bedpe* file structure is reported below:
+
+```
+chrA  startA  startB  chrB  startB  endB
+chr5	74050000	74060000	chr5	74640000	74650000
+chr5	75350000	75360000	chr5	75670000	75680000
+chr5	75740000	75750000	chr5	76150000	76160000
+chr5	77560000	77570000	chr5	77960000	77970000
+```
+
+### GWAS
+
+**Genome Wide Association Studies (GWAS)** datasets are stored in a format containing all the information that can be plotted as Manhattan plots.
+The [**GWAS Catalog**](https://www.ebi.ac.uk/gwas/) official database storing this type of data has recently updated and uniformed the structure of the deposited **summary statistics** file format. 
+These are normally stored as gzipped .tsv files since contain huge amount of data. 
+To generate a **Manhattan plot** through  **Genomic viewer** there are four required fields, which contain information about **chromosome name**, **position**, **p-value** and **SNP id**. 
+These fields must be tab separated and named with a header as in the example below:
+
+```
+chrom   pos         p       snp 
+chr1	162766673	3.1e-01	rs1000050		
+chr1	157285606	1.1e-02	rs1000073	
+chr1	94701276	4.5e-01	rs1000075		
+chr1	66392232	3.3e-01	rs1000085	
+chr1	62967045	5.3e-01	rs1000127	
+chr1	205536349	6.0e-01	rs1000312		
+```
+
+Any number of additional tab separated fields can be optionally added with no restriction in their name. 
+All of the minimal required fields are always available in [**GWAS Catalog**](https://www.ebi.ac.uk/gwas/) summary statistics stored files. 
+It is however recommended to check the columns headers to match the ***Genomic Viewer*** requirements. 
+To reduce the filesize, the user which is only interested in plotting and not to exploit the *Data* subset funciton, can remove from the input dataframe the non-essential columns.
+
+### bam ??? va provato
+
 ------------------------------------------------------------------------
 
 ## Features and usage
@@ -53,6 +155,10 @@ How to choose reference genome and which are the available options and the affet
 
 ### Visualization
 Plots, settings, export options.
+In this section the user will find a description of the graphical output specific to the single data tracks and how they are managed by the tool. Since the basic graphical parameters are managed through the [`plotgardener`](https://phanstiellab.github.io/plotgardener/index.html)[[1]](#ref1)
+R package, the specific function that handles each type of track is specified.
+
+Bed files will be plotted by genomic viewer using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
 
 ### Analysis Tools
 All computational or analytical modules.
@@ -107,7 +213,7 @@ and download data form source databases. Save the files in the `./data` folder a
 ### Biological question
 
 When loading custom datasets in ***Genomic Viewer*** the choice can be driven by either **technical or biological** questions. The visualization of genomic tracks can indeed validate the quality of both sequencing raw data and some downstream analysis,
-like **peak calling**[[1]](#ref1). In addition, it is also very useful for investigation biological questions.
+like **peak calling**[[2]](#ref2). In addition, it is also very useful for investigation biological questions.
 Considering the data that are loaded as usage example in the present tutorial, an interesting biological question can be to *identify SNPs (from the GWAS data) found in CKD patients that are associated to relevant genes for kidney function*.
 
 ### Genome selection, navigation and plot inspection
@@ -205,8 +311,8 @@ trends, and regions of interest. In turn it allows to both answer to simple biol
 In the current example we were exploiting public data from the human kidney cortex and from patients with CKD to identify single nucleotide variants that can impact on the correct gene expression and functionality 
 in the context of renal health. Through a simple overview of the *chromosome 5* it was possible to identify a cluster of SNPs signifcantly correlating to CKD.
 By a closer investigation of this region it becomes evident that at least 6 of the most significant SNPs fall inside *SLC34A1 gene*. This gene encodes for a renal‐specific sodium–phosphate 
-cotransporter responsible for the readsorption of filtered sodium and phosphate and expressed in the proximal tubule within the renal cortex (Fearn et al. 2018)[[2]](#ref2).
-The clinical relevance of this gene product is supported by recent literature observing its downregulation in coditions of acute kidney injury (AKI)(Wilflingseder et al.)[[3]](#ref3).
+cotransporter responsible for the readsorption of filtered sodium and phosphate and expressed in the proximal tubule within the renal cortex (Fearn et al. 2018)[[3]](#ref3).
+The clinical relevance of this gene product is supported by recent literature observing its downregulation in coditions of acute kidney injury (AKI)(Wilflingseder et al.)[[4]](#ref4).
 For a user that would like to further investigate a molecular mechanism linking SNPs to SLC34A1 deregulation, the example data loaded into ***Genomic Viewer*** suggest that in healty condition SLC34A1 is in a context of open chromatin, and is in gene rich region with multiple regulatory elements.
 Especially there is an overlap between the SNPs and an enhaner element, but also with several promoters. In turn HiC data revel the presence of a chromatin loop that connects the region upstream to SLC34A1 promtoer with 
 distal elements. Altogether, these information can suggest that the presence of SNPs in the SLC34A1 locus can alter the function of epigenetic regulatory elements and the expression of the gene.
@@ -237,9 +343,13 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables). 
 
 ### Literature
-1.<a id="ref1"></a> Nakato R, Sakata T. Methods for ChIP-seq analysis: A practical workflow and advanced applications. Methods 2021;187:44–53.
-2.<a id="ref2"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical, and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715
-3.<a id="ref3"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun 2020;11:3383.
+*1.*<a id="ref1"></a> Kramer NE, Davis ES, Wenger CD et al. Plotgardener: cultivating precise multi-panel figures in R. Bioinformatics 2022;38:2042–5.
+
+*2.*<a id="ref2"></a> Nakato R, Sakata T. Methods for ChIP-seq analysis: A practical workflow and advanced applications. Methods 2021;187:44–53.
+
+*3.*<a id="ref3"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical, and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715.
+
+*4.*<a id="ref4"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun 2020;11:3383.
 
 ------------------------------------------------------------------------
 
