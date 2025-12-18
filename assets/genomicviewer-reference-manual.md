@@ -44,9 +44,10 @@ Document all configurable items:
 
 The following section will describe the file formats that can be imported in **Genomic viewer**, mentioning if there are specific requirements and for which track plot they are useful.
 
-
 <details open>
-<summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;>bigwig</summary>
+<summary>bigwig;</summary>
+
+### bigwig
 
 Most of the 2D NGS datasets are normally stored in bigWig file formats, a bigWig file represents values along the genome, such as read coverage, signal intensity, or enrichment scores.
 BigWigs are indexed binary files allowing the fast access of selected portions of the file corresponding to a browsed genomic region. 
@@ -54,6 +55,11 @@ BigWigs are indexed binary files allowing the fast access of selected portions o
 The most common data types that can be loaded through a bigWig file are ChIP-seq, CUT&Tag, ATAC-seq, RNA-seq and any genome-wide quantitative signal dataset.
 
 For more details about the feature and creation of these files you can browse the [bigWig track format](https://genome.ucsc.edu/goldenpath/help/bigWig.html) webpage on the *UCSC web portal*.
+
+</details>
+
+<details open>
+<summary>bed;</summary>
 
 ### bed
 
@@ -69,6 +75,11 @@ chr1  213943530  213944697
 ```
 Make sure that your file does not have a header with column names (like `chr`, `start`, `end`, or a comment `#`) to ensure proper reafing of the file.
 Additional columns are allowed, those will be displayed in the *Data* navigation tab, but are ignored for plotting.
+
+</details>
+
+<details open>
+<summary>Categorical bed;</summary>
 
 ### Categorical bed
 
@@ -94,6 +105,11 @@ Additional columns will be ignored for plotting but are kept in the *Data* navig
 
 *Categorical bed* format is highly flexible, allowing many different types of data to be organized according to this structure and can be adapted to a wide range of use cases.
 
+</details>
+
+<details open>
+<summary>HiC;</summary>
+
 ### HiC
 
 3D contacts files, like HiC, stored in [hic file format](https://genome.ucsc.edu/goldenpath/help/hic.html). 
@@ -102,6 +118,11 @@ These is a binary format allowing for fast access to contact matrix heatmaps and
 To know more about .hic *normalization methods* you can refer to the [*Normalization of Hi-C Maps*](https://gcmapexplorer.readthedocs.io/en/latest/cmapNormalization.html) article.
 Based on their availability in the source data file, ***Genomic Viewer*** reads **.hic** files at different resolutions depending on the size of the requested genomic window to plot. T
 his ensures a faster access to the data and more lightweight outputs.
+
+</details>
+
+<details open>
+<summary>debpe;</summary>
 
 ### bedpe
 
@@ -120,6 +141,10 @@ chr5	75350000	75360000	chr5	75670000	75680000
 chr5	75740000	75750000	chr5	76150000	76160000
 chr5	77560000	77570000	chr5	77960000	77970000
 ```
+</details>
+
+<details open>
+<summary>GWAS;</summary>
 
 ### GWAS
 
