@@ -42,14 +42,11 @@ Document all configurable items:
 
 ## File Formats
 
-
-<summary>&nbsp;</summary>
-
 The following section will describe the file formats that can be imported in **Genomic viewer**, mentioning if there are specific requirements and for which track plot they are useful.
 
 
 <details open>
-<summary>### bigwig</summary>
+<summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;>bigwig</summary>
 
 Most of the 2D NGS datasets are normally stored in bigWig file formats, a bigWig file represents values along the genome, such as read coverage, signal intensity, or enrichment scores.
 BigWigs are indexed binary files allowing the fast access of selected portions of the file corresponding to a browsed genomic region. 
