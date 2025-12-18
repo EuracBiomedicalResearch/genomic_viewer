@@ -298,7 +298,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
           # bed signal
           plotRanges(
           data = bed.file[i],
-          collapse = T,
+          collapse = endsWith(bed.file[i], ".bed"),
           fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]),
           y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,
           params = params)
