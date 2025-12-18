@@ -56,11 +56,13 @@ and `names` which is an array of quoted string to be used as labels for the inpu
 **Note:** 
 In the `ext` fields you can use regular expressions [regular expressions](https://www.geeksforgeeks.org/dsa/write-regular-expressions/) as input, use only the file extension as parameter or type the entire file name for safety.
 When loading several files of the same format through extension or regular expression please remember that file are alway read in alphabetical order, therefore their *name labels* must follow the file order to be correectly assigend.
+In the presence of multiple subfolders with data of the same file format, the `dir` field also accepts an arraz following the same rules of `name` labels arrays.
+When loading **.bam** files it is recommended to use the regular expression `$` to specify the end of the file extension (like this `.bam$`), this avoids to erroneously try to load the associated *.bai* files.
 
 - You can have more versions of the configuration file, but only the file named `GenomicViewer_config.yml` will be read by the tool in the working session.
 It is suggested to keep additional versions in a separated location on your computer to avoid confusion.
 
-- When one filed is empty because you do not want to enter a subdirectory, assign a name or you just do not have a specific file format to load, you must enter a **two whitespacea** empty string "  " or vector '[""]' to prevent unwanted behaviors 
+- When one filed is empty because you do not want to enter a subdirectory, assign a name or you just do not have a specific file format to load, you must enter a **two whitespaces** empty string "  " or vector '[""]' to prevent unwanted behaviors 
 
 - The last field in the configuration file refers to a custom bed file with a saved preset of coordinateds of interest. This file con be substituted or dynamically modified during every working session.
 
@@ -88,7 +90,7 @@ default:
   bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
   bedpe.names: ["HiC arches"] # Comma separated, "quoted" names
   
-  # bed directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  # bed or bam directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
   bed.dir: "GSE212908_ATAC_peaks"
   bed.ext: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
   bed.names: ["ATAC peaks"] # Comma separated, "quoted" names
@@ -211,12 +213,12 @@ his ensures a faster access to the data and more lightweight outputs.
 This type of information is stored in the [.bedpe file format](https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format). 
 Normally **bedpe files** are 6 columns files with *chr*, *start*, *end* fields of the two anchor and bait regions, however optional columns can be added. 
 In the latter case 7th column must contain the name or id of the row in string format, the 8th column is a number representing the score and the 9th column represents the strand. 
-Mis-formatting of these columns will result in an error. Column header is optional and wil not affect the output.
+Mis-formatting of these columns will result in an error. Column header is optional and will not affect the output.
 
 An example of the minimal *.bedpe* file structure is reported below:
 
 ```
-chrA  startA  startB  chrB  startB  endB
+chrA  startA  endA  chrB  startB  endB
 chr5	74050000	74060000	chr5	74640000	74650000
 chr5	75350000	75360000	chr5	75670000	75680000
 chr5	75740000	75750000	chr5	76150000	76160000
@@ -255,7 +257,12 @@ To reduce the filesize, the user which is only interested in plotting and not to
 <details open>
 <summary>bam</summary>
 
-### bam ??? va provato
+### bam
+
+The **.bam** file format is used to store in a compressed binary version the results of sequencing reads alignments. To allow graphical tools to access this type of data the file must be indexed, therefor every **.bam** file 
+must always be assocaited to a corresponding **.bam.bai** file. For a more extensive description of **bam ** files you can refer to the [BAM Track Format](https://genome.ucsc.edu/goldenpath/help/bam.html) of the UCSC web portal.
+Sometimes publicly deposited **.bam** files are not indexed, in order to index a bam file it is recommended to use [*Samtools index*](https://www.htslib.org/doc/samtools-index.html) function.
+**Bam** files are generally large files since they store information about single aligned reads.
 
 </details>
 
@@ -282,6 +289,7 @@ In this section the user will find a description of the graphical output specifi
 R package, the specific function that handles each type of track is specified.
 
 Bed files will be plotted by genomic viewer using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
+The same function is also employed to plot **-bam** files, the two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collpsed way, the bam are expanded to allow the visualization of individual reads.
 
 ### Analysis Tools
 All computational or analytical modules.
