@@ -31,10 +31,91 @@
 <details open>
 <summary>&nbsp;</summary>
 
-Document all configurable items:
-- Application preferences
-- Environment variables
-- Integration with external tools
+Upon [***Genomic Viewer*** installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation) the user is asked to choose a local directory that the app will be able to access to load the working datasets. 
+In that folder the installer will create by default a `/data` directory containing the *tutorial example data* and a *configuration file*.
+
+The `GenomicViewer_config.yml` file is the only configurable object that is essential for starting a ***Genomic Viewer*** session. 
+This file allows the user to specify the input datasets to upload and assign sample labels to be displayed in the graphics.
+The usage of a configuration file to provide locally saved data to ***Genomic Viewer*** has the advantage to:
+
+- Avoid graphically heavy interface to manually choose individual files from local directories;
+- Keep all the files robustly organized in a common parent directory;
+- Avoid to use hard-coded personal paths; 
+- Make it easy to share working sessions with any user that has access to the raw data.
+
+Here are some indications to correctly fill the configuration file:
+
+
+- It is not necessary to change the `data.dir` field unless you created a common sub-directory to `/data` with all the files to be uploaded;
+
+- The configuration file reports a single section relative to each accepted [File Format](#file-formats);
+
+- Each section requires three fields: `dir` for the specific sub-directory, if present; `ext` for the file extension or shortest common substring in file names of the same type; 
+and `names` which is an array of quoted string to be used as labels for the input data.
+
+**Note:** 
+In the `ext` fields you can use regular expressions [regular expressions](https://www.geeksforgeeks.org/dsa/write-regular-expressions/) as input, use only the file extension as parameter or type the entire file name for safety.
+When loading several files of the same format through extension or regular expression please remember that file are alway read in alphabetical order, therefore their *name labels* must follow the file order to be correectly assigend.
+
+- You can have more versions of the configuration file, but only the file named `GenomicViewer_config.yml` will be read by the tool in the working session.
+It is suggested to keep additional versions in a separated location on your computer to avoid confusion.
+
+- When one filed is empty because you do not want to enter a subdirectory, assign a name or you just do not have a specific file format to load, you must enter a **two whitespacea** empty string "  " or vector '[""]' to prevent unwanted behaviors 
+
+- The last field in the configuration file refers to a custom bed file with a saved preset of coordinateds of interest. This file con be substituted or dynamically modified during every working session.
+
+- Most of these instructions and field description are also summarized in the configuration file itselt so you do not need to refer to the manual every time.
+
+An example of the configuration file is reported below:
+
+```{yaml}
+---
+
+default:
+
+    # Set here the parameters related to the input files path and extensions
+    
+  # Data directory
+  data.dir: "/data/"
+  
+  # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type "  " or [""] in names.
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.ext: "treat_pileup_chr5.bw"
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"] # Comma separated, "quoted" names
+  
+  # bedpe directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
+  bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
+  bedpe.names: ["HiC arches"] # Comma separated, "quoted" names
+  
+  # bed directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bed.dir: "GSE212908_ATAC_peaks"
+  bed.ext: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
+  bed.names: ["ATAC peaks"] # Comma separated, "quoted" names
+  
+  # hic directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  hic.dir: "GSE212910_RAW_HiC"
+  hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic"
+  hic.names: ["HiC cortex"] # Comma separated, "quoted" names
+  
+  # GWAS directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  gwas.dir: "GWAScatalog_KidneyDisease"
+  gwas.ext: "relocatedCol_chr5.tsv"
+  gwas.names: ["GWAS CDK"]
+  
+  # categorical bed file. If empty type "  " or [""] in names. Columns must be names and the one with category must be 'category'.
+  cat.dir: ""
+  cat.file: "regulatory_elements_hg38_chr5.bed"
+  cat.names: ["Regulatory Elements"] # Comma separated, "quoted" names
+  
+  # file with selected genomic regions to be imported (bed format: chr, start end, name. No header). If empty type "  " or [""] in names.
+  reg.dir: ""
+  reg.file: "Example_region_table.bed"
+
+```
+
+***Important!*** It is required to **not change the configuration file name** and to keep it saved in the **same folder as the other app scripts and files**. 
+You can modify its name when you want to store a configuration which is not in use anymore, or move it to a different directory outside of the tool.
 
 </details>
 
@@ -45,7 +126,7 @@ Document all configurable items:
 The following section will describe the file formats that can be imported in **Genomic viewer**, mentioning if there are specific requirements and for which track plot they are useful.
 
 <details open>
-<summary>bigwig;</summary>
+<summary>bigwig</summary>
 
 ### bigwig
 
@@ -59,7 +140,7 @@ For more details about the feature and creation of these files you can browse th
 </details>
 
 <details open>
-<summary>bed;</summary>
+<summary>bed</summary>
 
 ### bed
 
@@ -79,7 +160,7 @@ Additional columns are allowed, those will be displayed in the *Data* navigation
 </details>
 
 <details open>
-<summary>Categorical bed;</summary>
+<summary>Categorical bed</summary>
 
 ### Categorical bed
 
@@ -108,7 +189,7 @@ Additional columns will be ignored for plotting but are kept in the *Data* navig
 </details>
 
 <details open>
-<summary>HiC;</summary>
+<summary>HiC</summary>
 
 ### HiC
 
@@ -122,7 +203,7 @@ his ensures a faster access to the data and more lightweight outputs.
 </details>
 
 <details open>
-<summary>debpe;</summary>
+<summary>bedpe</summary>
 
 ### bedpe
 
@@ -144,7 +225,7 @@ chr5	77560000	77570000	chr5	77960000	77970000
 </details>
 
 <details open>
-<summary>GWAS;</summary>
+<summary>GWAS</summary>
 
 ### GWAS
 
@@ -168,6 +249,11 @@ Any number of additional tab separated fields can be optionally added with no re
 All of the minimal required fields are always available in [**GWAS Catalog**](https://www.ebi.ac.uk/gwas/) summary statistics stored files. 
 It is however recommended to check the columns headers to match the ***Genomic Viewer*** requirements. 
 To reduce the filesize, the user which is only interested in plotting and not to exploit the *Data* subset funciton, can remove from the input dataframe the non-essential columns.
+
+</details>
+
+<details open>
+<summary>bam</summary>
 
 ### bam ??? va provato
 
