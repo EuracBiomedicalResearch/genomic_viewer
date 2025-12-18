@@ -28,14 +28,22 @@
 
 ## Configuration
 
+<details open>
+<summary>&nbsp;</summary>
+
 Document all configurable items:
 - Application preferences
 - Environment variables
 - Integration with external tools
 
+</details>
+
 ------------------------------------------------------------------------
 
 ## File Formats
+
+<details open>
+<summary>&nbsp;</summary>
 
 The following section will describe the file formats that can be imported in **Genomic viewer**, mentioning if there are specific requirements and for which track plot they are useful.
 
@@ -139,9 +147,14 @@ To reduce the filesize, the user which is only interested in plotting and not to
 
 ### bam ??? va provato
 
+</details>
+
 ------------------------------------------------------------------------
 
 ## Features and usage
+
+<details open>
+<summary>&nbsp;</summary>
 
 Explain major features in dedicated subsections.
 
@@ -186,9 +199,15 @@ Which file formats can be exported.
 | Go button          | generate plot according to the selected options                                                                                                      |
 | Save button        | Export plot choosing among different formats: .svg, .pdf, .png, .jpg  
 
+
+</details>
+
 ------------------------------------------------------------------------
 
 ## Tutorial
+
+<details open>
+<summary>&nbsp;</summary>
 
 This section contains an easy tutorial explaining how to use ***Genomic Viewer*** through a practical example with real data.
 
@@ -319,18 +338,25 @@ distal elements. Altogether, these information can suggest that the presence of 
 These hypothesis can be experimentally tested or adressed by integration of further genomic tracks, like RNA-seq or ChIP-seq.
 This is a simple example of how the integrative visualization of genomic tracks can guide biological research to investigate otherwise unforeseen features. 
 
+</details>
 
 ------------------------------------------------------------------------
 
 ## Getting Help
+<details open>
+<summary>&nbsp;</summary>
 
 For **general support** questions, **reporting a bug** or **suggest a new feature** you can create an issue in our [Github repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
 
 For **confidential reports** you can contact us by [email](mailto:sara.lago@eurac.edu).
 
+</details>
+
 ------------------------------------------------------------------------
 
 ## References and Links
+<details open>
+<summary>&nbsp;</summary>
 
 ### Data Availability
 
@@ -350,6 +376,8 @@ Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucs
 *3.*<a id="ref3"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical, and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715.
 
 *4.*<a id="ref4"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun 2020;11:3383.
+
+</details>
 
 ------------------------------------------------------------------------
 
