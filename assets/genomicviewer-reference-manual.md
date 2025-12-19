@@ -322,34 +322,110 @@ It follows a more detailed description of usage of all the  mentioned functions.
 Choosing a *reference genome* is the first essential step to address before generating any plot. 
 The reference genome provides the *correct coordinates* to ensure that the values you are entering in the navigation options correspond to the displayed *gene label and features*.
 It can be selected from a built-in list available form a drop-down menu at the top of the **left sidebar**.  
-The reference genome of choice must match the one used in the alignment of the track that are uploaded by the user through the [**Configuration file**](#configruation).
+The reference genome of choice must match the one used in the alignment of the track that are uploaded by the user through the [**Configuration file**](#configuration).
 At ***Genomic Viewer*** startup the human hg19 (GRCh19) version of the reference genome is loaded as default.
 
-<img src="GV_ref_genome.png" alt="GV select reference genome menu" width="30%">
+<img src="GV_ref_genome.png" alt="GV select reference genome menu" width="25%">
 
-Changing the selected working reference genome will affect also the **chromosome hover plot**, the list of available *gene names* and the gene annotation labels in the main plot output.
+Changing the selected working reference genome will affect also the list of chromosomes in the *Insert coordinates* panel, the **chromosome hover plot**, the list of available *gene names* and the gene annotation labels in the main plot output.
 
 </details>
+
+<details open>
+<summary>Navigation</summary>
+
 ### Navigation
 
-- Insert coordinates
-- Load coordinates
-- Choose chromosome
-- Search by gene
+***Genomic Viewer*** offers several options to navigate across the genome. Their usage is described in the following section.
 
-### 
+#### Insert coordinates
+
+One option to tell ***Genomic Viewer*** which coordinates you want to plot is through the *Insert coordinates* panel. 
+This panel allows to manually insert specific coordinates to be plotted by selecting the **chromosome name** from a drop-down menu, and entering the **start** and **end** coordinates in the numeric entry fields available fro the same panel.
+Once you are satisfied of the entered coordinates, press the *Go button* to activate the generation of the plot or other analysis.
+
+<img src="GV_insert_coordinates.png" alt="GV insert coordinates panel for genome navigation" width="25%">
+
+#### Load coordinates
+
+The user can navigate across a list of previously saved coordinates by specifying a *region table bed file* to be uploaded through the [configruation file](#configuration) or by accessing local files from a running ***Genomic Viewer*** session.
+The provided coordinates list file should ideally be structured as a bed file with a minimum of three tab separated columns corresponding to: **chr**, **start**, **end**. It is suggested but not mandatory to have a fourth clumn with a name or ID for the corresponding genomic region.
+It is also suggested to avoid column headers.
+
+An example of region table bed file is reported below:
+
+```
+chr5	177365507	177412577	SLC34A1
+chr5	177372928	177499184	SLC34A1_zoomOut
+```
+Once the region file is uploaded, the coordinates it contains become available to be selected form the **Select from menu** drop-down list.
+
+<img src="GV_load_coordinates_menu.png" alt="GV load coordinates allows to choose coordinates from a saved list" width="25%">
+
+A custom region table list can be dynamically created by the user by either generating a new one in the vase where no list is uploaded, or by modifying a previously uploaded table.
+The **Add** and **Remove** buttons below the selection drop-down meno allow to access these options. In particular, to *Add* a new entry to the an existing list or to create a new one after clicking the *Add button*
+a pop-up window will appear reporting the selected coordinates and allowing the user to assign a name to the region. By clicking *Ok* the entry and assigned name will be added to the list.
+
+<img src="GV_load_coordinates_add.png" alt="GV load coordinates panel for adding new coordinates to list" width="25%">
+
+Similarly, if you want to remove a coordinate from the uploaded list or you erroneously added an entry, you can select the entry form the drop-down list and next click the *Remove button*.
+The new custom coordinates list can be also exported for storing it, having it available for a different session or sharing it with another user.
+
+To restore the initial setting of the *Load coordinates* panel it is sufficient to click the *Reset button* at the panel's bottom.
+
+#### Choose chromosome
+
+To visualize the genomic screen of a whole chromosome or the corresponding analysis at the top of the **Right sidebar** the user can see a plot schematizing the *chromosomes structures* corresponding to the selected *reference genome*.
+The plot will update every time that the user selects a different reference genome.
+The *Choose chromosome plot* is an interactive plot that the user can hover with the mouse. A label with the **chromosome id** of the region that the user is hovering will apper below the graph. Upon click the corresponding coordinates are passed to ***Genomic Viewer***
+and the genomic plo or desired analysis can be generated by pressing the *Go button*.
+
+<img src="GV_choose_chrom.png" alt="GV choose chromosome hover and click plot" width="25%">
+
+#### Search by gene
+
+If a user is interested in visualizing or analyzing the genomic region corresponding to a specific gene, the easiest way is to retrieve its coordinates from the *Search by gene* menu.
+This menu is updated accordingly to the selected *reference genome*. To search for a gene of interest you can start typing the gene name in the menu and a list with the matching entries will be displayed below.
+Once your gene of interest appears you can click on it and the tool will automatically load its coordinates.
+Note that if changing the reference genome after selecting for a gene the coordinates will not update automatically, but you have to search againg for the gene in the menu. This is for safety reasons since not all reference genomes encodes for the same genes, or have different nomenclatures.
+
+<img src="GV_search_gene.png" alt="GV search by gene function" width="25%">
+
+To trigger the generation of the plot or relative analysis, after choosing the gene of interest you must click the *Go button*
+
+#### Zoom
+
+The *zoom-panel* located at the bottom of the *Plot navigation panel* in the **Central Window** offers an alternative way for genome navigation. This is especially useful when a user wants to investigate the flanking regions of a selected genomic position
+or on the opposite when starting from a wide genomic window there is the need to focus on a more restricted area as in the example reported in the [Tutorial](#tutorial).
+
+There are two ways for using the *zoom-panel* for navigation:
+
+- **Drag an drop bar**: below the static zoom button there is a draggable bar consisting in an orange rectangle, that matches the plotted genomic range, and grey flanking representing the ***25% extensions*** of the visualized range. The numbers below the bar report the coordinates in bp. 
+By mouse drag-and-drop in the orange rectangle the user can zoom-in in the visualized genomic area, while by mouse drag-and-drop in the grey area the user can either zoom-out enlarging the actual genomic range or zoom-in in the flanking range. 
+The maximum allowed zoom-in is **500 bp**, further zoom will not be allowed. Zooming by drag-and-drop is **limited to the selected chromosome coordinates**. 
+The coordinates of the zoomed region will be automatically updated. You can repeat the action multiple times to update the coordinates and generate the plot only when you are satisfied by clicking the *Go button*.
+
+- **Proportional zoom buttons**: the lowermost zoom option in the **Zoom bar** allows the user to **proportionally enlarge or restrict** the visualized genomic range, by keeping the initial region in the middle of the plotted area. 
+Different buttons are available to zoom-in or out by **2x**, **5x** or **10x**. The user can click once or several times on each button, at every click the coordinates displayed in the **left sidebar** will update. 
+To trigger the generation of the plot or analysis, click on the *Go button* once you are satisfied.
+
+The maximum allowed zoom-in is **500 bp**, further zoom will not be allowed. Zooming by drag-and-drop is **limited to the selected chromosome coordinates**.
+
+<img src="GV_zoom_bar.png" alt="GV navigation through zoom bar" width="25%">
+
+</details>
 
 ### Visualization
 
-- Track spcific features
+- Track specific features
 Plots, settings, export options.
 In this section the user will find a description of the graphical output specific to the single data tracks and how they are managed by the tool. Since the basic graphical parameters are managed through the [`plotgardener`](https://phanstiellab.github.io/plotgardener/index.html)[[1]](#ref1)
 R package, the specific function that handles each type of track is specified.
 
 Bed files will be plotted by genomic viewer using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
 The same function is also employed to plot **.bam** files, the two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collpsed way, the bam are expanded to allow the visualization of individual reads.
-
 - Zoom
+
 ### Genome annotation options
 - expand transcripts
 - chromosome ideogram
