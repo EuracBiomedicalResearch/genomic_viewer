@@ -270,32 +270,98 @@ Sometimes publicly deposited **.bam** files are not indexed, in order to index a
 
 ## Features and usage
 
+In the following section the user will find a detailed description of the main functions that are available from ***Genomic Viewer*** interface.
+
 <details open>
-<summary>&nbsp;</summary>
+<summary>Interface organization</summary>
 
-Explain major features in dedicated subsections.
+### Interface organization
 
-### Data Import
-How to load files, accepted formats, drag-and-drop support.
+***Genomic Viewer*** is organized into three main sections. A list with a brief description of the functions that are available from each section is schematized below.
+It follows a more detailed description of usage of all the  mentioned functions.
 
-### Reference Genome
-How to choose reference genome and which are the available options and the affeted sections in the viewer.
+<img src="GV_main_window_sections.png" alt="GV overview of the interface with sections" width="80%">
 
+**Left sidebar**
+
+| Section/Button     | Function                                                                                                                                             |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Reference genome   | Select a reference genome form list.                                                                                                                 |
+| Insert coordinates | Choose chromosome to visualize from drop-down menu and enter start and end coordinates.                                                              |
+| Load coordinates   | Load a bed format file with a list of saved genomic coordinates. If present, the file specified in the configuration file will be loaded as default  |
+| Go button          | Generate plot according to the selected options.                                                                                                     |
+| Save button        | Export plot choosing among different formats: .svg, .pdf, .png, .jpg                                                                                 |
+
+
+**Right sidebar**
+
+| Section/Button     | Function                                                                                                                                             |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Choose chromosome  | Select a chromosome to plot by hovering over the plot and clicking.                                                                                  |
+| Search by gene     | Plot a genomic region by inserting the corresponding gene name.                                                                                      |
+| bigWig plot mode   | Choose if plotting bigWig tracks in the profile or heatmap mode. Both plots can also be generated simultaneously.                                    |
+| Autoscale settings | Define grouping rule for autoscaling bigWig tracks.                                                                                                  |
+| Expand category    | Gives the possibility to expand tracks of categorical bed files to avoid categories overlap.                                                         |
+| Expand transcripts | Alternative to gene label track, plots individually the available transcript isoforms.                                                               |
+| Chromosome ideogram| Checked by default, allows to remove the chromosome ideogram form plot.                                                                              |
+
+**Central window**
+
+| Section/Button     | Function                                                                                                                                             |
+|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Plot, Data, Stats  | Click to access the corresponding navigation tab and the relative functions.                                                                         |
+| Zoom section       | Zooming options available from the Plot tab. Provide functions for static zoom of the image or for dynamic genome navigation around a plotted region.|  
+
+</details>
+
+<details open>
+<summary>Reference genome</summary>
+
+### Reference genome
+
+Choosing a *reference genome* is the first essential step to address before generating any plot. 
+The reference genome provides the *correct coordinates* to ensure that the values you are entering in the navigation options correspond to the displayed *gene label and features*.
+It can be selected from a built-in list available form a drop-down menu at the top of the **left sidebar**.  
+The reference genome of choice must match the one used in the alignment of the track that are uploaded by the user through the [**Configuration file**](#configruation).
+At ***Genomic Viewer*** startup the human hg19 (GRCh19) version of the reference genome is loaded as default.
+
+<img src="GV_ref_genome.png" alt="GV select reference genome menu" width="30%">
+
+Changing the selected working reference genome will affect also the **chromosome hover plot**, the list of available *gene names* and the gene annotation labels in the main plot output.
+
+</details>
 ### Navigation
 
+- Insert coordinates
+- Load coordinates
+- Choose chromosome
+- Search by gene
+
+### 
+
 ### Visualization
+
+- Track spcific features
 Plots, settings, export options.
 In this section the user will find a description of the graphical output specific to the single data tracks and how they are managed by the tool. Since the basic graphical parameters are managed through the [`plotgardener`](https://phanstiellab.github.io/plotgardener/index.html)[[1]](#ref1)
 R package, the specific function that handles each type of track is specified.
 
 Bed files will be plotted by genomic viewer using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
-The same function is also employed to plot **-bam** files, the two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collpsed way, the bam are expanded to allow the visualization of individual reads.
+The same function is also employed to plot **.bam** files, the two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collpsed way, the bam are expanded to allow the visualization of individual reads.
+
+- Zoom
+### Genome annotation options
+- expand transcripts
+- chromosome ideogram
 
 ### Analysis Tools
-All computational or analytical modules.
+Data subsetting
+Stats plot description
 
-### Export Functionalities
-Which file formats can be exported.
+### Run and Export Functionalities
+- Go button
+- Save button
+- Data download buttons from Data navigation tab
 
 ### Central Panels
 - Plot viewer
@@ -305,17 +371,6 @@ Which file formats can be exported.
 
 ### Sidebars Actions
 
-</div>
-
-**Left sidebar**
-
-| Section/Button     | Function                                                                                                                                             |
-|--------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Reference genome   | Select a reference genome form list                                                                                                                  |
-| Insert coordinates | Choose chromosome to visualize from drop-down menu and enter start and end coordinates                                                               |
-| Load coordinates   | Load a bed format file with a list of saved genomic coordinates, if present, the file specified in the configuration file will be loaded as default  |
-| Go button          | generate plot according to the selected options                                                                                                      |
-| Save button        | Export plot choosing among different formats: .svg, .pdf, .png, .jpg  
 
 
 </details>
