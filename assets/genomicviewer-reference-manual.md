@@ -411,23 +411,148 @@ To trigger the generation of the plot or analysis, click on the *Go button* once
 
 The maximum allowed zoom-in is **500 bp**, further zoom will not be allowed. Zooming by drag-and-drop is **limited to the selected chromosome coordinates**.
 
-<img src="GV_zoom_bar.png" alt="GV navigation through zoom bar" width="60%">
+<img src="GV_zoom_bar.png" alt="GV navigation through zoom bar" width="80%">
 
 </details>
 
 <details open>
-<summary>Visualization</summary>
+<summary>Genomic view plot</summary>
 
-### Visualization
+### Genomic view plot
 
-- Track specific features
-Plots, settings, export options.
-In this section the user will find a description of the graphical output specific to the single data tracks and how they are managed by the tool. Since the basic graphical parameters are managed through the [`plotgardener`](https://phanstiellab.github.io/plotgardener/index.html)[[1]](#ref1)
-R package, the specific function that handles each type of track is specified.
+The principal output of the app is the **genomic view plot**, accessed through the *Plot navigation tab* which is displayed by default at startup. 
+The plot is generated using the track files uploaded by the user in the [Configuration file](#configuration). 
+***Genomic Viewer*** handles the major genomic data tracks format using specific functions and graphical parameters which are managed through custom functions exploiting the [`plotgardener`](https://phanstiellab.github.io/plotgardener/index.html)[[1]](#ref1)
+R package.
 
-Bed files will be plotted by genomic viewer using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
+<details open>
+<summary>Track specific features</summary>
+
+#### Track specific features
+
+It follows a description of all the single tracks plot that can be displayed, which are the options that the user has to modify their visualization based on the input data format, and how the tool calculates the output depending on the size of the genomic range to be visualized.
+In the output plot the order of tracks is predefined to ensure an optimal distribution of the image space and a logic flow of the biological information normally provided by the different files types.
+For this reason in this section we will described how each track is handled following their plotting order from top to bottom of the output image.
+
+##### HiC 3D contact matrix
+
+Files of the [*.hic format*](#HiC) are used to plot **HiC and 3D contact matrices**. ***Genomic Viewer*** represents this type of data as *triangular matrices* exploiting the `plotgardener` function [`plotHicTriangle()`](#https://phanstiellab.github.io/plotgardener/reference/plotHicTriangle.html). 
+Contact scores that are stored in the input file are displayed as a heatmap and will be scaled in the range of 1-100 to maximize their visual evaluation. The corresponding scalebar is always reported beside the plot.
+
+This type of data and consequently the resulting plot can be quite large in size and computationally expensive.
+To improve the performance in handling this kind of data and preserving the levels of details, ***Genomic Viewer*** automatically sets different data resolutions based on the size of the genomic regions that is requested to plot. 
+
+In particular:
+
+- for genomic ranges larger than 5 Mbp the binning resolution will be of 500 kbp;
+
+- for genomic ranges > 100 kbp and ≤ 5 Mbp the binning resolution will be of 100 kbp;
+
+- for genomic ranges > 25 kbp and ≤ 100 kbp the binning resolution will be of 25 kbp;
+
+- for genomic ranges ≥ 15 kbp and ≤ 25 kbp the binning resolution will be of 15 kbp (this must be compatible with the input data resolution, otherwise will not be plotted);
+
+- for genomic ranges < 15 kbp the 3D contact matrix will not be plotted since it approaches the minimal resolution allowed by the data and will not have a significant biological meaning.
+
+The image below shows some examples of HiC heatmaps plotted at different resolutions according to the genomic range.
+
+<img src="GV_hic.png" alt="GV hic tringular matrix at different resolutions" width="80%">
+
+##### BigWig profile and heatmap
+
+Files of the [*.bigwig format*](#bigwig) are used to plot any coverage or signal score data like ChIP-seq, ATAC-seq, RNA-seq and many others. 
+The most common way in which *bigWig* files are plotted is as signal intensity ***profile plots***, however in some cases it can be useful to plot them as ***heatmaps***. 
+**Genomic viewer** allows both visualization modes, plus it allows to plot the same track simultaneously as *profile* or *heatmap*. 
+*BigWig* files are thought for data visualization and contain a score that is proportional to the signal intensity for defined genomic bins. 
+
+This score information stored in *bigWig* files is normally binned. This information is exploited to generate both the standard histogram-like **profile plots**, exploiting the `plotgardener`
+function [`plotSignal()`](https://phanstiellab.github.io/plotgardener/reference/plotSignal.html), or is transformed into a color-scale represented as **heatmap** through the `plotgardener`
+function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html). 
+
+To choose the **plot mode** the user can act through the *Select bigwig plot mode* menu in the *right sidebar*. The plot creating is triggered automatically after selecting the modality.
+
+<img src="GV_bigwig_mode.png" alt="GV bigwig plot mode drop-down menu" width="30%">
+
+Like the *3D contact matrix* plots, also the *bigWig* files can be plotted using a different bin size as a compromise between resolution and computational expenses. 
+
+To optimize the visualization performance without loosing information, both ***profile plots*** and ***heatmaps*** are differently binned depending on the size of the genomic range selected by the user:
+
+- for genomic ranges ≥ 200 Mbp the binning resolution will be of 1 Mbp;
+
+- for genomic ranges ≥ 50 Mbp and < 200 Mbp the binning resolution will be of 500 kbp;
+
+- for genomic ranges ≥ 5 Mbp and < 50 Mbp the binning resolution will be of 50 kbp;
+
+- for genomic ranges ≥ 100 kbp and < 5 Mbp the binning resolution will be of 5 kbp;
+
+- for  genomic ranges < 100 kbp no binning is applied, preserving the resolution of the original input file.
+
+The image below shows some examples of *profile* plots and *heatmaps* from the same input *bigWig* file, plotted at different resolutions according to the genomic range.
+
+<img src="GV_bigwig.png" alt="GV bigwig profile and heatmap plots at different resolutions" width="80%">
+
+
+When multiple *bigwig* files are loaded and must be compared, it is good practice to uniform the y-scale for all samples. 
+However when plotting data generate through different techniques, like can be ATAC-seq and RNA-seq, the data range can be quite different between datasets.
+For these reasons ***Genomic Viewer*** offers the possibility to choose y-axis autoscale groups which can be chosen by th user from the *Autoscale settings* button in the *right sidebar*.
+By clicking the button a pop-up window will appear:
+
+<img src="GV_autoscale_group.png" alt="GV popup window for bigwig autoscale group" width="60%">
+
+To create groups click the *+ Add* button and select the corresponding samples.
+If no grouping is required, you can click the *Set Individual Scale* checkbox.
+
+By default the y-scale for bigwigs is automatically auto-scaled based on the maximal *y* value of the most intense sample, it is updated  every time the selected genomic range is updated. 
+When multiple *bigwig* files are loaded a different color is automatically applied to every track, when plotted in the *profile mode* the color/score scalebar is displayed on the right of the plot.
+
+
+##### Bed files 
+
+The [*bed file format](#bed) is commonly used to store information regarding annotation of peaks or genomic regions of interest identified through coverage enrichemnt datasets like ChIP-seq, ATAC-seq and others.
+Bed files are plotted by ***Genomic Viewer*** using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
+
+When multiple *bed files* are loaded by the user a different color is automatically applied to every sample. 
+There is no customization option for this type of track and no binning is normally necessary. 
+However, when the plotted range is larger than 10 Mbp peaks are displayed as **density plots** to improve readability, informativity and reduce image size.
+
+An example of how peak file track appears in ***Genomic Viewer*** is reported in the figure below:
+
+<img src="GV_autoscale_group.png" alt="GV popup window for bigwig autoscale group" width="80%">
+
+##### Bam files
 The same function is also employed to plot **.bam** files, the two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collpsed way, the bam are expanded to allow the visualization of individual reads.
-- Zoom
+
+
+##### Categorical bed files
+
+[*Categoricla Bed files*](#categorical-bed) can be used to mark genomic regions that belong to specific categories, which can be annotated with external tools or databases, or defined by the user. 
+***Genomic Viewer*** plots *categorical bed files* through the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html). 
+Every category that is found in the input file is associated to a different color and represented in a legend displayed to the right of the corresponding track in the plot.
+By default all the categories in the same track are plotted in one line, however, sometimes the genomic ranges belonging to different categories may overlap, or the same genomic range belongs to two categories.
+To address these situations ***Genomic Viewer*** provides the possibility to *expand* the categories through the *Expand categories* menu in the **right sidebar**.
+When the user click in the menu all the tracks that are uploaded as *categorical bed files* are displayed through their label name and the user can choose multiple of them to be expanded, so that overlapping categories of th same track are splitted on different lines.
+
+<img src="GV_expand_cat.png" alt="GV drop down menu to expand categories of categorical bed file" width="40%">
+
+An example of *collapsed* and *expanded* categorical bed tracks is reported in the figure below:
+
+<img src="GV_cat_bed.png" alt="GV view of categorical bed in collapsed or expanded mode" width="80%">
+
+### Image Static Zoom
+
+
+- **Static plot zoom**: The '+', '-' and 'RESET' buttons in the bottom right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. 
+The resolution of the plot will not change by zooming-in since it is a **vectorial image**. The 'RESET' button allows to restore the initial plot size. The static zoom is also a **pan-zoom**, meaning that the user can move the image by hold-clicking on it. 
+Note that this type of zoom is just for dynamic visualization within the app and will not be applied on the **[[#Downloading plots and data|saved plot]]**. 
+In addition the ***static zoom controller*** will be disabled when the cumulative size of the files to plot is greater than 2 GB and the selected range to plot larger than 500 kbp, this is because in such condition the visualized image is not **vectorial**, but is a **jpeg** to allow for faster and more dynamic image visualization. 
+The **[[#Downloading plots and data|saved plot]]** will instead keep vectorial resolution.
+
+
+
+Tracks height is automatically scaled depending on the number of loaded datasets to fit in the visualization window.
+Moreover, to improve the image readability, dynamic interaction and computation speed, the tool applies some automatic resolution rescalig operations based on the tracks features, original file size and wideness of the selected genomic region.
+
+</details>
 
 </details>
 
