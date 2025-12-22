@@ -605,7 +605,7 @@ In any case it will always be possible to download the image in *vectorial resol
 ***Genomic Viewer*** is thought to be sufficiently flexible to allow the user to modify the stricktly necessary graphical parameters, but also to require the minimal effort in generating a **publication quality image**.
 For this reason the final size of the plot is predefined and each track, depending on its format and the total number of tracks to be plotted, is automatically scaled to occupy a precise space in the final output.
 
-Having the possibility to download the image in **.svg** vectortial formt alwazs allows to modify graphical parameters that cannot be controlled from the application iterface.
+Having the possibility to download the image in **.svg** vectorial formt alwazs allows to modify graphical parameters that cannot be controlled from the application iterface.
 
 </details>
 
@@ -615,8 +615,57 @@ Having the possibility to download the image in **.svg** vectortial formt alwazs
 <summary>Genome annotation</summary>
 
 ### Genome annotation
-- expand transcripts
-- chromosome ideogram
+
+The lowermost part of the main plot output consists of different layers of genes annotations. 
+Genes annotation is available for all the *reference genomes* that the user can selected from the corresponding menu.
+
+The *genes annotation track* in the main plot output has a fixed height and will not be scaled depending on the number of loaded datasets. 
+It is composed of three elements that will be described below:
+
+1. The representation of *genes and genes structures* exploits the `plotgardener` function [`plotGenes()`](https://phanstiellab.github.io/plotgardener/reference/plotGenes.html).
+It allows to represent functional elements like promoters, introns and exons that are encoded in the user-selected genomic range. 
+
+By default genes that are encoded on the leading and lagging DNA strand are divided into two lines, marked as `+` and `-`. 
+Genes encoded on leading strand are plotted in *green* while lagging strand genes are plotted in *lightblue*.
+
+Through the **right sidebar**, the user can optionally decide to *expand transcripts*, meaining that instead of visualizing the cumulative form of each ***gene*** in the displayed genomic range (default option), 
+the separated ***transcript isoforms*** are displayed on multiple lines.
+
+<img src="GV_expand_transcripts.png" alt="GV checkbox to expand transcripts" width="30%">
+
+The two outputs are represented in the image below:
+
+<img src="GV_gene_track.png" alt="GV gene track with or without expanded transcripts" width="80%">
+
+
+Another relevant feature of the **genes annotation track** is that when the genomic range selected for visualization is too wide (> 10 Mbp), 
+individual genes are not plotted but are substituted by a **density plot** of genes density. 
+This solution allows to obtain faster computation of the genes track and is more readable and informative, 
+indeed at that resolution individual genes could not be otherwise distinguishable. 
+Below is an example of how **genes density plot** appear at large genomic ranges visualization:
+
+<img src="GV_gene_density.png" alt="GV gene track displayed as density plot" width="80%">
+
+*Note:* The **gene density** visualization mode does not allow the user to apply the *Expand transcript* option.
+
+2. A *Genome label* track is always reported below of the *genome annotation* dedicated track. 
+The **genome label** is generated thanks to the `pltgardener` function [`annoGenomeLabel()`](https://phanstiellab.github.io/plotgardener/reference/annoGenomeLabel.html).
+This is a light representation of the genomic coordinates in *bp* and the *chromosome name* corresponding to the visualized region, as indicated by the arrow in the previous image. 
+
+   
+3. By default, a **[Chromosome ideogram](https://phanstiellab.github.io/plotgardener/reference/plotIdeogram.html)** of the corresponding chromosome to which the user selected coordinates map is plotted below of all the other genomic annotation tracks. 
+A *red highlight* indicates the position of the chromosome portion that is plotted and two dashed lines connect the highlight to the graph above to improve the visualization of the chromosome location, especially when small ranges are selected. 
+An example of this visualization is shown in the image below: 
+
+<img src="GV_chr_highlight.png" alt="GV chromosome ideogram with highlight" width="80%">
+
+If the user is not interested in visualizing the *chromosome ideogram*, ***Genomic Viewer*** offers the possibility to hide it by unchecking the *Chromosome Ideogram* checkbox.
+
+<img src="GV_chr_ideogram.png" alt="GV chromosome ideogram checkbox" width="30%">
+
+Since `plotgardener` does not have access to the cytoband information for all the available reference genomes that are provided by ***Genomic Viewer*** the missing information for ideogram plotting has been retrieved from public sources (see [References and Línks](#references-and-links) and used to generate a plotgardener-like ideograms
+
+
 
 </details>
 
@@ -799,6 +848,11 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 - H3K27ac bam (ENCODE ENCFF119WEO)
 
 Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables). 
+
+The *cytoband information* that were not directly available through `plotgardener` were retrieved from:
+
+- CHM13 (T2T): [marbl/CHM13 GitHub repo](https://github.com/marbl/CHM13)
+- GRCM39 (mm29): [UCSC GoldenPath](https://hgdownload.soe.ucsc.edu/goldenPath/mm39/database/)
 
 ### Literature
 *1.*<a id="ref1"></a> Kramer NE, Davis ES, Wenger CD et al. Plotgardener: cultivating precise multi-panel figures in R. Bioinformatics 2022;38:2042–5.
