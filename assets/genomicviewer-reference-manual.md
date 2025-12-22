@@ -456,7 +456,7 @@ In particular:
 
 The image below shows some examples of HiC heatmaps plotted at different resolutions according to the genomic range.
 
-<img src="GV_hic.png" alt="GV hic tringular matrix at different resolutions" width="80%">
+<img src="GV_hic.png" alt="GV hic tringular matrix at different resolutions" width="90%">
 
 ##### BigWig profile and heatmap
 
@@ -489,7 +489,7 @@ To optimize the visualization performance without loosing information, both ***p
 
 The image below shows some examples of *profile* plots and *heatmaps* from the same input *bigWig* file, plotted at different resolutions according to the genomic range.
 
-<img src="GV_bigwig.png" alt="GV bigwig profile and heatmap plots at different resolutions" width="80%">
+<img src="GV_bigwig.png" alt="GV bigwig profile and heatmap plots at different resolutions" width="90%">
 
 
 When multiple *bigwig* files are loaded and must be compared, it is good practice to uniform the y-scale for all samples. 
@@ -497,7 +497,7 @@ However when plotting data generate through different techniques, like can be AT
 For these reasons ***Genomic Viewer*** offers the possibility to choose y-axis autoscale groups which can be chosen by th user from the *Autoscale settings* button in the *right sidebar*.
 By clicking the button a pop-up window will appear:
 
-<img src="GV_autoscale_group.png" alt="GV popup window for bigwig autoscale group" width="60%">
+<img src="GV_autoscale_group.png" alt="GV popup window for bigwig autoscale group" width="45%">
 
 To create groups click the *+ Add* button and select the corresponding samples.
 If no grouping is required, you can click the *Set Individual Scale* checkbox.
@@ -517,10 +517,23 @@ However, when the plotted range is larger than 10 Mbp peaks are displayed as **d
 
 An example of how peak file track appears in ***Genomic Viewer*** is reported in the figure below:
 
-<img src="GV_autoscale_group.png" alt="GV popup window for bigwig autoscale group" width="80%">
+<img src="GV_bed.png" alt="GV bed file track for different genomic ranges" width="80%">
 
 ##### Bam files
-The same function is also employed to plot **.bam** files, the two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collpsed way, the bam are expanded to allow the visualization of individual reads.
+
+[*Bam files](#bam) normally store information about individual sequencing reads obtained after alignment against a reference genome.
+In ***Genomic Viewer*** **bam** are plotted using the same function that is used to plot **bed files**, and therefore the informatio nthat is represented for each sread is the covered genomic range.
+The two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collapsed way, the bam are expanded to allow the visualization of individual reads.
+When there are more read than the one the tool can display due to space constrains a `+` is reported in the upper-right parte of the track plot.
+
+An example of how aligned reads are plotted by ***Genomic Viewer*** is shown in the figure below:
+
+<img src="GV_bam.png" alt="GV example of aligned reads visualized from bam file" width="80%">
+
+
+*bam files inspection* is not among the main purposes of ***Genomic Viewer***. Since **bam** file are often very large in size the data are plotted as default behavior only for highly zoomed region as is also the default behavior of the majority of genome browsers.
+For these reasons *bam files are not provided as example data in the [**Tutorial**](#tutorial). But a user who is interested in testing this funcitonality can retrieved the raw data used to generate the above image from 
+the link reported in the [**References and links**](#references-and-links) section.
 
 
 ##### Categorical bed files
@@ -532,25 +545,67 @@ By default all the categories in the same track are plotted in one line, however
 To address these situations ***Genomic Viewer*** provides the possibility to *expand* the categories through the *Expand categories* menu in the **right sidebar**.
 When the user click in the menu all the tracks that are uploaded as *categorical bed files* are displayed through their label name and the user can choose multiple of them to be expanded, so that overlapping categories of th same track are splitted on different lines.
 
-<img src="GV_expand_cat.png" alt="GV drop down menu to expand categories of categorical bed file" width="40%">
+<img src="GV_expand_cat.png" alt="GV drop down menu to expand categories of categorical bed file" width="30%">
 
 An example of *collapsed* and *expanded* categorical bed tracks is reported in the figure below:
 
 <img src="GV_cat_bed.png" alt="GV view of categorical bed in collapsed or expanded mode" width="80%">
 
-### Image Static Zoom
+When a `+` is displazed ast the top-right of the track it means that some information may be hidded due to space restrictions.
+
+##### 3D contact arches
+
+In addition to contact matrices and heatmaps, 3D contacts can also be represented as *arches* connecting the 2D genomic positions that are touching. 
+This type of representation is stored in [*bedpe files*](#bedpe) and is plotted in ***Genomic viewer*** through the dedicated `plotgardener` function [`plotPairsArches()`](https://phanstiellab.github.io/plotgardener/reference/plotPairsArches.html). 
+
+There is no customization option for this type of track and no binning is normally necessary. The precision of how anchors are defined often depends on the resolution used to generate the data.
+
+An example of how *3D contact arches bedpe* file track appears in the **Genomic viewer** is reported in the figure below:
+
+<img src="GV_arches.png" alt="GV examples of 3D contact arches track" width="80%">
+
+##### GWAS Manhattan
+
+[*GWAS summary statistics*](#gwas) files can be exploited to generate *Manhattan plots* for the identification of trait-associated SNPs. 
+The *Manhattan plots* are generated in ***Genomic Viewer*** through the dedicated `plotgardener` function [`plotManhattan()`](https://phanstiellab.github.io/plotgardener/reference/plotManhattan.html). 
+In this plot every SNP is represented by a dot, which color is representative of the p-value of its association with specific traits, depending on the dataset. 
+The input file column `p` (representing the p-value) is automatically converted into -log10(p-value) as reported on the y-axis scale.
+A dashed line indicate the SNPs *significance threshold* and is by default 10e-08.
+
+There is no customization option for this type of track and no binning is normally necessary.
+
+An example of how  **Manhattan plot** track appears in ***Genomic Viewer*** is reported in the figure below:
+
+<img src="GV_gwas_track.png" alt="GV examples of Manhattan plot obtained from GWAS data" width="80%">
+
+</details>
+
+<details open>
+<summary>Additional options and features</summary>
+
+#### Additional Plot options and features
+
+##### Image Static Zoom
+
+The `+`, `-` and `RESET` buttons in the lower right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. 
+The resolution of the plot will not change by zooming-in since it is a **vectorial image**. The `RESET` button allows to restore the initial plot size. 
+The static zoom is also a **pan-zoom**, meaning that the user can move the image by hold-clicking on it. 
+Note that this type of zoom is just for dynamic visualization within the app and will not be applied on the downloaded plots.
+
+In addition the ***static zoom controller*** will be disabled when the cumulative size of the files to plot is greater than 2 GB and the selected range to plot larger than 500 kbp, 
+this is because in such condition the visualized image is not **vectorial**, but is a **jpeg** to allow for faster and more dynamic image visualization.
+
+In any case it will always be possible to download the image in *vectorial resolution* (.svg format) form the *Save* pop-up window.
+
+<img src="GV_static_zoom.png" alt="GV static zoom controllers" width="80%">
 
 
-- **Static plot zoom**: The '+', '-' and 'RESET' buttons in the bottom right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. 
-The resolution of the plot will not change by zooming-in since it is a **vectorial image**. The 'RESET' button allows to restore the initial plot size. The static zoom is also a **pan-zoom**, meaning that the user can move the image by hold-clicking on it. 
-Note that this type of zoom is just for dynamic visualization within the app and will not be applied on the **[[#Downloading plots and data|saved plot]]**. 
-In addition the ***static zoom controller*** will be disabled when the cumulative size of the files to plot is greater than 2 GB and the selected range to plot larger than 500 kbp, this is because in such condition the visualized image is not **vectorial**, but is a **jpeg** to allow for faster and more dynamic image visualization. 
-The **[[#Downloading plots and data|saved plot]]** will instead keep vectorial resolution.
+##### Tracks arrangement 
 
+***Genomic Viewer*** is thought to be sufficiently flexible to allow the user to modify the stricktly necessary graphical parameters, but also to require the minimal effort in generating a **publication quality image**.
+For this reason the final size of the plot is predefined and each track, depending on its format and the total number of tracks to be plotted, is automatically scaled to occupy a precise space in the final output.
 
-
-Tracks height is automatically scaled depending on the number of loaded datasets to fit in the visualization window.
-Moreover, to improve the image readability, dynamic interaction and computation speed, the tool applies some automatic resolution rescalig operations based on the tracks features, original file size and wideness of the selected genomic region.
+Having the possibility to download the image in **.svg** vectortial formt alwazs allows to modify graphical parameters that cannot be controlled from the application iterface.
 
 </details>
 
@@ -736,11 +791,12 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 
 ### Data Availability
 
- The data employed in the *usage example tutorial* are publicly available from [GEO](https://www.ncbi.nlm.nih.gov/geo/) and [GWAS catalog](https://www.ebi.ac.uk/gwas/) under the accession numbers listed below:
+ The data employed in the *usage example tutorial* and other representative examples are publicly available from [GEO](https://www.ncbi.nlm.nih.gov/geo/), the [GWAS catalog](https://www.ebi.ac.uk/gwas/) and [ENCODE](https://www.encodeproject.org/) under the accession numbers listed below:
 
 - HiC (GEO GSE212910)
 - ATAC-seq (GEO GSE212908)
 - CKD GWAS (GWAS Catalog 26831199)
+- H3K27ac bam (ENCODE ENCFF119WEO)
 
 Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables). 
 
