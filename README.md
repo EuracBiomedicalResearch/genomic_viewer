@@ -243,7 +243,7 @@ Further details are available in the [Features and Usage section](#features-and-
 
 <div>
   
-A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** built-in test data is described in the [Tutorial](./genomicviewer-reference-manual.md#tutorial) section of the reference manual.                                                                      
+A complete **Tutorial** showing a usage example with the ***Genomic Viewer*** built-in test data is described in the [Tutorial](assets/genomicviewer-reference-manual.md#tutorial) section of the reference manual.                                                                      
 
 ------------------------------------------------------------------------
 
