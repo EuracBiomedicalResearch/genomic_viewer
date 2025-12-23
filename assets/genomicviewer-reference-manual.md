@@ -56,7 +56,7 @@ and `names` which is an array of quoted string to be used as labels for the inpu
 **Note:** 
 In the `ext` fields you can use [regular expressions](https://www.geeksforgeeks.org/dsa/write-regular-expressions/) as input, use only the file extension as parameter or type the entire file name for safety.
 When loading several files of the same format through extension or regular expression please remember that file are always read in alphabetical order, therefore their *name labels* must follow the file order to be correectly assigend.
-In the presence of multiple subfolders with data of the same file format, the `dir` field also accepts an arraz following the same rules of `name` labels arrays.
+In the presence of multiple subfolders with data of the same file format, the `dir` field also accepts an array following the same rules of `name` labels arrays.
 When loading **.bam** files it is recommended to use the regular expression `$` to specify the end of the file extension (like this `.bam$`), this avoids to erroneously try to load the associated *.bai* files.
 
 - You can have more versions of the configuration file, but only the file named `GenomicViewer_config.yml` will be read by the tool in the working session.
@@ -70,7 +70,7 @@ It is suggested to keep additional versions in a separated location on your comp
 
 An example of the configuration file is reported below:
 
-```{yaml}
+```
 ---
 
 default:
@@ -141,13 +141,14 @@ For more details about the feature and creation of these files you can browse th
 
 </details>
 
+<div>
 <details open>
 <summary>bed</summary>
 
 ### bed
 
 [Bed files](https://www.ensembl.org/info/website/upload/bed.html) are normally used to store genomic ranges annotations, which can be for instance ChIP-seq or ATAC-seq peaks. 
-Bed files con contain a variable number of columns with essential and optional information. For the purposes of ***Genomic Viewer*** only three tab separated fields are strictly 
+Bed files can contain a variable number of columns with essential and optional information. For the purposes of ***Genomic Viewer*** only three tab separated fields are strictly 
 necessary: **chromosome name**, **start**, **end**. 
 As in the example below:
 
@@ -156,11 +157,13 @@ chr1  213941196  213942363
 chr1  213942363  213943530
 chr1  213943530  213944697
 ```
-Make sure that your file does not have a header with column names (like `chr`, `start`, `end`, or a comment `#`) to ensure proper reafing of the file.
+Make sure that your file does not have a header with column names (like `chr`, `start`, `end`, or a comment `#`) to ensure proper reading of the file.
 Additional columns are allowed, those will be displayed in the *Data* navigation tab, but are ignored for plotting.
 
 </details>
+</div>
 
+<div>
 <details open>
 <summary>Categorical bed</summary>
 
@@ -189,21 +192,25 @@ Additional columns will be ignored for plotting but are kept in the *Data* navig
 *Categorical bed* format is highly flexible, allowing many different types of data to be organized according to this structure and can be adapted to a wide range of use cases.
 
 </details>
+</div>
 
+<div>
 <details open>
 <summary>HiC</summary>
 
 ### HiC
 
 3D contacts files, like HiC, stored in [hic file format](https://genome.ucsc.edu/goldenpath/help/hic.html). 
-These is a binary format allowing for fast access to contact matrix heatmaps and is used for displaying chromatin conformation data in a browser.
+This is a binary format allowing for fast access to contact matrix heatmaps and is used for displaying chromatin conformation data in a browser.
 *.hic* files are generally large file and can store the information at different resolutions and normalizations. It is suggested to include a column with *KR normalization*. 
 To know more about .hic *normalization methods* you can refer to the [*Normalization of Hi-C Maps*](https://gcmapexplorer.readthedocs.io/en/latest/cmapNormalization.html) article.
-Based on their availability in the source data file, ***Genomic Viewer*** reads **.hic** files at different resolutions depending on the size of the requested genomic window to plot. T
-his ensures a faster access to the data and more lightweight outputs.
+Based on their availability in the source data file, ***Genomic Viewer*** reads **.hic** files at different resolutions depending on the size of the requested genomic window to plot. 
+This ensures a faster access to the data and more lightweight outputs.
 
 </details>
 
+
+<div>
 <details open>
 <summary>bedpe</summary>
 
@@ -224,8 +231,12 @@ chr5	75350000	75360000	chr5	75670000	75680000
 chr5	75740000	75750000	chr5	76150000	76160000
 chr5	77560000	77570000	chr5	77960000	77970000
 ```
-</details>
 
+</details>
+</div>
+
+
+<div>
 <details open>
 <summary>GWAS</summary>
 
@@ -254,17 +265,22 @@ To reduce the filesize, the user which is only interested in plotting and not to
 
 </details>
 
+
+<div>
 <details open>
 <summary>bam</summary>
 
 ### bam
 
 The **.bam** file format is used to store in a compressed binary version the results of sequencing reads alignments. To allow graphical tools to access this type of data the file must be indexed, therefor every **.bam** file 
-must always be assocaited to a corresponding **.bam.bai** file. For a more extensive description of **bam ** files you can refer to the [BAM Track Format](https://genome.ucsc.edu/goldenpath/help/bam.html) of the UCSC web portal.
+must always be associated to a corresponding **.bam.bai** file. For a more extensive description of **bam** files you can refer to the [BAM Track Format](https://genome.ucsc.edu/goldenpath/help/bam.html) of the UCSC web portal.
 Sometimes publicly deposited **.bam** files are not indexed, in order to index a bam file it is recommended to use [*Samtools index*](https://www.htslib.org/doc/samtools-index.html) function.
 **Bam** files are generally large files since they store information about single aligned reads.
 
 </details>
+</div>
+</div>
+</div>
 
 ------------------------------------------------------------------------
 
@@ -272,6 +288,7 @@ Sometimes publicly deposited **.bam** files are not indexed, in order to index a
 
 In the following section the user will find a detailed description of the main functions that are available from ***Genomic Viewer*** interface.
 
+<div>
 <details open>
 <summary>Interface organization</summary>
 
@@ -313,7 +330,9 @@ It follows a more detailed description of usage of all the  mentioned functions.
 | Zoom section       | Zooming options available from the Plot tab. Provide functions for static zoom of the image or for dynamic genome navigation around a plotted region.|  
 
 </details>
+</div>
 
+<div>
 <details open>
 <summary>Reference genome</summary>
 
@@ -330,7 +349,9 @@ At ***Genomic Viewer*** startup the human hg19 (GRCh19) version of the reference
 Changing the selected working reference genome will affect also the list of chromosomes in the *Insert coordinates* panel, the **chromosome hover plot**, the list of available *gene names* and the gene annotation labels in the main plot output.
 
 </details>
+</div>
 
+<div>
 <details open>
 <summary>Navigation</summary>
 
@@ -341,7 +362,7 @@ Changing the selected working reference genome will affect also the list of chro
 #### Insert coordinates
 
 One option to tell ***Genomic Viewer*** which coordinates you want to plot is through the *Insert coordinates* panel. 
-This panel allows to manually insert specific coordinates to be plotted by selecting the **chromosome name** from a drop-down menu, and entering the **start** and **end** coordinates in the numeric entry fields available fro the same panel.
+This panel allows to manually insert specific coordinates to be plotted by selecting the **chromosome name** from a drop-down menu, and entering the **start** and **end** coordinates in the numeric entry fields available from the same panel.
 Once you are satisfied of the entered coordinates, press the *Go button* to activate the generation of the plot or other analysis.
 
 <img src="GV_insert_coordinates.png" alt="GV insert coordinates panel for genome navigation" width="25%">
@@ -349,7 +370,7 @@ Once you are satisfied of the entered coordinates, press the *Go button* to acti
 #### Load coordinates
 
 The user can navigate across a list of previously saved coordinates by specifying a *region table bed file* to be uploaded through the [configruation file](#configuration) or by accessing local files from a running ***Genomic Viewer*** session.
-The provided coordinates list file should ideally be structured as a bed file with a minimum of three tab separated columns corresponding to: **chr**, **start**, **end**. It is suggested but not mandatory to have a fourth clumn with a name or ID for the corresponding genomic region.
+The provided coordinates list file should ideally be structured as a bed file with a minimum of three tab separated columns corresponding to: **chr**, **start**, **end**. It is suggested but not mandatory to have a fourth column with a name or ID for the corresponding genomic region.
 It is also suggested to avoid column headers.
 
 An example of region table bed file is reported below:
@@ -362,8 +383,8 @@ Once the region file is uploaded, the coordinates it contains become available t
 
 <img src="GV_load_coordinates_menu.png" alt="GV load coordinates allows to choose coordinates from a saved list" width="30%">
 
-A custom region table list can be dynamically created by the user by either generating a new one in the vase where no list is uploaded, or by modifying a previously uploaded table.
-The **Add** and **Remove** buttons below the selection drop-down meno allow to access these options. In particular, to *Add* a new entry to the an existing list or to create a new one after clicking the *Add button*
+A custom region table list can be dynamically created by the user by either generating a new one in the case where no list is uploaded, or by modifying a previously uploaded table.
+The **Add** and **Remove** buttons below the selection drop-down menu allow to access these options. In particular, to *Add* a new entry to the an existing list or to create a new one after clicking the *Add button*
 a pop-up window will appear reporting the selected coordinates and allowing the user to assign a name to the region. By clicking *Ok* the entry and assigned name will be added to the list.
 
 <img src="GV_load_coordinates_add.png" alt="GV load coordinates panel for adding new coordinates to list" width="35%">
@@ -377,8 +398,8 @@ To restore the initial setting of the *Load coordinates* panel it is sufficient 
 
 To visualize the genomic screen of a whole chromosome or the corresponding analysis at the top of the **Right sidebar** the user can see a plot schematizing the *chromosomes structures* corresponding to the selected *reference genome*.
 The plot will update every time that the user selects a different reference genome.
-The *Choose chromosome plot* is an interactive plot that the user can hover with the mouse. A label with the **chromosome id** of the region that the user is hovering will apper below the graph. Upon click the corresponding coordinates are passed to ***Genomic Viewer***
-and the genomic plo or desired analysis can be generated by pressing the *Go button*.
+The *Choose chromosome plot* is an interactive plot that the user can hover with the mouse. A label with the **chromosome id** of the region that the user is hovering will appear below the graph. Upon clicking the corresponding coordinates are passed to ***Genomic Viewer***
+and the genomic plot or desired analysis can be generated by pressing the *Go button*.
 
 <img src="GV_choose_chrom.png" alt="GV choose chromosome hover and click plot" width="30%">
 
@@ -387,7 +408,7 @@ and the genomic plo or desired analysis can be generated by pressing the *Go but
 If a user is interested in visualizing or analyzing the genomic region corresponding to a specific gene, the easiest way is to retrieve its coordinates from the *Search by gene* menu.
 This menu is updated accordingly to the selected *reference genome*. To search for a gene of interest you can start typing the gene name in the menu and a list with the matching entries will be displayed below.
 Once your gene of interest appears you can click on it and the tool will automatically load its coordinates.
-Note that if changing the reference genome after selecting for a gene the coordinates will not update automatically, but you have to search againg for the gene in the menu. This is for safety reasons since not all reference genomes encodes for the same genes, or have different nomenclatures.
+Note that if changing the reference genome after selecting for a gene the coordinates will not update automatically, but you have to search again for the gene in the menu. This is for safety reasons since not all reference genomes encodes for the same genes, or have different nomenclatures.
 
 <img src="GV_search_gene.png" alt="GV search by gene function" width="30%">
 
@@ -414,9 +435,8 @@ The maximum allowed zoom-in is **500 bp**, further zoom will not be allowed. Zoo
 <img src="GV_zoom_bar.png" alt="GV navigation through zoom bar" width="80%">
 
 </details>
+</div>
 
-<details open>
-<summary>Genomic view plot</summary>
 
 ### Genomic view plot
 
@@ -425,6 +445,7 @@ The plot is generated using the track files uploaded by the user in the [Configu
 ***Genomic Viewer*** handles the major genomic data tracks format using specific functions and graphical parameters which are managed through custom functions exploiting the [`plotgardener`](https://phanstiellab.github.io/plotgardener/index.html)[[1]](#ref1)
 R package.
 
+<div>
 <details open>
 <summary>Track specific features</summary>
 
@@ -432,7 +453,7 @@ R package.
 
 It follows a description of all the single tracks plot that can be displayed, which are the options that the user has to modify their visualization based on the input data format, and how the tool calculates the output depending on the size of the genomic range to be visualized.
 In the output plot the order of tracks is predefined to ensure an optimal distribution of the image space and a logic flow of the biological information normally provided by the different files types.
-For this reason in this section we will described how each track is handled following their plotting order from top to bottom of the output image.
+For this reason in this section we will describe how each track is handled following their plotting order from top to bottom of the output image.
 
 ##### HiC 3D contact matrix
 
@@ -493,7 +514,7 @@ The image below shows some examples of *profile* plots and *heatmaps* from the s
 
 
 When multiple *bigwig* files are loaded and must be compared, it is good practice to uniform the y-scale for all samples. 
-However when plotting data generate through different techniques, like can be ATAC-seq and RNA-seq, the data range can be quite different between datasets.
+However when plotting data generated through different techniques, like can be ATAC-seq and RNA-seq, the data range can be quite different between datasets.
 For these reasons ***Genomic Viewer*** offers the possibility to choose y-axis autoscale groups which can be chosen by th user from the *Autoscale settings* button in the *right sidebar*.
 By clicking the button a pop-up window will appear:
 
@@ -508,7 +529,7 @@ When multiple *bigwig* files are loaded a different color is automatically appli
 
 ##### Bed files 
 
-The [*bed file format](#bed) is commonly used to store information regarding annotation of peaks or genomic regions of interest identified through coverage enrichemnt datasets like ChIP-seq, ATAC-seq and others.
+The [*bed file format*](#bed) is commonly used to store information regarding annotation of peaks or genomic regions of interest identified through coverage enrichemnt datasets like ChIP-seq, ATAC-seq and others.
 Bed files are plotted by ***Genomic Viewer*** using the `plotgardener` function [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
 
 When multiple *bed files* are loaded by the user a different color is automatically applied to every sample. 
@@ -521,10 +542,10 @@ An example of how peak file track appears in ***Genomic Viewer*** is reported in
 
 ##### Bam files
 
-[*Bam files](#bam) normally store information about individual sequencing reads obtained after alignment against a reference genome.
-In ***Genomic Viewer*** **bam** are plotted using the same function that is used to plot **bed files**, and therefore the informatio nthat is represented for each sread is the covered genomic range.
+[*Bam files*](#bam) normally store information about individual sequencing reads obtained after alignment against a reference genome.
+In ***Genomic Viewer*** **bam** are plotted using the same function that is used to plot **bed files**, and therefore the information that is represented for each read is the covered genomic range.
 The two formats are automatically detected by ***Genomic Viewer*** and while bed files are plotted in collapsed way, the bam are expanded to allow the visualization of individual reads.
-When there are more read than the one the tool can display due to space constrains a `+` is reported in the upper-right parte of the track plot.
+When there are more read than the one the tool can display due to space constrains a `+` is reported in the upper-right part of the track plot.
 
 An example of how aligned reads are plotted by ***Genomic Viewer*** is shown in the figure below:
 
@@ -543,7 +564,7 @@ the link reported in the [**References and links**](#references-and-links) secti
 Every category that is found in the input file is associated to a different color and represented in a legend displayed to the right of the corresponding track in the plot.
 By default all the categories in the same track are plotted in one line, however, sometimes the genomic ranges belonging to different categories may overlap, or the same genomic range belongs to two categories.
 To address these situations ***Genomic Viewer*** provides the possibility to *expand* the categories through the *Expand categories* menu in the **right sidebar**.
-When the user click in the menu all the tracks that are uploaded as *categorical bed files* are displayed through their label name and the user can choose multiple of them to be expanded, so that overlapping categories of th same track are splitted on different lines.
+When the user click in the menu all the tracks that are uploaded as *categorical bed files* are displayed through their label name and the user can choose multiple of them to be expanded, so that overlapping categories of the same track are splitted on different lines.
 
 <img src="GV_expand_cat.png" alt="GV drop down menu to expand categories of categorical bed file" width="30%">
 
@@ -551,7 +572,7 @@ An example of *collapsed* and *expanded* categorical bed tracks is reported in t
 
 <img src="GV_cat_bed.png" alt="GV view of categorical bed in collapsed or expanded mode" width="80%">
 
-When a `+` is displazed ast the top-right of the track it means that some information may be hidded due to space restrictions.
+When a `+` is displayed at the top-right of the track it means that some information may be hidded due to space restrictions.
 
 ##### 3D contact arches
 
@@ -568,23 +589,25 @@ An example of how *3D contact arches bedpe* file track appears in the **Genomic 
 
 [*GWAS summary statistics*](#gwas) files can be exploited to generate *Manhattan plots* for the identification of trait-associated SNPs. 
 The *Manhattan plots* are generated in ***Genomic Viewer*** through the dedicated `plotgardener` function [`plotManhattan()`](https://phanstiellab.github.io/plotgardener/reference/plotManhattan.html). 
-In this plot every SNP is represented by a dot, which color is representative of the p-value of its association with specific traits, depending on the dataset. 
+In this plot every SNP is represented by a dot, whose color is representative of the p-value of its association with specific traits, depending on the dataset. 
 The input file column `p` (representing the p-value) is automatically converted into -log10(p-value) as reported on the y-axis scale.
 A dashed line indicate the SNPs *significance threshold* and is by default 10e-08.
 
 There is no customization option for this type of track and no binning is normally necessary.
 
-An example of how  **Manhattan plot** track appears in ***Genomic Viewer*** is reported in the figure below:
+An example of how **Manhattan plot** track appears in ***Genomic Viewer*** is reported in the figure below:
 
 <img src="GV_gwas_track.png" alt="GV examples of Manhattan plot obtained from GWAS data" width="80%">
 
 </details>
+</div>
 
+<div>
 <details open>
-<summary>Additional options and features</summary>
+<summary>Additional Plot options and features</summary>
 
 #### Additional Plot options and features
-
+ 
 ##### Image Static Zoom
 
 The `+`, `-` and `RESET` buttons in the lower right corner of the genomic view plot allows to zoom-in and out the plot without changing the visualized genomic coordinates. 
@@ -600,17 +623,17 @@ In any case it will always be possible to download the image in *vectorial resol
 <img src="GV_static_zoom.png" alt="GV static zoom controllers" width="80%">
 
 
-##### Tracks arrangement 
+#### Tracks arrangement 
 
-***Genomic Viewer*** is thought to be sufficiently flexible to allow the user to modify the stricktly necessary graphical parameters, but also to require the minimal effort in generating a **publication quality image**.
+***Genomic Viewer*** is thought to be sufficiently flexible to allow the user to modify the strictly necessary graphical parameters, but also to require the minimal effort in generating a **publication quality image**.
 For this reason the final size of the plot is predefined and each track, depending on its format and the total number of tracks to be plotted, is automatically scaled to occupy a precise space in the final output.
 
-Having the possibility to download the image in **.svg** vectorial formt alwazs allows to modify graphical parameters that cannot be controlled from the application iterface.
+Having the possibility to download the image in **.svg** vectorial formt always allows to modify graphical parameters that cannot be controlled from the application interface.
 
 </details>
+</div>
 
-</details>
-
+<div>
 <details open>
 <summary>Genome annotation</summary>
 
@@ -665,9 +688,10 @@ If the user is not interested in visualizing the *chromosome ideogram*, ***Genom
 
 Since `plotgardener` does not have access to the cytoband information for all the reference genomes that are provided by ***Genomic Viewer*** the missing information for ideogram plotting has been retrieved from public sources (see [References and Línks](#references-and-links) and used to generate a plotgardener-like ideograms
 
-
 </details>
+</div>
 
+<div>
 <details open>
 <summary>Analysis Tools</summary>
 
@@ -736,7 +760,9 @@ This allows the user to evaluate the relevance of the features in the selected r
 The direct export of these charts is not implemented since they are meant for the user to have a wider data overview, but not for their external reuse. Anyway, for the interested user, each plot can be copy-pasted to have them saved. 
 
 </details>
+</div>
 
+<div>
 <details open>
 <summary>Run and Export Functionalities</summary>
 
@@ -761,11 +787,13 @@ Below each table overview there is a **Download button** which automatically exp
 <img src="GV_gwas_table_example.png" alt="GV export table with data subset" width="60%">
 
 </details>
+</div>
 
 ------------------------------------------------------------------------
 
 ## Tutorial
 
+<div>
 <details open>
 <summary>&nbsp;</summary>
 
@@ -792,7 +820,7 @@ and download data form source databases. Save the files in the `./data` folder a
 ### Biological question
 
 When loading custom datasets in ***Genomic Viewer*** the choice can be driven by either **technical or biological** questions. The visualization of genomic tracks can indeed validate the quality of both sequencing raw data and some downstream analysis,
-like **peak calling**[[2]](#ref2). In addition, it is also very useful for investigation biological questions.
+like **peak calling**[[2]](#ref2). In addition, it is also very useful to address biological questions.
 Considering the data that are loaded as usage example in the present tutorial, an interesting biological question can be to *identify SNPs (from the GWAS data) found in CKD patients that are associated to relevant genes for kidney function*.
 
 ### Genome selection, navigation and plot inspection
@@ -817,7 +845,7 @@ Next click the *Go button* to generate the corresponding genomic screenshot plot
 <img src="GV_chr5_overview.png" alt="GV overview of chromosome 5 example genomic tracks" width="80%">
 
 From a quick look at the generated plot, a cluster of significant SNPs close to the right chromosome end appear from the GWAS data. It is worthy to take a close look.
-For this aim the user can employ the *drag and drop zoom bar* at the bottom of the plot. In this tutorial the coordinates of the region arounf the SNPs cluster were already saved as custom coordinates list
+For this aim the user can employ the *drag and drop zoom bar* at the bottom of the plot. In this tutorial the coordinates of the region around the SNPs cluster were already saved as custom coordinates list
 and uploaded as default through the configuration file. The user can access these coordinates form the from the *Load Coordinates* panel in the left sidebar. 
 By clicking on the first entry in the list, the corresponding coordinates (relative to the gene SLC34A1) are passed to the tool and the *Insert Coordinates* panel will automatically update.
 
@@ -867,15 +895,15 @@ The subset tables can be inspected form the application interface preview or dow
 <img src="GV_navigation_tabs_stats.png" alt="GV navigation tabs Stats selected" width="20%">
 
 Each of these plot can be generated by clicking the *Run* button in the corresponding section.
-Since our example include all the data types associated to a Stats plot you can try to generate all of them. For a detailed description of the single plots you can refer to the *Analysis Tools* in the [Features and Usange](#features-and-usage) section.
+Since our example include all the data types associated to a Stats plot you can try to generate all of them. For a detailed description of the single plots you can refer to the *Analysis Tools* in the [Features and Usage](#features-and-usage) section.
 
 For the purpose of this tutorial we will only describe the outputs that provides more relevant insights for the proposed biological question:
 
-- We have a *Manhattan plot* that summarizes in a single view what we already observed from the two genomic screen that were evaluated. There is a putative risk locus with a *cluster of significant SNPs* assocaited with CKD in the right telomere proximal region
+- We have a *Manhattan plot* that summarizes in a single view what we already observed from the two genomic screen that were evaluated. There is a putative risk locus with a *cluster of significant SNPs* associated with CKD in the right telomere proximal region
 of chromosome 5. A zoom-in of this region is useful to visually report the *rs IDs* of the significant SNPs as an alternative to the table generated in the *Data tab*.
 
-- From the zoomed genomic screen comprising the risk locus we noticed the presence of several *regulatory elements*. The *categorical classification* chart is useful to evaluate their enrichment compare to their abundace in the whole genome.
-For instance, the locus of interest is rich is *TSS peaks* resembling gene promoters, which makes this region very interesting since SNPs can have crucial effects on transcription regulation when occurring in regulatory regions like
+- From the zoomed genomic screen comprising the risk locus we noticed the presence of several *regulatory elements*. The *categorical classification* chart is useful to evaluate their enrichment compared to their abundance in the whole genome.
+For instance, the locus of interest is rich in *TSS peaks* resembling gene promoters, which makes this region very interesting since SNPs can have crucial effects on transcription regulation when occurring in regulatory regions like
 promoters or enhancers.
 
 - The *peak counts and overlap* plots report the presence of both open chromatin regions (ATAC-seq) and 3D chromatin interactions (HiC arches), strengthening the epigenetic importance of the investigated locus in kidney cells.
@@ -892,18 +920,20 @@ In the current example we were exploiting public data from the human kidney cort
 in the context of renal health. Through a simple overview of the *chromosome 5* it was possible to identify a cluster of SNPs signifcantly correlating to CKD.
 By a closer investigation of this region it becomes evident that at least 6 of the most significant SNPs fall inside *SLC34A1 gene*. This gene encodes for a renal‐specific sodium–phosphate 
 cotransporter responsible for the readsorption of filtered sodium and phosphate and expressed in the proximal tubule within the renal cortex (Fearn et al. 2018)[[3]](#ref3).
-The clinical relevance of this gene product is supported by recent literature observing its downregulation in coditions of acute kidney injury (AKI)(Wilflingseder et al.)[[4]](#ref4).
+The clinical relevance of this gene product is supported by recent literature observing its downregulation in conditions of acute kidney injury (AKI)(Wilflingseder et al.)[[4]](#ref4).
 For a user that would like to further investigate a molecular mechanism linking SNPs to SLC34A1 deregulation, the example data loaded into ***Genomic Viewer*** suggest that in healty condition SLC34A1 is in a context of open chromatin, and is in gene rich region with multiple regulatory elements.
-Especially there is an overlap between the SNPs and an enhaner element, but also with several promoters. In turn HiC data revel the presence of a chromatin loop that connects the region upstream to SLC34A1 promtoer with 
+Especially there is an overlap between the SNPs and an enhancer element, but also with several promoters. In turn HiC data reveal the presence of a chromatin loop that connects the region upstream to SLC34A1 promtoer with 
 distal elements. Altogether, these information can suggest that the presence of SNPs in the SLC34A1 locus can alter the function of epigenetic regulatory elements and the expression of the gene.
-These hypothesis can be experimentally tested or adressed by integration of further genomic tracks, like RNA-seq or ChIP-seq.
+These hypothesis can be experimentally tested or addressed by integration of further genomic tracks, like RNA-seq or ChIP-seq.
 This is a simple example of how the integrative visualization of genomic tracks can guide biological research to investigate otherwise unforeseen features. 
 
 </details>
-
+</div>
 ------------------------------------------------------------------------
 
 ## Getting Help
+
+<div>
 <details open>
 <summary>&nbsp;</summary>
 
@@ -912,10 +942,11 @@ For **general support** questions, **reporting a bug** or **suggest a new featur
 For **confidential reports** you can contact us by [email](mailto:sara.lago@eurac.edu).
 
 </details>
-
+</div>
 ------------------------------------------------------------------------
 
 ## References and Links
+<div>
 <details open>
 <summary>&nbsp;</summary>
 
@@ -945,6 +976,6 @@ The *cytoband information* that were not directly available through `plotgardene
 *4.*<a id="ref4"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun 2020;11:3383.
 
 </details>
-
+</div>
 ------------------------------------------------------------------------
 
