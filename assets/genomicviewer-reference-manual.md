@@ -54,8 +54,8 @@ Here are some indications to correctly fill the configuration file:
 and `names` which is an array of quoted string to be used as labels for the input data.
 
 **Note:** 
-In the `ext` fields you can use regular expressions [regular expressions](https://www.geeksforgeeks.org/dsa/write-regular-expressions/) as input, use only the file extension as parameter or type the entire file name for safety.
-When loading several files of the same format through extension or regular expression please remember that file are alway read in alphabetical order, therefore their *name labels* must follow the file order to be correectly assigend.
+In the `ext` fields you can use [regular expressions](https://www.geeksforgeeks.org/dsa/write-regular-expressions/) as input, use only the file extension as parameter or type the entire file name for safety.
+When loading several files of the same format through extension or regular expression please remember that file are always read in alphabetical order, therefore their *name labels* must follow the file order to be correectly assigend.
 In the presence of multiple subfolders with data of the same file format, the `dir` field also accepts an arraz following the same rules of `name` labels arrays.
 When loading **.bam** files it is recommended to use the regular expression `$` to specify the end of the file extension (like this `.bam$`), this avoids to erroneously try to load the associated *.bai* files.
 
