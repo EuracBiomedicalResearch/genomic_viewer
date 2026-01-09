@@ -2,24 +2,29 @@
 
 # Example configuration file for Genomic Viewer, used in the tutorial.
 
-# XXX what does "default" mean? I am sure it's needed. Should have a quick
-# explanation. Also, why does the file start with three dashes in the first
-# line. Remember, the config file is the file where somebody can screw it up
-# all.
+    # Notes: 
+    # 1) Starting the file with three dashes is recommended to indicate where the file begins;
+    # 2) The 'default' key is required for the app to correctly load your configuration file.
+
 default:
 
   # Input files and track label handling.
 
-  # Data directory to search for.
-  # XXX This looks funny. Why do we have two slashes here? A leading slash
-  # normally indicates an absolute path. Needs explanation.
+  # Data parent directory to search for.
+    # Note: The data directory must be referenced with leading and trailing slashes,
+    # as Shiny resolves paths as absolute URLs from the app’s web root.
+    
   data.dir: "/data/"
-  # bigWig directory and list of files.
-  # Directory that contains bigWig data files.
+  
+  # Specific file formats section.
+    # Note: Specify the following keys information for every file section below:
+    # 1) 'dir': the directory that contains the files;
+    # 2) 'ent': the file extension or shorter substring matching one or multiple files with the same format;
+    # 3) 'names': list of the sample names to be displyed.
+
+  # BIGWIG files section.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  # XXX needs more explanation, also here in this file.
   bw.ext: "treat_pileup.bw"
-  # List of bigWig tracks to show.
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
   # BEDPE files section.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
@@ -41,6 +46,10 @@ default:
   cat.dir: ""
   cat.file: "regulatory_elements_hg38.bed"
   cat.names: ["Regulatory Elements"]
-  # XXX What is that?
+  
+  # File with user-defined list of coordines.
+    # Note: Specify the following keys:
+    # 1) 'dir': the directory that contains the file;
+    # 2) 'file': the file name or shorter matching substring.
   reg.dir: ""
   reg.file: "Example_region_table.bed"
