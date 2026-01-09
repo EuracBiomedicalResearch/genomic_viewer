@@ -1,34 +1,55 @@
 ---
 
+# Example configuration file for Genomic Viewer, used in the tutorial.
+
+    # Notes: 
+    # 1) Starting the file with three dashes is recommended to indicate where the file begins;
+    # 2) The 'default' key is required for the app to correctly load your configuration file.
+
 default:
 
-    # Set here the parameters related to the input files path and extensions
-  # Data directory
+  # Input files and track label handling.
+
+  # Data parent directory to search for.
+    # Note: The data directory must be referenced with leading and trailing slashes,
+    # as Shiny resolves paths as absolute URLs from the app’s web root.
+    
   data.dir: "/data/"
-  # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type "  " or [""] in names.
+  
+  # Specific file formats section.
+    # Note: Specify the following keys information for every file section below:
+    # 1) 'dir': the directory that contains the files;
+    # 2) 'ent': the file extension or shorter substring matching one or multiple files with the same format;
+    # 3) 'names': list of the sample names to be displyed.
+
+  # BIGWIG files section.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
   bw.ext: "treat_pileup_chr5.bw"
-  bw.names: ["Kidney cortex 12", "Kidney cortex 15"] # Comma separated, "quoted" names
-  # bedpe directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
+  # BEDPE files section.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
   bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
-  bedpe.names: ["HiC arches"] # Comma separated, "quoted" names
-  # bed or bam directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bedpe.names: ["HiC arches"]
+  # BED files section.
   bed.dir: "GSE212908_ATAC_peaks"
   bed.ext: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
-  bed.names: ["ATAC peaks"] # Comma separated, "quoted" names
-  # hic directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  bed.names: ["ATAC peaks"]
+  # HiC files section.
   hic.dir: "GSE212910_RAW_HiC"
   hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic"
-  hic.names: ["HiC cortex"] # Comma separated, "quoted" names
-  # GWAS directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
+  hic.names: ["HiC cortex"]
+  # GWAS files section.
   gwas.dir: "GWAScatalog_KidneyDisease"
   gwas.ext: "relocatedCol_chr5.tsv"
-  gwas.names: ["GWAS CDK"]
-  # categorical bed file. If empty type "  " or [""] in names. Columns must be names and the one with category must be 'category'.
+  gwas.names: ["GWAS chronic kidney disease"]
+  # Categorical BED files section.
   cat.dir: ""
   cat.file: "regulatory_elements_hg38_chr5.bed"
-  cat.names: ["Regulatory Elements"] # Comma separated, "quoted" names
-  # file with selected genomic regions to be imported (bed format: chr, start end, name. No header). If empty type "  " or [""] in names.
+  cat.names: ["Regulatory Elements"]
+  
+  # File with user-defined list of coordines.
+    # Note: Specify the following keys:
+    # 1) 'dir': the directory that contains the file;
+    # 2) 'file': the file name or shorter matching substring.
   reg.dir: ""
   reg.file: "Example_region_table.bed"
