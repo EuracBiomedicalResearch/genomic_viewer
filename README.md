@@ -1,8 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 
 # Genomic Viewer
 
@@ -100,7 +95,7 @@ application running.
     WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) (optional, if
     not enabled ***Genomic Viewer installer*** will do this for you).
 -   Download `genomicviewer-gui-installer` file for Windows from
-    [GitHub](https://github.com/sarlago/Electron_GV_installer).
+    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron).
 
 **Installation:**
 
@@ -116,7 +111,7 @@ application running.
 -   Install [Docker Desktop for
     macOS](https://docs.docker.com/desktop/setup/install/mac-install/).
 -   Download `genomicviewer-gui-installer` file for macOS from
-    [GitHub](https://github.com/sarlago/Electron_GV_installer).
+    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron).
 
 **Installation:**
 
@@ -137,7 +132,7 @@ application running.
     mode](https://docs.docker.com/engine/security/rootless/) is configured on
     their system.
 -   Download `genomicviewer-gui-installer` file for Linux from
-    [GitHub](https://github.com/sarlago/Electron_GV_installer).<br> **Note:**
+    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron).<br> **Note:**
     Linux installer provides both *.deb* package for Debian-based
     distributions and *.rpm* package for Red Hat-based distributions. A
     self-contained app is also available for non-root users.
@@ -376,7 +371,7 @@ reference manual.
 
 ***Genomic Viewer*** and its [Electron](https://www.electronjs.org/)-based
 ***GUI installer*** source code are freely available through
-[GitHub](https://github.com/sarlago) under the MIT Licence.
+[GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer) under the MIT Licence.
 </div>
 </details>
 
