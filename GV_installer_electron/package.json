@@ -1,0 +1,39 @@
+{
+  "name": "genomicviewer-gui-installer",
+  "product": "Genomic Viewer",
+  "version": "1.0.0",
+  "description": "Shiny based app for the visualization and basic analysis of NGS data.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "clean": "rimraf ./out",
+    "package": "npm run clean && electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
+  },
+  "keywords": [
+    "Next Generation Sequencing",
+    "genome browser",
+    "data visualization",
+    "shiny app"
+  ],
+  "author": "Sara Lago",
+  "license": "MIT",
+  "dependencies": {
+    "create-desktop-shortcuts": "^1.11.1",
+    "electron-squirrel-startup": "^1.0.1",
+    "hazardous": "^0.3.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.8.3",
+    "@electron-forge/maker-deb": "^7.9.0",
+    "@electron-forge/maker-dmg": "^7.9.0",
+    "@electron-forge/maker-rpm": "^7.9.0",
+    "@electron-forge/maker-squirrel": "^7.9.0",
+    "@electron-forge/maker-zip": "^7.9.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.9.0",
+    "@electron-forge/plugin-fuses": "^7.9.0",
+    "@electron/fuses": "^1.8.0",
+    "electron": "^38.2.1"
+  }
+}

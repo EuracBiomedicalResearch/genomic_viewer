@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GenomicViewer Installer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    #log {
+      background: #eee;
+      padding: 10px;
+      height: 330px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      white-space: pre-line;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+	/* Progress bar container */
+#loading {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+/* Progress bar background */
+#progressBar {
+  flex-grow: 1;
+  height: 15px;
+  background: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Progress bar fill */
+#progressFill {
+  height: 100%;
+  width: 0%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+  border-radius: 5px 0 0 5px;
+}
+
+/* Progress text */
+#progressText {
+  font-size: 0.85rem;
+  min-width: 150px;
+  font-weight: 600;
+  color: #333;
+}
+  </style>
+  
+<!-- Title section -->
+</head>
+<body>
+ <div style="display: flex; align-items: center;">
+   <img src="assets/GV_installer_logo.png" alt="GV Icon" style="width:120px; height:120px; vertical-align:center; margin-right:40px; margin-bottom:15px;">
+  <h2 style="margin: 4; vertical-align:top">GenomicViewer Installer</h2>
+
+ </div>
+
+<!-- Log output -->
+  <div style="white-space: pre-wrap;" id="log">Click "Start Installation" to begin...&#10;</div><br>
+  
+  <!-- Progress bar container -->
+<div id="loading" style="display:none; align-items:center;">
+  <div id="progressBar" style="width: 100%; background: #eee; height: 20px; border-radius: 5px; overflow: hidden;">
+    <div id="progressFill" style="width: 0%; background: #4caf50; height: 100%; transition: width 0.3s ease;"></div>
+  </div>
+  <span id="progressText" style="margin-left: 10px;"></span>
+</div>
+  
+<!-- Buttons -->
+  <button id="startBtn">Start Installation</button>
+  <button id="dockerBtn" style="display: none;">Open Docker Desktop</button>
+  <button id="retryBtn" style="display: none;">Retry</button>
+  <button id="exitBtn" style="display:none;">Finish</button>
+
+  <script src="./renderer.js"></script>
+</body>
+</html>
