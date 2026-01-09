@@ -16,7 +16,7 @@
 <summary>&nbsp;</summary>
 
 1.  [Configuration](#configuration)
-2.  [File formats](#file-formats)
+2.  [File Formats](#file-formats)
 3.  [Features and Usage](#features-and-usage)
 4.  [Tutorial](#tutorial)
 5.  [Getting Help](#help)
@@ -284,7 +284,7 @@ Sometimes publicly deposited **.bam** files are not indexed, in order to index a
 
 ------------------------------------------------------------------------
 
-## Features and usage
+## Features and Usage
 
 In the following section the user will find a detailed description of the main functions that are available from ***Genomic Viewer*** interface.
 
