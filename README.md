@@ -192,13 +192,13 @@ section](assets/genomicviewer-reference-manual.md#configuration). ***Genomic
 Viewer*** determines the data type and label based on the configuration file
 entries.
 
-See [File Formats](assets/genomicviewer-reference-manual.md#file-formats) for
+See [File Formats](assets/genomicviewer-reference-manual.md #file-formats) for
 information on the supported data formats in the [Configuration
 section](#configuration). Additional configuration options like track plots
 alternatives, transcript or gene label annotation and chromosome display are
 available from the graphical interface and are thoroughly described in the
 [Features and Usage
-section](assets/genomicviewer-reference-manual.md#features-and-usage). Ensure
+section](assets/genomicviewer-reference-manual.md #features-and-usage). Ensure
 that the data you want to load are saved in the `data/` directory that was
 created upon ***GenomicViewer*** installation. Pay attention to load only data
 files with matching reference genome.
