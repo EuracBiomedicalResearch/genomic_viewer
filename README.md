@@ -192,7 +192,7 @@ section](assets/genomicviewer-reference-manual.md#configuration). ***Genomic
 Viewer*** determines the data type and label based on the configuration file
 entries.
 
-See [File Formats](assets/genomicviewer-reference-manual.md #file-formats) for
+See [File Formats](#file-formats) for
 information on the supported data formats in the [Configuration
 section](#configuration). Additional configuration options like track plots
 alternatives, transcript or gene label annotation and chromosome display are
