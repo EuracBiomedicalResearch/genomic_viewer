@@ -4,7 +4,7 @@
 
     # Notes: 
     # 1) Starting the file with three dashes is recommended to indicate where the file begins;
-    # 2) The 'default' key is required for the app to correctly load your configuration file.
+    # 2) The 'default' key is required for the app to correctly recognize your configuration file.
 
 default:
 
@@ -19,7 +19,7 @@ default:
   # Specific file formats section.
     # Note: Specify the following keys information for every file section below:
     # 1) 'dir': the directory that contains the files;
-    # 2) 'ent': the file extension or shorter substring matching one or multiple files with the same format;
+    # 2) 'ext': the file extension or shorter substring matching one or multiple files with the same format;
     # 3) 'names': list of the sample names to be displyed.
 
   # BIGWIG files section.
@@ -51,5 +51,6 @@ default:
     # Note: Specify the following keys:
     # 1) 'dir': the directory that contains the file;
     # 2) 'file': the file name or shorter matching substring.
+    
   reg.dir: ""
   reg.file: "Example_region_table.bed"
