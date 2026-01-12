@@ -49,24 +49,88 @@ options(shiny.port = 8180)
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
+## Load config_gen file with genome annotations, not modifyiable bu the user.
 config_gen <- config::get(file = "GenomicViewer_config_gen.yml")
-config <- config::get(file = "/data/GenomicViewer_config.yml")
 
-## Read data
+## Load config file and handle parsing errors like invalid YAML, bad indentation, missing ":".
+config <- tryCatch(
+  config::get(file = "/data/GenomicViewer_config.yml"),
+  error = function(e) {
+    stop("#### CONFIGURATION ERROR #### \n GenomicViewer_config.yml: ", e$message, call. = FALSE)
+  }
+)
+
+# Validate required keys in config file
+required.keys <- c("data.dir", "bw.dir", "bw.file", "bw.names", "bedpe.dir", 
+                   "bedpe.file", "bedpe.names", "bed.dir", "bed.file", 
+                   "bed.names", "hic.dir", "hic.file", "hic.names", "gwas.dir", 
+                   "gwas.file", "gwas.names", "cat.dir", "cat.file", "cat.names", 
+                   "reg.dir", "reg.file")
+missing.keys <- setdiff(required.keys, names(config))
+
+if (length(missing.keys) > 0) {
+  stop(
+    "#### CONFIGURATION ERROR #### \n Missing required config keys: ",
+    paste(missing.keys, collapse = ", "),
+    call. = FALSE
+  )
+}
+
+# Validate expected extensions are correctly assigned to keys
+# Define expected extensions for certain keys
+expected.ext <- list(
+  "bw.file"  = c(".bw", ".bigwig"),
+  "bedpe.file" = ".bedpe",
+  "bed.file" = c(".bed", ".tsv", ".txt"),
+  "hic.file" = c(".hic"),
+  "gwas.file" = c(".tsv", ".txt"),
+  "cat.file" = c(".bed", ".tsv", ".txt"),
+  "reg.file" = c(".bed", ".txt", ".tsv")
+)
+compressed.ext <- c(".gz", ".zip", ".bz2", ".xz", ".tgz", ".tar")
+
+# Check config keys 
+for (key in names(config)) {
+  # Only process keys ending with .file
+  if (grepl("\\.file$", key, ignore.case = TRUE)) {
+    value <- config[[key]]
+    # Skip if value is empty
+    if (is.null(value) || value == "") next
+    # Remove compression ext
+    value <- gsub(paste(compressed.ext, collapse = "|"), "", value)
+    # Get file extension including dot, lowercased
+    ext <- paste0(".", tolower(tools::file_ext(value)))
+    # Determine expected extensions for this key
+    if (key %in% names(expected.ext)) {
+      allowed <- expected.ext[[key]]
+    } else {
+      # Default: accept any extension
+      next
+    } # Check if the extension is valid
+    if (!(ext %in% tolower(allowed))) {
+      stop(sprintf(
+        "#### CONFIGURATION ERROR #### \n File extension error: '%s' should have extension %s but got '%s'.",
+        key, paste(allowed, collapse = " or "), ext
+      ))
+    }
+  }
+}
+
+## Read data from config file
 # Set a BigWig file
-bw.file <- dir(paste(config$data.dir, config$bw.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bw.file)
+bw.file <- dir(file.path("/", config$data.dir, config$bw.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bw.file)
 # Set a bed file
-bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bedpe.file)
+bedpe.file <- dir(file.path("/", config$data.dir, config$bedpe.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bedpe.file)
 # Set a bedpe file
-bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bed.file)
+bed.file <- dir(file.path("/", config$data.dir, config$bed.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bed.file)
 # Set hiC data file
-hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.file)
+hic.file <- dir(file.path("/", config$data.dir, config$hic.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.file)
 # Set GWAS data file
-gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.file)
+gwas.file <- dir(file.path("/", config$data.dir, config$gwas.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.file)
 # Categorical bed file
-cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
+cat.file <- dir(file.path("/", config$data.dir, config$cat.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
 # Region Table file
-saved.coord.path <- dir(paste(config$data.dir, config$reg.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
+saved.coord.path <- dir(file.path("/", config$data.dir, config$reg.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
 saved.coord <- read_delim(saved.coord.path, "\t", col_names = F, show_col_types = F)
 saved.coord <- apply(saved.coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
 saved.coord <- gsub(" ", "", saved.coord) # remove eventual white spaces
@@ -105,7 +169,7 @@ ui <- page_sidebar(
          )),
          div(style="display:flex; align-items:center; gap:8px; margin-top:-20px; margin-left:-7px;",
              tags$label("chr", style="margin:0; padding-bottom:15px; width:19%; text-align:right;"),
-             selectizeInput('chr', NULL, selected = "1", choices = c(as.character(seq(1:22)), "X", "Y"), multiple = F)
+             selectizeInput('chr', NULL, selected = "5", choices = c(as.character(seq(1:22)), "X", "Y"), multiple = F)
          ),
          # coordinates
          div(style="display:flex; align-items:center; gap:8px; margin-top:-30px; margin-left:-7px;",
@@ -316,13 +380,13 @@ server <- function(input, output, session){
   ##---------------------- Read reference genome related files
   # Genes hgnc symbol
   genes.hgnc <- eventReactive(input$ref.genome, {
-  genes.hgnc.path <- paste(config_gen$genes.hgnc.dir, "/", gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep="")
+  genes.hgnc.path <- file.path(config_gen$genes.hgnc.dir, paste(gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep=""))
   genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
   })
   
   ### For chromosomes plotting
   chrom.cen.df <- eventReactive(input$ref.genome, {
-  chrom.cen.path <- paste(config_gen$chrom.cen.dir, "/chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep="")
+  chrom.cen.path <- file.path(config_gen$chrom.cen.dir, paste("chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep=""))
   chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
   })
   
@@ -339,11 +403,11 @@ server <- function(input, output, session){
     if (ref.genome %in% c("hg19", "hg38", "mm10")){
       cytoband <- NULL
     } else if (ref.genome == "T2T"){
-      cytoband <- read_delim(paste(config_gen$chrom.cen.dir, "/chm13v2.0_cytobands_allchrs.bed", sep=""), delim = "\t", col_names = F)
+      cytoband <- read_delim(file.path(config_gen$chrom.cen.dir, "chm13v2.0_cytobands_allchrs.bed"), delim = "\t", col_names = F)
       colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
       return(cytoband)
     } else if (ref.genome == "mm39"){
-      cytoband <- read_delim(paste(config_gen$chrom.cen.dir, "/cytoBand_GRCm39.txt", sep=""), delim = "\t", col_names = F)
+      cytoband <- read_delim(file.path(config_gen$chrom.cen.dir, "cytoBand_GRCm39.txt"), delim = "\t", col_names = F)
       colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
       return(cytoband)
     }
