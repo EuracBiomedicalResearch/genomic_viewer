@@ -46,41 +46,44 @@ sleep 25
 echo "Opening browser at http://localhost:8180"
 #open "http://localhost:8180"
 URL="http://localhost:8180"
+GV_ERROR=0
 
 while true; do
-    # Get HTTP status code
+	    # Detect container failure (once)
+    if [[ "$GV_ERROR" -eq 0 ]]; then
+        if ! docker ps --filter "ancestor=sarlago/shiny-docker-genomicviewer2" \
+            --format '{{.ID}}' | grep -q .; then
+            GV_ERROR=1
+            echo "Genomic Viewer failed during startup. Waiting silently..."
+        fi
+    fi
+	    # Get HTTP status code
     status=$(curl -s -o /dev/null -w '%{http_code}' "$URL")
     if [[ "$status" == "200" ]]; then
         echo "GV is ready! Opening browser..."
-        open "$URL"      # macOS
-		
-		echo "Browser opened. Monitoring availability of $URL ..."
-            # Loop until page is NOT available
-            while true; do
-                status=$(curl -s -o /dev/null -w '%{http_code}' "$URL")
-                if [[ "$status" != "200" ]]; then
-                    echo "Page is no longer available (status $status). Exiting."
-                    break
-                fi
-                sleep 2
-            done
-
-        else
-            echo "Please open your browser and go to: $URL"
-            echo "Waiting until $URL is not available anymore..."
-            while true; do
-                status=$(curl -s -o /dev/null -w '%{http_code}' "$URL")
-                if [[ "$status" != "200" ]]; then
-                    echo "$URL is no longer available (status $status). Exiting."
-                    break
-                fi
-                sleep 2
-            done
+        if command -v xdg-open &>/dev/null; then
+			xdg-open $URL 2>&1 | tee out.log 
+			echo "Browser opened. Monitoring availability of $URL ..."
+			else
+				echo "Please open your browser and go to: $URL"
+				echo "Monitoring availability of $URL ..."
         fi
-
-        break
-    else
-        echo "Waiting for GV... (status $status)"
-        sleep 1
+            # Loop until page is NOT available
+                    while true; do
+            status=$(curl -s -o /dev/null -w '%{http_code}' "$URL")
+            if [[ "$status" != "200" ]]; then
+                echo "Page is no longer available (status $status). Exiting."
+                exit 0
+            fi
+            sleep 2
+        done
     fi
+
+    # Print waiting message only if no error occurred
+    if [[ "$GV_ERROR" -eq 0 ]]; then
+        echo "Waiting for GV... (status $status)"
+    fi
+
+    sleep 1
 done
+

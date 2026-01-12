@@ -48,14 +48,25 @@ set URL=http://localhost:8180
 REM Check if page responds with 200 OK
 for /f "tokens=*" %%i in ('curl -s -o nul -w "%%{http_code}" %URL%') do set status=%%i
 
+REM Detect failure: container no longer running
+docker ps --filter "ancestor=sarlago/shiny-docker-genomicviewer2" --format "{{.ID}}" | findstr . >nul
+if errorlevel 1 (
+    set GV_ERROR=1
+)
+
 if "%status%"=="200" (
     echo GV is ready! Opening browser...
     start "" "%URL%"
     goto end
-) else (
-    echo Waiting for GV to start...
-    timeout /t 1 >nul
-    goto waitloop
+)
+
+REM Print message only if no error has occurred
+if "%GV_ERROR%"=="0" (
+    echo Waiting for GV to start
+)
+
+timeout /t 1 >nul
+goto waitloop
 )
 
 :end
