@@ -54,15 +54,15 @@ config <- config::get(file = "/data/GenomicViewer_config.yml")
 
 ## Read data
 # Set a BigWig file
-bw.file <- dir(paste(config$data.dir, config$bw.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bw.ext)
+bw.file <- dir(paste(config$data.dir, config$bw.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bw.file)
 # Set a bed file
-bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bedpe.ext)
+bedpe.file <- dir(paste(config$data.dir, config$bedpe.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bedpe.file)
 # Set a bedpe file
-bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bed.ext)
+bed.file <- dir(paste(config$data.dir, config$bed.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bed.file)
 # Set hiC data file
-hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.ext)
+hic.file <- dir(paste(config$data.dir, config$hic.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.file)
 # Set GWAS data file
-gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.ext)
+gwas.file <- dir(paste(config$data.dir, config$gwas.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.file)
 # Categorical bed file
 cat.file <- dir(paste(config$data.dir, config$cat.dir, sep=""), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
 # Region Table file
