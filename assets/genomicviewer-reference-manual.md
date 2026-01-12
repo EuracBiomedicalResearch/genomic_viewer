@@ -107,6 +107,29 @@ Here are some points to consider when modifying the configuration file:
    explicit.
 -->
 
+<!-- General recommendatation:
+
+ I have used a (hopefully) consistent way for formatting text. Yours was full
+ emphasis markup that did not improve readability. Please stick to this now.
+
+ - Consistently write ***Genome Viewer*** as virtually the almost only font
+   variant.
+ - Buttons are only *ButtonName*. Eg. 'Hitting the *Go* button'.
+ - Same with all the panels and other graphical elements we refer by name:
+   only their name is emphasized with markup. *Stats* panel.
+   *Input coordinates:* panel.
+ - Genomic file types are written as they should be (BED, BEDPE, BAM, bugWig).
+ - A graphics file format is upper case (PNG, SVG, PDF, ...) and a file
+   extension used in a file name is lower case (.png, .svg, .pdf).
+ - You have a highly repetetive language, I have tried to remove frequently
+   repeated phrases.
+ - Your language is also quite prosaic, use of 'easy, nicely,...' adjectives is
+   discouraged unless really intended.
+ - Tried to avoid using 'The user...' sentences in many cases. Indirect speech
+   is better. 'You' and 'One' is also ok in some cases.A
+ - Break lines in this file at 80 characters.
+-->
+
 **Note:** In the `ext` fields you can use regular expressions as input, use only
 the file extension as parameter or type the entire file name for safety.  When
 loading several files of the same format through extension or regular expression
@@ -1141,133 +1164,244 @@ Viewer*** interface:
 <details open>
 <summary>&nbsp;</summary>
 
-This section contains an easy tutorial explaining how to use ***Genomic Viewer*** through a practical example with real data.
+This section contains a tutorial explaining how to use ***Genomic Viewer***
+through a practical example with real data.
 
 In this tutorial you will learn how to:
 - Correctly set navigation parameters to visualize genomic tracks.
-- Navigate throughout the genome.
-- Generate a plot with diverse genomic data.
-- Export subset of the raw data.
+- Navigate the genome.
+- Generate a plot with different genomic data tracks.
+- Export a subset of the raw data.
 - Evaluate data based on the stats.
-- Formulate biological hypothesis driven by data integration.
+- Formulate a biological hypothesis driven by data exploration.
 
 ### Loading usage example data
 
-The genomic data to be loaded must be entered through the `GenomicViewer_config.yml` configuration file as described in the [Configuration section](#configruation).
-In this tutorial we will exploit as usage example the data that are loaded by default in the pre-compiled *configuration file* that is saved upon ***Genomic Viewer*** installation.
-These are publicly available data from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)*.
-*Note:* The dataset which is made available upon ***Genomic Viewer*** installation only includes *chromosome 5* as lightweight sample. For the user that wants full data accessibility please see [References and Links](#references-links)
-and download data form source databases. Save the files in the `./data` folder and update the **configuration file** with the correct file paths and labels.
+The genomic data to be loaded must be specified in the
+`GenomicViewer_config.yml` configuration file as described in the [configuration
+section](#configruation). The data used in this tutorial are already
+pre-installed and the configuration file is ready for use, too.  We are
+analyzing publicly available data from the *Human Kidney cortex* and *Chronic
+Kidney Disease (CKD)* publications.  *Note:* The dataset is limited to
+chromosome 5 to keep the installation lean. The whole datasets are specified in
+[References and Links](#references-links) and can be downloaded from there.
+Place the files in the `./data` folder and update the configuration file with
+the correct file paths and labels.
 
-<img src="GV_configuration_example.png" alt="GV configuration file and data" width="80%">
+<img src="GV_configuration_example.png"
+     alt="GV configuration file and data"
+     width="80%">
 
 ### Biological question
 
-When loading custom datasets in ***Genomic Viewer*** the choice can be driven by either **technical or biological** questions. The visualization of genomic tracks can indeed validate the quality of both sequencing raw data and some downstream analysis,
-like **peak calling**[[2]](#ref2). In addition, it is also very useful to address biological questions.
-Considering the data that are loaded as usage example in the present tutorial, an interesting biological question can be to *identify SNPs (from the GWAS data) found in CKD patients that are associated to relevant genes for kidney function*.
+In this tutorial we are going to investigate SNPs from a GWA study investigating
+CKD. We are interested in finding genes associated with kidney function.
 
 ### Genome selection, navigation and plot inspection
 
-Before starting to inspect the data tracks it is essential to select the correct reference genome. When ***Genomic Viewer*** is started it loads by default the human *reference genome hg19* (GRCh19).
-The usage example data are mapped to the human *reference genome hg38* (GRCh38). Therefore the first thing to do to ensure correct annotation of the data is to choose the right version of the genome from the top left dropdown menu.
+Before starting to inspect the data tracks we have to select the correct
+reference genome. When ***Genomic Viewer*** is started it loads by default the
+human reference genome hg19 (GRCh19). However, the example data are mapped to
+the human reference genome hg38 (GRCh38). Therefore, we first select the
+appropriate reference genome from the dropdown menu in the left sidebar.
 
 <img src="GV_ref_genome.png" alt="GV reference genome selection" width="20%">
+<!-- This is the first time I see GRCh19 written. So far, it has always been
+GRCh37 or hg19. This should be altered... I just remember that Ensembl always
+wrote GRCh37 and GRCh38 whereas NCBI talked about hg. -->
 
-Since the example data used in this tutorial include the whole *chromosome 5* we can start taking an overview of the entire chromosome 5 by clicking on it form the **Choose chromosome** interactive plot
-in the upper right sidebar.
+The example dataset contains the full chromosome 5, so we can visualize it by
+clicking on the respective chromosome in the *Choose chromosome* interactive
+graphics in the upper right sidebar.
 
-<img src="GV_choose_chrom.png" alt="GV interactive chromosome hover plot" width="25%">
+<img src="GV_choose_chrom.png" alt="GV interactive chromosome hover plot"
+     width="25%">
 
-Upon click you will see that the coordinates are passed to the *Load coordinates* panel on the left sidebar. Make sure that the *Plot* navigation tab is selected form the main central window.
-Next click the *Go button* to generate the corresponding genomic screenshot plot.
+Clicking on chromosome 5 passes the coordinates to the *Load coordinates* panel
+on the left sidebar. Make sure that the *Plot* navigation tab is selected in the
+main central window.  Next click the *Go* button to generate the genomic plot.
 
-<img src="GV_navigation_tabs.png" alt="GV navigation tabs Plot selected" width="20%">
+<img src="GV_navigation_tabs.png" alt="GV navigation tabs Plot selected"
+     width="20%">
 
-<img src="GV_chr5_overview.png" alt="GV overview of chromosome 5 example genomic tracks" width="80%">
+<img src="GV_chr5_overview.png"
+     alt="GV overview of chromosome 5 example genomic tracks"
+     width="80%">
 
-From a quick look at the generated plot, a cluster of significant SNPs close to the right chromosome end appear from the GWAS data. It is worthy to take a close look.
-For this aim the user can employ the *drag and drop zoom bar* at the bottom of the plot. In this tutorial the coordinates of the region around the SNPs cluster were already saved as custom coordinates list
-and uploaded as default through the configuration file. The user can access these coordinates form the from the *Load Coordinates* panel in the left sidebar.
-By clicking on the first entry in the list, the corresponding coordinates (relative to the gene SLC34A1) are passed to the tool and the *Insert Coordinates* panel will automatically update.
+In the Manhattan plot, We notice a pileup of significant SNPs close to the right
+chromosome end. We want to look in more detail at this region, so we use the
+*drag and drop zoom bar* at the bottom of the plot. For quick access, we have
+already preloaded these coordinates as a custom coordinates list. This is
+accessed via the *Load Coordinates* panel in the left sidebar. By clicking on
+the first entry in the list, the corresponding coordinates (relative to the gene
+SLC34A1) are passed to the tool and the *Insert Coordinates* panel will
+automatically update.
+<!-- That is cool. And I would like to see the same behavior for the Search by
+gene functionality, as I have already written above. -->
 
-<img src="GV_region_table_example.png" alt="GV coordinates selection from custom list" width="25%">
+<img src="GV_region_table_example.png"
+     alt="GV coordinates selection from custom list"
+     width="25%">
 
-As before, make sure that the *Plot* navigation tab is selected form the main central window. Next click the *Go button* to generate the corresponding genomic screenshot plot.
-If you are not satisfied of the output you can adjust the selected genomic range by zooming-in and out through the zoom panel at the bottom of the *Plot tab* and
-eventually save the new coordinates in the region table by clicking on the *Add button*.
+Again, make sure that the *Plot* navigation tab is selected in the main central
+window. Next click the *Go* button to render the visualization. Feel free to
+play with the different zoom options (either on the location bar or with the
+zoom buttons). The new visualization range can be saved by pressing the *Add*
+button.
 
-<img src="GV_chr5_zoom.png" alt="GV zoom of chromosome 5 example genomic tracks" width="80%">
+<img src="GV_chr5_zoom.png"
+     alt="GV zoom of chromosome 5 example genomic tracks"
+     width="80%">
 
-From the zoomed plot we can distinguish more clearly the significant SNPs, the gene in which they are found (SLC34A1) and some epigenetic features of this locus, like the presence of *regulatory elements*, *ATAC-seq peaks* and the proximity to a *3D chromatin loop* (HiC arch).
+In the enlarged visualization focusing on *SLC34A1*, we note the presence of
+some epigenetic features, like the presence of regulatory elements, ATAC-seq
+peaks and the proximity to a 3D chromatin loop (HiC arch).
+<!-- Put more biological meat on this bone here. (I have not read to the end
+of the tutorial, but here it would already be good to know why this is
+interesting. -->
 
 
 ### Download of the genomic view plot
 
-Once you are satisfied of the generated genomic view plot you can choose to download it through the *Save button* in the bottom left sidebar. This will open a popup window through which you can choose the file format
-among: .pdf, .svg, .png and .jpeg. See *Export Functionalities* in the [Features and Usage](#features-and-usage) section.
+A snapshot of the currently displayed visulization can be downloaded by pressing
+the *Save* in the bottom left sidebar. This will open a popup window offering
+different file formats for saving the image: SVG, PDF, PNG and JPG. See *Export
+Functionalities* in the [Features and Usage](#features-and-usage) section.
 
-<img src="GV_save_window.png" alt="GV save button and popup window with export formats" width="60%">
+<img src="GV_save_window.png"
+     alt="GV save button and popup window with export formats"
+     width="60%">
 
 ### Export raw data subsets
 
-In addition to the plot of genomic tracks, ***Genomic Viewer*** offers the possibility to investigate the input data more deeply. One of the provided options to easily extract details about a user selected genomic range
-is through the *Data tab* of the main central window.
+In addition to plotting genomic tracks, ***Genomic Viewer*** offers the
+possibility to investigate the input data more deeply. This is done in the
+*Data* tab of the central window.
 
-<img src="GV_navigation_tabs_data.png" alt="GV navigation tabs Data selected" width="20%">
+<img src="GV_navigation_tabs_data.png"
+     alt="GV navigation tabs Data selected"
+     width="20%">
 
-From here you can export a filtered version of the raw data of some of the tracks, limited to the region that you selected from the genome navigation options.
-In the working example the region is the one corresponding to SLC34A1 gene (chr5: 177365507-177412577) and this option is useful to:
-- Extract the *rs IDs* and the *alternative DNA bases* in the two SNPs alleles, from the GWAS table.
-- Evaluate the category of the *regulatory elements* that are found in the risk locus.
-- Understand if there is overlap with *open chromatin ATAC-seq* peaks.
+From here you can export the raw data, limited to the region that you selected
+from the genome navigation options. In the working example the region is the
+one corresponding to SLC34A1 gene (chr5: 177365507-177412577) and this option is
+useful to:
 
-For example we can easily see that the 4 SNPs above the significance threshold have the following IDs: rs3812035, rs6420094, rs6862195, rs7447593. This can be useful to search the literature for reported information on their effect on CKD or other pathologies.
+- Extract the dbSNP IDs and the alternative DNA bases in the two SNPs alleles
+  from the GWAS table.
+- Inspect the category of the regulatory elements that are found in the risk
+  locus.
+  <!-- Isn't that somehow visualized? By color or so? -->
+- Understand if there is overlap with open chromatin ATAC-seq peaks.
+  <!-- Why can this not be seen in the genomic plot?? -->
 
-While form the visual inspection of the plot we can only gain qualitative readouts, the possibility to export the detailed information from the raw data allow the formulation of more robust interpretations.
+For example we can see that the 4 SNPs above the significance threshold have the
+following IDs: rs3812035, rs6420094, rs6862195, rs7447593. With these IDs, we
+can interrogate the literature for reported information on their effect on CKD
+or other pathologies.
+<!-- Well, this is like the carrot in front of the mule. What's up now with
+these SNPs? Dive in, we want to tell a story! Where are they exactly located.
+Are they even changing the codeing sequence? -->
 
-The subset tables can be inspected form the application interface preview or downloaded from the *Download button* below each table.
+While from the visual inspection of the plot we can only gain qualitative
+readouts, the possibility to export the detailed information from the raw data
+allow the formulation of more robust interpretations.
+<!-- How? You owe the reader what he might do from here on. -->
 
-<img src="GV_gwas_table_example.png" alt="GV export table with data subset" width="60%">
+The tables can be inspected in the application interface preview or downloaded
+from the *Download* button below each table.
 
-### Evaluate data from stats
+<img src="GV_gwas_table_example.png" alt="GV export table with data subset"
+     width="60%">
 
-***Genomic Viewer*** also offers a handful of dataset-specific plots accessible from the *Stats tab*.
+### Evaluation of data (Stats tab)
 
-<img src="GV_navigation_tabs_stats.png" alt="GV navigation tabs Stats selected" width="20%">
+***Genomic Viewer*** also offers some dataset-specific plots accessible from the
+*Stats* tab.
 
-Each of these plot can be generated by clicking the *Run* button in the corresponding section.
-Since our example include all the data types associated to a Stats plot you can try to generate all of them. For a detailed description of the single plots you can refer to the *Analysis Tools* in the [Features and Usage](#features-and-usage) section.
+<img src="GV_navigation_tabs_stats.png" alt="GV navigation tabs Stats selected"
+     width="20%">
 
-For the purpose of this tutorial we will only describe the outputs that provides more relevant insights for the proposed biological question:
+Each of these plot can be generated by clicking the *Run* button in the
+corresponding section.  Since our example include all the data types associated
+to a Stats plot you can try to generate all of them. For a detailed description
+of the single plots you can refer to the *Analysis Tools* in the [Features and
+Usage](#features-and-usage) section.
 
-- We have a *Manhattan plot* that summarizes in a single view what we already observed from the two genomic screen that were evaluated. There is a putative risk locus with a *cluster of significant SNPs* associated with CKD in the right telomere proximal region
-of chromosome 5. A zoom-in of this region is useful to visually report the *rs IDs* of the significant SNPs as an alternative to the table generated in the *Data tab*.
+Next, we are going to concentrate on the following aspects related to our
+biological question:
 
-- From the zoomed genomic screen comprising the risk locus we noticed the presence of several *regulatory elements*. The *categorical classification* chart is useful to evaluate their enrichment compared to their abundance in the whole genome.
-For instance, the locus of interest is rich in *TSS peaks* resembling gene promoters, which makes this region very interesting since SNPs can have crucial effects on transcription regulation when occurring in regulatory regions like
-promoters or enhancers.
+- The Manhattan plot shows a putative risk locus with a cluster of significantly
+  associated SNPs in the right telomere proximal region of chromosome
+  5. A zoom-in of this region is useful to visually report the dbSNP IDs of the
+  significant SNPs as an alternative to the table generated in the *Data* tab.
 
-- The *peak counts and overlap* plots report the presence of both open chromatin regions (ATAC-seq) and 3D chromatin interactions (HiC arches), strengthening the epigenetic importance of the investigated locus in kidney cells.
+- From the zoomed genomic screen comprising the risk locus we noticed the
+  presence of several regulatory elements. The categorical classification chart
+  is useful to evaluate their enrichment compared to their abundance in the
+  whole genome. For instance, the locus of interest is rich in TSS peaks
+  resembling gene promoters. An altered DNA sequence can have crucial effects on
+  transcription regulation when occurring in regulatory regions like promoters
+  or enhancers.
 
-<img src="GV_stats_example.png" alt="GV example of stats plot relative to kidney data" width="80%">
+- The peak counts and overlap plots report the presence of both open chromatin
+  regions (ATAC-seq) and 3D chromatin interactions (HiC arches), strengthening
+  the epigenetic importance of the investigated locus in kidney cells.
+  <!-- Again, do we really need to look at table to see this? Isn't it
+  obvious from the visualization? -->
+
+<img src="GV_stats_example.png"
+     alt="GV example of stats plot relative to kidney data"
+     width="80%">
 
 
 ### Biological interpretation
 
-***Genomic Viewer*** combines interactive visual inspection of genomic data with essential analytical features.By enabling comparison across datasets and conditions, the tool helps identify patterns,
-trends, and regions of interest. In turn it allows to both answer to simple biological questions and guide the formulation of new hypotheses.
+***Genomic Viewer*** combines interactive visual inspection of genomic data with
+basic analytical features. By enabling comparison across datasets and
+conditions, the tool helps to identify patterns, trends, and regions of
+interest facilitating biological interpretation and hypothesis building.
 
-In the current example we were exploiting public data from the human kidney cortex and from patients with CKD to identify single nucleotide variants that can impact on the correct gene expression and functionality
-in the context of renal health. Through a simple overview of the *chromosome 5* it was possible to identify a cluster of SNPs signifcantly correlating to CKD.
-By a closer investigation of this region it becomes evident that at least 6 of the most significant SNPs fall inside *SLC34A1 gene*. This gene encodes for a renal‐specific sodium–phosphate
-cotransporter responsible for the readsorption of filtered sodium and phosphate and expressed in the proximal tubule within the renal cortex (Fearn et al. 2018)[[3]](#ref3).
-The clinical relevance of this gene product is supported by recent literature observing its downregulation in conditions of acute kidney injury (AKI)(Wilflingseder et al.)[[4]](#ref4).
-For a user that would like to further investigate a molecular mechanism linking SNPs to SLC34A1 deregulation, the example data loaded into ***Genomic Viewer*** suggest that in healty condition SLC34A1 is in a context of open chromatin, and is in gene rich region with multiple regulatory elements.
-Especially there is an overlap between the SNPs and an enhancer element, but also with several promoters. In turn HiC data reveal the presence of a chromatin loop that connects the region upstream to SLC34A1 promtoer with
-distal elements. Altogether, these information can suggest that the presence of SNPs in the SLC34A1 locus can alter the function of epigenetic regulatory elements and the expression of the gene.
-These hypothesis can be experimentally tested or addressed by integration of further genomic tracks, like RNA-seq or ChIP-seq.
-This is a simple example of how the integrative visualization of genomic tracks can guide biological research to investigate otherwise unforeseen features.
+In this example we investigated public data from the human kidney cortex and
+from patients with CKD to identify single nucleotide variants that may impact
+gene expression and functionality in the context of renal health. Looking at the
+Manhattan plot from a CKD GWA study on chromosome 5, revealed a locus of
+interest with signifcantly associated SNPs. A more detailed investigation of
+this region indicates that at least 6 of the most significant SNPs fall inside
+the *SLC34A1* gene. <!-- Please also consider/discuss the fact that SNP
+proximity is not sufficient to causality! Clearly, this gene is the best
+candidate by function.  How many other genes we have there within a reasonable
+distance? And repeat what you have found about the SNPs in the previous section,
+where I have asked for more information. --> This gene encodes for a
+renal‐specific sodium–phosphate cotransporter responsible for the readsorption
+of filtered sodium and phosphate and is expressed in the proximal tubule within
+the renal cortex (Fearn et al.  2018)[[3]](#ref3). The clinical relevance of
+*SLC34A1* is supported by recent literature reporting its downregulation in
+acute kidney injury (Wilflingseder et al.)[[4]](#ref4). In healthy condition,
+*SLC34A1* is in an open chromatin region, <!-- I have just simplified your
+sentence here. But the question is: why do we know that? Where does this
+information come from?  Insert this please. --> which also contains several
+regulatory elements. In particular, there is an overlap between the SNPs of
+interest and an enhancer element,<!-- which one?  Characterize. --> but also
+with several promoters <!-- Details please -->.  In addition, HiC data reveal
+the presence of a chromatin loop that connects the region upstream to *SLC34A1*
+promoter with distal elements.<!-- Again, what are the distal elements, do they
+have any connection with CKD? How can we make use of this finding? What would be
+possible further steps? (And why haven't they been described here?) -->
+Altogether, these bits of information indicate that the SNPs in the *SLC34A1*
+locus may alter the function of epigenetic regulatory elements and the
+expression of the gene.  <!-- So far, I am not convinced. You have listed a
+couple of features near the SNPs, but how close are they? Would it be enough to
+hypothetize that the SNPs are tagging changes in the regulatory elements? -->
+This hypothesis can be experimentally tested or addressed by integration of
+further genomic tracks, like RNA-seq or ChIP-seq. <!-- Well, the first is lab
+work. Ok. But the second we could also do. Why don't we have these data then
+already in the example dataset? And please finish this paragraph with a concrete
+message, dont' leave stuff open here. -->
+
+<!-- Please add a paragraph on limitations. Not excuses why data are not in the
+example or why you did not further dig into some follow-up worthy idea :-) Real
+limitations. What can be improved in the app? -->
 
 </details>
 </div>
@@ -1279,9 +1413,12 @@ This is a simple example of how the integrative visualization of genomic tracks 
 <details open>
 <summary>&nbsp;</summary>
 
-For **general support** questions, **reporting a bug** or **suggest a new feature** you can create an issue in our [Github repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
+For general support questions, reporting a bug or suggesting a new feature you
+can create an issue in our [Github
+repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
 
-For **confidential reports** you can contact us by [email](mailto:sara.lago@eurac.edu).
+For confidential reports, please contact [the
+maintainer](mailto:sara.lago@eurac.edu) by email.
 
 </details>
 </div>
@@ -1294,28 +1431,40 @@ For **confidential reports** you can contact us by [email](mailto:sara.lago@eura
 
 ### Data Availability
 
- The data employed in the *usage example tutorial* and other representative examples are publicly available from [GEO](https://www.ncbi.nlm.nih.gov/geo/), the [GWAS catalog](https://www.ebi.ac.uk/gwas/) and [ENCODE](https://www.encodeproject.org/) under the accession numbers listed below:
+All data in this tutorial are publicly available from
+[GEO](https://www.ncbi.nlm.nih.gov/geo/), the [GWAS
+catalog](https://www.ebi.ac.uk/gwas/) and
+[ENCODE](https://www.encodeproject.org/) under the following accession numbers:
 
 - HiC (GEO GSE212910)
 - ATAC-seq (GEO GSE212908)
 - CKD GWAS (GWAS Catalog 26831199)
 - H3K27ac bam (ENCODE ENCFF119WEO)
 
-Regulatory elements were downloaded from [UCSC Table Browser](https://genome.ucsc.edu/cgi-bin/hgTables).
+Regulatory elements were downloaded from [UCSC Table
+Browser](https://genome.ucsc.edu/cgi-bin/hgTables).
 
-The *cytoband information* that were not directly available through `plotgardener` were retrieved from:
+Additional cytoband information was retrieved from:
 
 - CHM13 (T2T): [marbl/CHM13 GitHub repo](https://github.com/marbl/CHM13)
 - GRCM39 (mm29): [UCSC GoldenPath](https://hgdownload.soe.ucsc.edu/goldenPath/mm39/database/)
 
 ### Literature
-*1.*<a id="ref1"></a> Kramer NE, Davis ES, Wenger CD et al. Plotgardener: cultivating precise multi-panel figures in R. Bioinformatics 2022;38:2042–5.
 
-*2.*<a id="ref2"></a> Nakato R, Sakata T. Methods for ChIP-seq analysis: A practical workflow and advanced applications. Methods 2021;187:44–53.
+*1.*<a id="ref1"></a> Kramer NE, Davis ES, Wenger CD et al. Plotgardener:
+cultivating precise multi-panel figures in R. Bioinformatics 2022;38:2042–5.
 
-*3.*<a id="ref3"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical, and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715.
+*2.*<a id="ref2"></a> Nakato R, Sakata T. Methods for ChIP-seq analysis: A
+practical workflow and advanced applications. Methods 2021;187:44–53.
+<!-- Please take into account that ref. 2 has been deleted in the text, as the
+sentence was not needed and therefore had been removed. -->
 
-*4.*<a id="ref4"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun 2020;11:3383.
+*3.*<a id="ref3"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical,
+and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715.
+
+*4.*<a id="ref4"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and
+super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun
+2020;11:3383.
 
 </details>
 </div>
