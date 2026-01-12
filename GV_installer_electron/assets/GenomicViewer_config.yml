@@ -41,7 +41,7 @@ default:
   # GWAS files section.
   gwas.dir: "GWAScatalog_KidneyDisease"
   gwas.file: "relocatedCol_chr5.tsv"
-  gwas.names: ["GWAS chronic kidney disease"]
+  gwas.names: ["GWAS CKD"]
   # Categorical BED files section.
   cat.dir: ""
   cat.file: "regulatory_elements_hg38_chr5.bed"
