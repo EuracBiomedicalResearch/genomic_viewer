@@ -222,7 +222,7 @@ ui <- page_sidebar(
          
          # List of user-defined coordinates
          div(style="align-items:center; gap:10px; margin-top:-30px; margin-bottom:-10px;",
-             tags$label("Select form menu", style="margin:0; padding-bottom:2px; padding-top:10px; text-align:left; font-size:90%;"),
+             tags$label("Select from menu", style="margin:0; padding-bottom:2px; padding-top:10px; text-align:left; font-size:90%;"),
              selectizeInput(
                inputId = "select", 
                label = NULL,
