@@ -13,10 +13,7 @@ default:
   # Input files and track label handling.
 
   # Data parent directory to search for.
-  # Note: The data directory must be referenced with leading slash
-  # as Shiny resolves paths as absolute URLs from the app’s web root.
-
-  data.dir: "/data"
+  data.dir: "data"
 
   # Specific file formats section.
   # Note: Specify the following keys information for every file section below:
