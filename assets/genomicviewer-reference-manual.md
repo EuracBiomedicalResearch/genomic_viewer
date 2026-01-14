@@ -36,71 +36,263 @@ and analyzing genomic data hosted in a Docker container.
 <details open>
 <summary>&nbsp;</summary>
 
+***Genomic Viewer*** uses a *configuration file* to load the genomic datasets to
+be visualized. This is the only required input for starting a session. 
+It defines which data are loaded and how they are visualized.
+
 During [***Genomic Viewer***
 installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation)
-a local directory is specified which will be used by the app for accessing data
-to be visualized. In that folder the installer will create by default a `data`
-directory containing the *tutorial example data* and a *configuration file*.
+a pre-filled example *configuration file*, named `GenomicViewer_config.yml`, is 
+saved automatically in a local folder of your choice.
 
-The `GenomicViewer_config.yml` file is the only configurable object that is
-essential for starting a ***Genomic Viewer*** session. This file specified
-which and how data are visualized. The advantages of this approach are
-summarized as follows:
+### Example configuration file
 
-- Keep all files organized in a common parent directory.
-- Avoid use of hard-coded absolute paths.
-- Facilitate exchange of data between collaborators.
+The example *configuration file* is reported below. Guidelines for how to fill it 
+are present as comments in the file itself (after the `#` mark). In addition, all 
+fields and features are explained in detail in the following sections. 
 
-Here are some points to consider when modifying the configuration file:
+```
+---
 
-<!-- This is not clear. I also don't see why this level of detail should be
-     among the first lines explaining the config file.
-     XXX revise
--->
-- It is not necessary to change the `data.dir` field unless you created a common
-  sub-directory to `data` with all the files to be uploaded;
+# Example configuration file for Genomic Viewer, used in the tutorial.
 
-- The configuration file reports a single section relative to each accepted
-  [File Format](#file-formats);
+# Notes:
+# 1) Starting the file with three dashes is recommended to indicate where the
+#    file begins.
+# 2) The 'default' key is required for the app to correctly recognize your
+#    configuration file.
 
-- Each section requires three fields: `dir` for the specific sub-directory, if
-  present; `ext` for the file extension or shortest common substring in file
-  names of the same type; and `names` which is an array of quoted string to be
-  used as labels for the input data.
+default:
 
-<!-- specify which type of reg ex can be used. There are multiple types. E.g.
- POSIX, Perl, extended. If you really want to link to a site, choose a serious
- one.
--->
+  # Input files and track label handling.
 
-<!-- you are explaining something that has not been introduced before. This
- is confusing. I have no clue what name labels are. Introduce things properly
- before talking about them.
+  # Data parent directory to search for.
+  data.dir: "data"
 
- Ok, after a while of looking at the config file and reading this manual,
- here are the things I am interested in with respect to the config file (see
- also comments directly in the config file.)
+  # Specific file formats section.
+  # Note: Specify the following keys information for every file section below:
+  # 1) 'dir': directory containing the files specified in that block.
+  # 2) 'file': A file name or part of a file name that matches a file/list of
+  #           files with the same format.
+  # 3) 'names': list of the sample names to be displayed.
 
- - I think it's better to show first the config file and then go through
-   it, line by line, listing all the details for each entry.
- - What is the general syntax of this file? I am sure you are using a parser
-   for it.
- - How in general is error handling implemented? The config file opens the
-   gate to hell. E.g. incorrectly spelled files/directory names, incorrect
-   tokens such as "bg.dir" instead of "bw.dir", etc.
- - Is the order of entries important? bw.dir before bw.ext for example?
- - The names .ext are a bit confusing. These are file names or regular
-   expressions, true? .ext let's everybody think of extensions. ".txt" is an
-   extension...
- - So if we e.g. don't have bigwig data to display, what do we do? According
-   to the config file and my knowledge so far, we would need to specify
-   [""] or "  " (two spaces, really??) in the bw.names tag? I guess I am
-   wrong, so this needs a better explanation. In fact, at the moment, I cannot
-   see how the bigwig file is found. Overall, we need a clear description how
-   files are searched. It would be good to have regexps in the example config
-   file, at least used once to show how they work.
- - What happens, if we enter bw.dir twice? Will both directories be searched
-   or the last occurrence?
+  # BIGWIG files section.
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.file: "treat_pileup_chr5.bw"
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
+  # BEDPE files section.
+  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
+  bedpe.file: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
+  bedpe.names: ["HiC arches"]
+  # BED files section.
+  bed.dir: "GSE212908_ATAC_peaks"
+  bed.file: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
+  bed.names: ["ATAC peaks"]
+  # HiC files section.
+  hic.dir: "GSE212910_RAW_HiC"
+  hic.file: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic"
+  hic.names: ["HiC cortex"]
+  # GWAS files section.
+  gwas.dir: "GWAScatalog_KidneyDisease"
+  gwas.file: "relocatedCol_chr5.tsv"
+  gwas.names: ["GWAS CKD"]
+  # Categorical BED files section.
+  cat.dir: ""
+  cat.file: "regulatory_elements_hg38_chr5.bed"
+  cat.names: ["Regulatory Elements"]
+
+  # File with user-defined list of coordinates.
+  # Note: Specify the following keys:
+  # 1) 'dir': the directory that contains the file;
+  # 2) 'file': the file name or shorter matching substring.
+
+  reg.dir: ""
+  reg.file: "Example_region_table.bed"
+
+```
+
+### Configuration file format and structure
+
+The ***Genomic Viewer's*** *configruation file* uses YAML syntax, consisting of 
+`key: value` pairs. All the keys present in the example file must be preserved,
+but their order is not relevant. Comments are supported using `#`.
+
+The file is parsed in R using `config::get()`, which internally relies on a YAML
+parser. 
+
+The *configuration file* begins with three dashes `---` indicating the start of 
+YAML syntax, and consists of a single `default` section. `dafault` is a required
+key for the correct recognition of your *configuration file*.
+Within this section, the base directory containing all your data is specified
+in the `data.dir` key. Moreover, each supported genomic [file type](#file-formats) 
+has its own group of keys.
+
+Each group follows the same pattern:
+
+- `*.dir` — subdirectory, or array of subdirectories relative to `data.dir`;
+
+- `*.file` — file name or extension;
+
+- `*.names` — array of sample names that will be displayed in the plots.  
+
+The `*.names` field is present for all file groups except one, which does
+not require track labeling. This exception is specified in the relative chunk of
+the *configuration file* itself (see example). 
+
+A single occurrence of each key must be present for each file group. Duplicated
+keys are not allowed.
+
+### How to correctly specify the keys value
+
+Specifying the keys value in the correct format is fundamental to ensure your 
+files are searched properly. The rules to fill each type of key are explained
+below:
+
+1) The `data.dir` field accepts a quoted directory name. Directory with
+subdirectories common to all files is also accepted 
+(e.g. `"data/experiment_1/replicate_1"`).
+
+2) The `*.dir` field relative to file type groups accepts:
+  
+  - a full directory name (e.g. `"RNAseq"`);
+  
+  - an array with multiple directory names, when files of the same type are 
+    saved in different subfolders (e.g. `["RNAseq", "ATACseq"]`);
+    
+  - an empty string `""` for no directory.
+    
+Paths with subdirectories are allowed (e.g. `"RNAseq/untreated"`)
+
+3) The `*.file` field accepts:
+
+  - a full file name (e.g. `"RNAseq_sample1_rep1.bed"`)
+
+  - a file extension (e.g. `".bed"`)
+
+  - a regular expression (below an example of how to apply them)
+
+  - an empty string `""` for no file
+
+Regular expressions are a tool for text-searching using special sequence of 
+characters to define a pattern. This can be useful when you have very long or
+complex file names, or a long list of files to specify. It will spare you time 
+and is more safe for preventing spelling errors.
+Regular expressions that you can use in the *configuration file* uses the 
+extended syntax as implemented in R and are explained into details 
+[here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html).
+
+To mention a use case, let's have a look at the `BIGWIG file section` of the 
+example *configuration file*:
+
+```
+  # BIGWIG files section.
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.file: "treat_pileup_chr5.bw"
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
+
+```
+The file pattern `"treat_pileup_chr5.bw"` is searched in the 
+`""GSE212908_RAW_ATAC_bigwig""` directory. Upon [***Genomic Viewer*** 
+installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation)
+two files matching this pattern will be available from the specified folder:
+`"GSM6560954_cortex_12_treat_pileup_chr5.bw"` and 
+`"GSM6560956_cortex_15_treat_pileup_chr5.bw"`. There are several alternatives to 
+obtain the same result through regular expressions, for instance:
+
+  - by using the operator `|`, which allows to
+    specify two alternative patterns to be matched (e.g 
+    `"GSM6560954_cortex_12_treat_pileup_chr5.bw|GSM6560956_cortex_15_treat_pileup_chr5.bw"`
+    or in shorter form `"12_treat_pileup_chr5.bw|15_treat_pileup_chr5.bw"`);
+    
+  - by using a combination of character classes and metacharacters, 
+    e.g. `"^[A-Z0-9]+_cortex_[0-9]{2}_treat_pileup_chr5.bw"`, where `"^[A-Z0-9]+"`
+    means the file name must start (`^`) with an alphanumeric string with capital
+    letters `[A-Z0-9]` matched one or more times `+`. It follow the strings 
+    `_cortex_`, and `_treat_pileup_chr5.bw` separate by two digits `[0-9]{2}`. 
+    This example is too elaborated for this use case, but is for illustrative
+    purpose only.
+
+When multiple files match, they are:
+
+  - sorted alphabetically;
+
+  - loaded in that .
+
+
+4) The `*.names` field accepts:
+
+  - arrays of strings (e.g. `["sample1", "sample2"", ..]`).
+  
+  - empty arrays for no name `[""]`.
+  
+Track names are read in the order specified by the user, so they must match the 
+alphabetical order of the files.
+
+### Error handling
+
+After loading, the configuration is explicitly validated by
+***Genomic Viewer***:
+
+- YAML syntax errors are detected at load time;
+
+- Required keys are checked for presence;
+
+- Unknown or misspelled keys are rejected;
+
+- Each file type section is validated against the expected format.
+
+If the configuration is invalid, the application fails fast with a clear error
+message.
+
+
+### How files are discovered
+
+If no syntax error is detected in the *configuration file* ***Genomic Viewer*** 
+constructs file paths for each file type group as follows:
+
+- The base directory is taken from the `data.dir` key;
+
+- The subdirectory defined in `*.dir` is appended (if provided);
+
+- Files matching `*.file` are searched within that directory.
+
+### Disabling a file type
+
+If no data of a given type should be loaded, all corresponding fields must be
+defined but left empty.
+
+Use either:
+
+- an empty string: " "
+
+- or an empty array: [""]
+
+This applies to` *.dir, *.file, and *.names`.
+
+Commenting out sections is not supported.
+
+### Notes on specific file types
+
+For BAM files, it is recommended to use a regular expression ending with $
+(e.g. .bam$) to avoid accidentally matching .bai index files.
+
+### Multiple sessions
+
+Genomic Viewer always reads a single configuration file named
+`GenomicViewer_config.yml`.
+
+To work with multiple sessions:
+
+- save the *configuration file* you want to store in a safe directory, 
+  or change the file name;
+
+- be sure that the desired file from which to search the data is into the 
+  application directory before startup.
+
+
+
+<!-- 
+
  - The assignment of bw.names to tracks inside the respective files is not at
    all user friendly and very prone to errors. How should the user know what
    is the alphabetical order of all items? I would prefer something more
@@ -129,98 +321,6 @@ Here are some points to consider when modifying the configuration file:
    is better. 'You' and 'One' is also ok in some cases.A
  - Break lines in this file at 80 characters.
 -->
-
-**Note:** In the `ext` fields you can use regular expressions as input, use only
-the file extension as parameter or type the entire file name for safety.  When
-loading several files of the same format through extension or regular expression
-please remember that files are always read in alphabetical order, therefore their
-*name labels* must follow the file order to be correctly assigend.  In the
-presence of multiple subfolders with data of the same file format, the `dir`
-field also accepts an array following the same rules of `name` labels arrays.
-When loading **.bam** files it is recommended to use the regular expression `$`
-to specify the end of the file extension (like this `.bam$`), this avoids to
-erroneously try to load the associated *.bai* files.
-<!-- Well, the last paragraph needs much more examples and details. Up to here
-it is not even clear how reg.exps are applied. -->
-
-- ***Genomic Viewer*** only reads one configuration file termed
-  `GenomicViewer_config.yml`. In order to handle multiple different sessions,
-  you need to keep copies of that file in some other location or under a
-  different name.
-
-- When one filed is empty because you do not want to enter a subdirectory,
-  assign a name or you just do not have a specific file format to load, you must
-  enter a **two whitespaces** empty string "  " or vector '[""]' to prevent
-  unwanted behaviors
-  <!-- where do we need to enter that? *.dir, *.ext, *.names? Why not comment
-   out respective section? -->
-
-- The last field in the configuration file refers to a custom BED file with a
-  saved preset of coordinateds of interest. This file con be substituted or
-  dynamically modified during every working session.
-  <!-- what is the file format. In case you explain it later, I don't know it
-  at the moment, because I am reading the manual the first time. Like anybody
-  else. So refer the reader to the appropriate section(s) where this is
-  addressed -->
-
-- Most of these instructions and field description are also summarized in the
-  configuration file itself so you do not need to refer to the manual every
-  time.
-  <!-- good point, but for this the config file needs to be very descriptive.
-  We have not reached this point yet. -->
-
-An example of the configuration file is reported below:
-<!-- Obviously, insert the final version of the config file here -->
-```
----
-
-default:
-
-    # Set here the parameters related to the input files path and extensions
-
-  # Data directory
-  data.dir: "/data/"
-
-  # bigWig directory and files final pattern or complete name (can correspond to one or more tracks), ordered file name to visualize. If empty type "  " or [""] in names.
-  bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.ext: "treat_pileup_chr5.bw"
-  bw.names: ["Kidney cortex 12", "Kidney cortex 15"] # Comma separated, "quoted" names
-
-  # BEDpe directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
-  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
-  bedpe.ext: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
-  bedpe.names: ["HiC arches"] # Comma separated, "quoted" names
-
-  # bed or bam directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
-  bed.dir: "GSE212908_ATAC_peaks"
-  bed.ext: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
-  bed.names: ["ATAC peaks"] # Comma separated, "quoted" names
-
-  # hic directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
-  hic.dir: "GSE212910_RAW_HiC"
-  hic.ext: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic"
-  hic.names: ["HiC cortex"] # Comma separated, "quoted" names
-
-  # GWAS directory and files final pattern, ordered file name to visualize. If empty type "  " or [""] in names.
-  gwas.dir: "GWAScatalog_KidneyDisease"
-  gwas.ext: "relocatedCol_chr5.tsv"
-  gwas.names: ["GWAS CDK"]
-
-  # categorical bed file. If empty type "  " or [""] in names. Columns must be names and the one with category must be 'category'.
-  cat.dir: ""
-  cat.file: "regulatory_elements_hg38_chr5.bed"
-  cat.names: ["Regulatory Elements"] # Comma separated, "quoted" names
-
-  # file with selected genomic regions to be imported (BED format: chr, start end, name. No header). If empty type "  " or [""] in names.
-  reg.dir: ""
-  reg.file: "Example_region_table.bed"
-
-```
-
-Please note that the configuration file has a unique hard-coded name,
-`GenomicViewer_config.yml`. When working on multiple sessions simultaneously,
-replace this file with the desired copy you keep in a different location or/and
-under a different name.
 
 </details>
 
