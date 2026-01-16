@@ -1567,23 +1567,6 @@ practical starting point for downstream analytical or experimental validation.
 </div>
 ------------------------------------------------------------------------
 
-## Getting Help
-
-<div>
-<details open>
-<summary>&nbsp;</summary>
-
-For general support questions, reporting a bug or suggesting a new feature you
-can create an issue in our [Github
-repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
-
-For confidential reports, please contact [the
-maintainer](mailto:sara.lago@eurac.edu) by email.
-
-</details>
-</div>
-------------------------------------------------------------------------
-
 ------------------------------------------------------------------------
 
 ## Limitations
@@ -1634,6 +1617,25 @@ tools.
 
 </details>
 </div>
+
+------------------------------------------------------------------------
+
+## Getting Help
+
+<div>
+<details open>
+<summary>&nbsp;</summary>
+
+For general support questions, reporting a bug or suggesting a new feature you
+can create an issue in our [Github
+repository](https://github.com/EuracBiomedicalResearch/genomic_viewer).
+
+For confidential reports, please contact [the
+maintainer](mailto:sara.lago@eurac.edu) by email.
+
+</details>
+</div>
+
 ------------------------------------------------------------------------
 
 ## References and Links
