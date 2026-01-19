@@ -1,3 +1,8 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 
 # Genomic Viewer Reference Manual
 <div align="center">
@@ -1287,13 +1292,13 @@ file with the correct file paths and labels.
 ### Biological question
 
 In this tutorial we are going to inspect a GWA study investigating human
-chronic kidney disease (CKD) with the aim to identify putative clinically 
+CKD with the aim to identify putative clinically 
 relevant risk loci. One way to select relevant genetic variants identified by 
 GWAS is by checking if they fall within genomically active genes or regulatory 
 elements. Therefore we are integrating GWAS with open chromatin profiling (ATAC-seq), 
 3D chromatin interactions (HiC) and regulatory elements annotations.
 
-This analysis should be considered as an explorative test to suggest the used 
+This analysis should be considered as an explorative test to suggest the user 
 for additional analytic or experimental validations.
 
 ### Genome selection, navigation and plot inspection
@@ -1315,7 +1320,7 @@ graphics in the upper right sidebar.
 
 Clicking on chromosome 5 passes the coordinates to the *Load coordinates* panel
 on the left sidebar. Make sure that the *Plot* navigation tab is selected in the
-main central window. Next click the *Go* button to generate the genomic plot.
+main central window. Next, click the *Go* button to generate the genomic plot.
 
 <img src="GV_navigation_tabs.png" alt="GV navigation tabs Plot selected"
      width="20%">
@@ -1330,7 +1335,7 @@ chromosome end. We want to look in more detail at this region, so we use the
 already preloaded these coordinates as a custom coordinates list. This is
 accessed via the *Load Coordinates* panel in the left sidebar. By clicking on
 the first entry in the list, the corresponding coordinates (relative to the gene
-SLC34A1) are passed to the tool and the *Insert Coordinates* panel will
+*SLC34A1*) are passed to the tool and the *Insert Coordinates* panel will
 automatically update.
 
 <img src="GV_region_table_example.png"
@@ -1338,7 +1343,7 @@ automatically update.
      width="25%">
 
 Again, make sure that the *Plot* navigation tab is selected in the main central
-window. Next click the *Go* button to render the visualization. Feel free to
+window. Next, click the *Go* button to render the visualization. Feel free to
 play with the different zoom options (either on the location bar or with the
 zoom buttons). The new visualization range can be saved by pressing the *Add*
 button.
@@ -1354,9 +1359,8 @@ feature is the presence of an enhancer region inside of the SLC34A1 gene (marked
 green) that overlaps with significant SNPs. Enhancers located inside genes can 
 act in place of a typical promoters for a specific isoform initiating 
 transcription itself or influencing splicing (Maqbool et al. 2020)[[2]](#ref2). 
-Despite not being a sufficient validation, if this is true for the SLC34A1 gene 
-we expect that the enhancer overlaps with the TSS of a shorter isoform of the 
-gene. 
+Despite not being a sufficient validation, if this is true for SLC34A1 gene 
+we expect that the enhancer overlaps with the TSS of a shorter isoform. 
 With ***Genomic Viewer*** we can inspect transcript isoforms by checking the 
 *Expand transcripts* box in the right sidebar, which will automatically trigger 
 the visualization of all isoforms.
@@ -1366,17 +1370,17 @@ the visualization of all isoforms.
      width="80%">
 
 As we can see from the resulting plot, the hypothesis of this enhancer to work 
-as internal promoter is compatible with the presence of a short SLC34A1 isoform 
+as internal promoter is compatible with the presence of a short *SLC34A1* isoform 
 transcribed from there and its functionality is supported by the overlapping with
 open chromatin, as reported by the ATAC-seq peaks and profile tracks (Kidney 
 cortex 12 and 15).
 
 An additional feature that can be observed is the presence of a chromatin loop 
 (grey HiC arch) starting from the right flanking region of the visualized locus.
-As before you can use the *drag and drop zoom bar* or *zoom buttons* to extend 
+As before, you can use the *drag and drop zoom bar* or *zoom buttons* to extend 
 the visualized window until the rightmost anchor of the loop and until additional 
-loops on the left side of SLC34A1 are displayed. Also in this case we saved
-for you the coordinates for a quick access. To select them click the second entry
+loops on the left side of *SLC34A1* are displayed. Also in this case we saved
+for you the coordinates for a quick access. To select them, click the second entry
 in the *Load coordinates* drop down menu.
 
 <img src="GV_tutorial_SLC34A1_TAD.png"
@@ -1385,21 +1389,23 @@ in the *Load coordinates* drop down menu.
 
 After pressing the *Go* button, the resulting plot shows that the *SLC34A1* gene 
 and the enhancer we are evaluating (black arrow in the image above) are located 
-within the same topologically associated domain (TAD) and between of different 
-sub-TADs (red triangles). This observation is indicative that more genes inside 
-the TAD can be regulated by the same enhancer.
+within the same topologically associated domain (TAD) and between different 
+sub-TADs (red triangles in HiC heatmap). This observation suggests that more genes 
+within the TAD might be regulated by this enhancer under analysis (black arrow).
 
-Together, these observations suggest that the identified SNPs, by affecting a 
-regulatory element, could potentially cause alterations in multiple genes inside
-the locus. Further testing this hypothesis is outside of the aim of the present 
-tutorial.
+Together, the observations retrieved through the use of ***Genomic Viewer*** 
+suggest that the identified SNPs, by affecting a regulatory element, 
+could potentially cause alterations in multiple genes inside the locus besides 
+*SLC34A1*. Further testing of this hypothesis is outside the aim of the present 
+tutorial but serve as an example of how ***Genomic Viewer*** can support the user
+in hypothesis formulation and experimental design.
 
 
 ### Download of the genomic view plot
 
 A snapshot of the currently displayed visualization can be downloaded by pressing
-the *Save* in the bottom left sidebar. This will open a popup window offering
-different file formats for saving the image: SVG, PDF, PNG and JPG. See *Export
+the *Save* button in the bottom left sidebar. This will open a popup window offering
+different file formats to save the image: SVG, PDF, PNG and JPG. See *Export
 Functionalities* in the [Features and Usage](#features-and-usage) section.
 
 <img src="GV_save_window.png"
@@ -1418,7 +1424,7 @@ possibility to investigate the input data more deeply. This is done in the
 
 From here you can export the raw data, limited to the region that you selected
 from the genome navigation options. In the working example the region is the
-one corresponding to SLC34A1 gene (chr5: 177365507-177412577) and this option is
+one corresponding to *SLC34A1* gene (chr5: 177365507-177412577) and this option is
 useful to:
 
 - Extract the dbSNP IDs and the alternative DNA bases in the two SNPs alleles
@@ -1433,24 +1439,24 @@ from the *Download* button below each table.
 <img src="GV_gwas_table_example.png" alt="GV export table with data subset"
      width="60%">
 
-For example we can see that the 4 SNPs above the significance threshold have the
+For example, we can see that the 4 SNPs above the significance threshold have the
 following IDs: rs3812035, rs6420094, rs6862195, rs7447593. With these IDs, we
 can interrogate the literature for reported information on their effect on CKD
 or other pathologies. Of note, the rs6420094 was already observed in association
-with diabetic kidney disease (DKD) (Zhang et al 2023)[[4]](#ref4), while there is still
-no report for the others.  
+with diabetic kidney disease (DKD) (Zhang et al 2023)[[4]](#ref4), while there 
+is still no report for the others.  
 <!-- Well, this is like the carrot in front of the mule. What's up now with
 these SNPs? Dive in, we want to tell a story! Where are they exactly located.
 Are they even changing the codeing sequence? -->
 
 On the other hand, having access to the exact coordinates of peaks and regulatory
-elements allows to gain details on the corresponding sequence, investigate the 
+elements allows to gather details on the corresponding sequence, investigate the 
 presence of transcription factor binding motifs or design PCR primers or gRNAs
 for experimental testing.
 
-Deepening these aspects is out of the aim of this tutorial, but we just wanted 
-to give some cues to how to exploit ***Genomic Viewer*** derived information for
-further biological exploration.
+Deepening these aspects is out of the aim of this tutorial, but provides an example 
+on how to exploit ***Genomic Viewer***-derived information for further biological 
+exploration.
 
 <!-- How? You owe the reader what he might do from here on. -->
 
@@ -1488,8 +1494,8 @@ biological question:
 - The peak counts and overlap plots shows that the percentage enrichment in open 
   chromatin regions (ATAC-seq peaks) and 3D chromatin interactions (HiC arches), 
   is comparable to that observed in the whole genome suggesting the importance of
-  the epigenetic regulation of this locus, which would otherwise been either 
-  depleted (low-) or enriched (high-epigentic regulation) in such elements.
+  the epigenetic regulation of this locus, which would have been underrepresented 
+  in such elements otherwise.
 
 
 <img src="GV_stats_example.png"
