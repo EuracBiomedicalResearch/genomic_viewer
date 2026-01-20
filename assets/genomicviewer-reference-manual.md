@@ -27,7 +27,7 @@ and analyzing genomic data hosted in a Docker container.
 
 ------------------------------------------------------------------------
 
-## 1. Configuration
+## Configuration
 
 <details open>
 <summary>&nbsp;</summary>
@@ -327,7 +327,7 @@ To work with multiple sessions:
 
 ------------------------------------------------------------------------
 
-## 2. File Formats
+## File Formats
 
 The following section will describe the file formats that can be imported in
 **Genomic viewer**, mentioning if there are specific requirements and for which
@@ -531,7 +531,7 @@ tend to be large files.
 
 ------------------------------------------------------------------------
 
-## 3. Features and Usage
+## Features and Usage
 
 In the following section the user will find a detailed description of the main
 functions that are available from ***Genomic Viewer*** interface.
@@ -1248,7 +1248,7 @@ Viewer*** interface:
 
 ------------------------------------------------------------------------
 
-## 4. Tutorial
+## Tutorial
 
 <div>
 <details open>
@@ -1576,7 +1576,7 @@ practical starting point for downstream analytical or experimental validation.
 
 ------------------------------------------------------------------------
 
-## 5. Limitations
+## Limitations
 
 <div>
 <details open>
@@ -1627,7 +1627,7 @@ tools.
 
 ------------------------------------------------------------------------
 
-## 6. Getting Help
+## Getting Help
 
 <div>
 <details open>
@@ -1645,7 +1645,7 @@ maintainer](mailto:sara.lago@eurac.edu) by email.
 
 ------------------------------------------------------------------------
 
-## 7. References and Links
+## References and Links
 <div>
 <details open>
 <summary>&nbsp;</summary>
