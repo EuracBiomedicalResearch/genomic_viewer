@@ -554,13 +554,13 @@ and right sidebar and the central window.
 | Section/Button     | Function                                              |
 |--------------------|-------------------------------------------------------|
 | Reference genome   | Select a reference genome form list.                  |
-| Insert coordinates | Choose chromosome to visualize from dropdown menu and 
+| Insert coordinates | Choose chromosome to visualize from dropdown menu and |
 |                    | enter start and end coordinates.                      |
-| Load coordinates   | Load a BED format file with a list of saved genomic   
-|                    | coordinates. If present, the file specified in the    
+| Load coordinates   | Load a BED format file with a list of saved genomic   |
+|                    | coordinates. If present, the file specified in the    |
 |                    | configuration file will be loaded as default.         |
 | Go button          | Generate plot according to the selected options.      |
-| Save button        | Export plot choosing among different formats:         
+| Save button        | Export plot choosing among different formats:         |
 |                    | SVG, PDF, PNG, JPG.                                   |
 
 
@@ -769,10 +769,10 @@ sections, we describe each of them in that order.
 
 Files formatted as [HiC](#HiC) are used to plot HiC and 3D contact matrices.
 ***Genomic Viewer*** represents this type of data as triangular matrices.
-Contact scores that are stored in the input file are displayed as a heatmap and
-will be scaled in the range of 1-100 to maximize their visual evaluation. The
-corresponding scale bar is always reported beside the plot.
-<!-- Do not understand what the "range of 1-100" means. Resolution? Specify. -->
+Contact scores reflecting the probability for a contact to occur, as stored in 
+the input file, are displayed as a heatmap and scaled to the 1-100 range to 
+maximize their visual evaluation. The corresponding scale bar is always reported 
+beside the plot.
 
 These files can be quite large and for performance reasons, ***Genomic
 Viewer*** automatically sets different data resolutions based on the size of
@@ -927,22 +927,18 @@ links**](#references-and-links) section.
 
 [Categorical BED](#categorical-bed) files can be used to mark genomic regions
 that belong to specific categories, which can be annotated with external tools
-or databases, such as user-defined data.  ***Genomic Viewer*** plots
+or databases, or as user-defined data.  ***Genomic Viewer*** plots
 categorical BED files through the `plotgardener` function
 [`plotRanges()`](https://phanstiellab.github.io/plotgardener/reference/plotRanges.html).
 To every category that is found in the input file a different color is assigned
 and listed in a legend displayed to the right of the corresponding track in the
-plot. By default all the categories in the same track are *collapsed* in one line,
-however, sometimes the genomic ranges belonging to different categories may
-overlap, or the same genomic range belongs to two categories. To address these
-situations ***Genomic Viewer*** provides the possibility to *expand* the
-categories through the *Expand categories* menu in the right sidebar. When
-clicking in the menu all the tracks that are uploaded as categorical BED
-files are displayed by their label name. The user can choose multiple
-of them to be expanded, so that overlapping categories of the same track are
-split on different lines.
-<!-- The last sentences on displaying and splitting I don't understand at
-all. Rewrite. -->
+plot. By default all categories within the same track are *collapsed* in a single line.
+While this compact representation is convenient, overlapping categories may be 
+partially or completely hidden. To address this limitation, ***Genomic Viewer*** 
+allows users to expand categories through the *Expand categories* menu in the 
+right sidebar. In this menu users can select one or more categorical BED file to 
+expand. As a result, annotated regions that overlap in the collapsed view are 
+displayed on separate lines, making all features clearly visible.
 
 <img src="GV_expand_cat.png"
      alt="GV drop down menu to expand categories of categorical BED file"
@@ -1381,7 +1377,7 @@ in the *Load coordinates* drop down menu.
 <img src="GV_tutorial_SLC34A1_TAD.png"
      alt="GV flanking region with TADs of SLC34A1 locus"
      width="80%"><br>**Figure 4.4:** 
-     *TADs and sub-TADs associated to the SLC34A1 locus*  
+     *TADs and sub-TADs associated to the SLC34A1 locus.*  
 
 After pressing the *Go* button, the resulting plot shows that the *SLC34A1* gene 
 and the enhancer we are evaluating (black arrow in the image above) are located 
@@ -1553,8 +1549,7 @@ affected by the SNPs or healthy. Unfortunately we do not have access to these da
 <!-- So far, I am not convinced. You have listed a
 couple of features near the SNPs, but how close are they? Would it be enough to
 hypothetize that the SNPs are tagging changes in the regulatory elements? -->
-This hypothesis can be experimentally tested or addressed by integration of
-further genomic tracks, like RNA-seq or ChIP-seq. <!-- Well, the first is lab
+<!-- Well, the first is lab
 work. Ok. But the second we could also do. Why don't we have these data then
 already in the example dataset? And please finish this paragraph with a concrete
 message, dont' leave stuff open here. -->
