@@ -15,13 +15,13 @@ and analyzing genomic data hosted in a Docker container.
 <details open>
 <summary>&nbsp;</summary>
 
-[1. Configuration](#configuration)
-[2. File Formats](#file-formats)
-[3. Features and Usage](#features-and-usage)
-[4. Tutorial](#tutorial)
-[5. Limitations](#limitations)
-[6. Getting Help](#help)
-[7. References and Links](#references-links)
+1.  [Configuration](#configuration)
+2.  [File Formats](#file-formats)
+3.  [Features and Usage](#features-and-usage)
+4.  [Tutorial](#tutorial)
+5.  [Limitations](#limitations)
+6.  [Getting Help](#help)
+7.  [References and Links](#references-links)
 
 </details>
 
