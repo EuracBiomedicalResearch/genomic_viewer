@@ -1,8 +1,3 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 
 # Genomic Viewer Reference Manual
 <div align="center">
@@ -20,19 +15,19 @@ and analyzing genomic data hosted in a Docker container.
 <details open>
 <summary>&nbsp;</summary>
 
-1.  [Configuration](#configuration)
-2.  [File Formats](#file-formats)
-3.  [Features and Usage](#features-and-usage)
-4.  [Tutorial](#tutorial)
-5.  [Limitations](#limitations)
-6.  [Getting Help](#help)
-7.  [References and Links](#references-links)
+[1. Configuration](#configuration)
+[2. File Formats](#file-formats)
+[3. Features and Usage](#features-and-usage)
+[4. Tutorial](#tutorial)
+[5. Limitations](#limitations)
+[6. Getting Help](#help)
+[7. References and Links](#references-links)
 
 </details>
 
 ------------------------------------------------------------------------
 
-## Configuration
+## 1. Configuration
 
 <details open>
 <summary>&nbsp;</summary>
@@ -332,7 +327,7 @@ To work with multiple sessions:
 
 ------------------------------------------------------------------------
 
-## File Formats
+## 2. File Formats
 
 The following section will describe the file formats that can be imported in
 **Genomic viewer**, mentioning if there are specific requirements and for which
@@ -536,7 +531,7 @@ tend to be large files.
 
 ------------------------------------------------------------------------
 
-## Features and Usage
+## 3. Features and Usage
 
 In the following section the user will find a detailed description of the main
 functions that are available from ***Genomic Viewer*** interface.
@@ -1253,7 +1248,7 @@ Viewer*** interface:
 
 ------------------------------------------------------------------------
 
-## Tutorial
+## 4. Tutorial
 
 <div>
 <details open>
@@ -1328,6 +1323,7 @@ main central window. Next, click the *Go* button to generate the genomic plot.
 <img src="GV_chr5_overview.png"
      alt="GV overview of chromosome 5 example genomic tracks"
      width="80%">
+     **Figure 4.1** 
 
 In the Manhattan plot, we notice a pileup of significant SNPs close to the right
 chromosome end. We want to look in more detail at this region, so we use the
@@ -1351,6 +1347,7 @@ button.
 <img src="GV_chr5_zoom.png"
      alt="GV zoom of chromosome 5 example genomic tracks"
      width="80%">
+     **Figure 4.2** 
 
 In the enlarged visualization focusing on *SLC34A1*, we note the presence of
 some epigenetic features, like regulatory elements, ATAC-seq
@@ -1359,7 +1356,7 @@ feature is the presence of an enhancer region inside of the SLC34A1 gene (marked
 green) that overlaps with significant SNPs. Enhancers located inside genes can 
 act in place of a typical promoters for a specific isoform initiating 
 transcription itself or influencing splicing (Maqbool et al. 2020)[[2]](#ref2). 
-Despite not being a sufficient validation, if this is true for SLC34A1 gene 
+Despite not being a sufficient validation, if this is true for *SLC34A1* gene 
 we expect that the enhancer overlaps with the TSS of a shorter isoform. 
 With ***Genomic Viewer*** we can inspect transcript isoforms by checking the 
 *Expand transcripts* box in the right sidebar, which will automatically trigger 
@@ -1368,6 +1365,7 @@ the visualization of all isoforms.
 <img src="GV_tutorial_SLC34A1_exptransc.png"
      alt="GV expanded isoforms for SLC34A1 gene"
      width="80%">
+     **Figure 4.3** 
 
 As we can see from the resulting plot, the hypothesis of this enhancer to work 
 as internal promoter is compatible with the presence of a short *SLC34A1* isoform 
@@ -1386,6 +1384,7 @@ in the *Load coordinates* drop down menu.
 <img src="GV_tutorial_SLC34A1_TAD.png"
      alt="GV flanking region with TADs of SLC34A1 locus"
      width="80%">
+     **Figure 4.4** 
 
 After pressing the *Go* button, the resulting plot shows that the *SLC34A1* gene 
 and the enhancer we are evaluating (black arrow in the image above) are located 
@@ -1441,10 +1440,13 @@ from the *Download* button below each table.
 
 For example, we can see that the 4 SNPs above the significance threshold have the
 following IDs: rs3812035, rs6420094, rs6862195, rs7447593. With these IDs, we
-can interrogate the literature for reported information on their effect on CKD
-or other pathologies. Of note, the rs6420094 was already observed in association
-with diabetic kidney disease (DKD) (Zhang et al 2023)[[4]](#ref4), while there 
-is still no report for the others.  
+can interrogate the literature and databases for reported information on their 
+effect on gene product integrity, CKD or other pathologies. According to a  
+[dbSNP](https://www.ncbi.nlm.nih.gov/snp/) search, all the relevant SNPs have
+functional consequences that do not affect the coding sequence, reinforcing the
+hypothesis of a potential regulatory elements-mediated effect. Of note, the 
+rs6420094 was already observed in association with diabetic kidney disease (DKD) 
+(Zhang et al 2023)[[4]](#ref4), while there is still no report for the others.  
 <!-- Well, this is like the carrot in front of the mule. What's up now with
 these SNPs? Dive in, we want to tell a story! Where are they exactly located.
 Are they even changing the codeing sequence? -->
@@ -1571,11 +1573,10 @@ practical starting point for downstream analytical or experimental validation.
 
 </details>
 </div>
-------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-## Limitations
+## 5. Limitations
 
 <div>
 <details open>
@@ -1626,7 +1627,7 @@ tools.
 
 ------------------------------------------------------------------------
 
-## Getting Help
+## 6. Getting Help
 
 <div>
 <details open>
@@ -1644,7 +1645,7 @@ maintainer](mailto:sara.lago@eurac.edu) by email.
 
 ------------------------------------------------------------------------
 
-## References and Links
+## 7. References and Links
 <div>
 <details open>
 <summary>&nbsp;</summary>
@@ -1681,7 +1682,7 @@ Cell Differentiation. Cell Reports 2020;32:108048.
 *3.*<a id="ref3"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical,
 and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715.
 
-*4.*<a id="ref4"> Liu Y, Chen Y, Yang Q et al. Single nucleotide polymorphisms 
+*4.*<a id="ref4"></a> Liu Y, Chen Y, Yang Q et al. Single nucleotide polymorphisms 
 in the GFR-related gene and the SNP-SNP interactions on the risk of diabetic 
 kidney disease in Chinese Han population. Acta Diabetol 2023;60:115–25.</a>
 
