@@ -1322,9 +1322,7 @@ main central window. Next, click the *Go* button to generate the genomic plot.
 
 <img src="GV_chr5_overview.png"
      alt="GV overview of chromosome 5 example genomic tracks"
-     width="80%">
-     
-**Figure 4.1** 
+     width="80%"><br>**Figure 4.1:** *Chromosome 5 overview.* 
 
 In the Manhattan plot, we notice a pileup of significant SNPs close to the right
 chromosome end. We want to look in more detail at this region, so we use the
@@ -1347,9 +1345,7 @@ button.
 
 <img src="GV_chr5_zoom.png"
      alt="GV zoom of chromosome 5 example genomic tracks"
-     width="80%">
-     
-**Figure 4.2** 
+     width="80%"><br>**Figure 4.2:** *Zoom-in of SLC34A1 gene locus.* 
 
 In the enlarged visualization focusing on *SLC34A1*, we note the presence of
 some epigenetic features, like regulatory elements, ATAC-seq
@@ -1366,9 +1362,7 @@ the visualization of all isoforms.
 
 <img src="GV_tutorial_SLC34A1_exptransc.png"
      alt="GV expanded isoforms for SLC34A1 gene"
-     width="80%">
-     
-**Figure 4.3** 
+     width="80%"><br>**Figure 4.3:** *Expanded transcript isoforms in SLC34A1 locus.* 
 
 As we can see from the resulting plot, the hypothesis of this enhancer to work 
 as internal promoter is compatible with the presence of a short *SLC34A1* isoform 
@@ -1386,9 +1380,8 @@ in the *Load coordinates* drop down menu.
 
 <img src="GV_tutorial_SLC34A1_TAD.png"
      alt="GV flanking region with TADs of SLC34A1 locus"
-     width="80%">
-     
-**Figure 4.4** 
+     width="80%"><br>**Figure 4.4:** 
+     *TADs and sub-TADs associated to the SLC34A1 locus*  
 
 After pressing the *Go* button, the resulting plot shows that the *SLC34A1* gene 
 and the enhancer we are evaluating (black arrow in the image above) are located 
