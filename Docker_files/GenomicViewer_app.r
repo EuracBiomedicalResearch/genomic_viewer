@@ -81,7 +81,7 @@ if (length(missing.keys) > 0) {
 expected.ext <- list(
   "bw.file"  = c(".bw", ".bigwig"),
   "bedpe.file" = ".bedpe",
-  "bed.file" = c(".bed", ".tsv", ".txt"),
+  "bed.file" = c(".bed", ".bam", ".tsv", ".txt"),
   "hic.file" = c(".hic"),
   "gwas.file" = c(".tsv", ".txt"),
   "cat.file" = c(".bed", ".tsv", ".txt"),
@@ -95,40 +95,41 @@ for (key in names(config)) {
   if (grepl("\\.file$", key, ignore.case = TRUE)) {
     value <- config[[key]]
     # Skip if value is empty
-    if (is.null(value) || value == "") next
-    # Remove compression ext
-    value <- gsub(paste(compressed.ext, collapse = "|"), "", value)
-    # Get file extension including dot, lowercased
-    ext <- paste0(".", tolower(tools::file_ext(value)))
-    # Determine expected extensions for this key
-    if (key %in% names(expected.ext)) {
-      allowed <- expected.ext[[key]]
-    } else {
-      # Default: accept any extension
-      next
-    } # Check if the extension is valid
-    if (!(ext %in% tolower(allowed))) {
-      stop(sprintf(
-        "#### CONFIGURATION ERROR #### \n File extension error: '%s' should have extension %s but got '%s'.",
-        key, paste(allowed, collapse = " or "), ext
-      ))
+    for (v in value){
+      if (is.null(v) || v == "") next
+      # Remove compression ext
+      value <- gsub(paste(compressed.ext, collapse = "|"), "", v)
+      # Get file extension including dot, lowercased
+      ext <- paste0(".", tolower(tools::file_ext(v)))
+      # Determine expected extensions for this key
+      if (key %in% names(expected.ext)) {
+        allowed <- expected.ext[[key]]
+        # Default: accept any extension
+        next
+      } # Check if the extension is valid
+      if (!(ext %in% tolower(allowed))) {
+        stop(sprintf(
+          "#### CONFIGURATION ERROR #### \n File extension error: '%s' should have extension %s but got '%s'.",
+          key, paste(allowed, collapse = " or "), ext
+        ))
+      }
     }
   }
 }
 
 ## Read data from config file
 # Set a BigWig file
-bw.file <- dir(file.path("/", config$data.dir, config$bw.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bw.file)
+bw.file <- unlist(lapply(config$bw.file, function(p) dir(file.path("/", config$data.dir, config$bw.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
 # Set a bed file
-bedpe.file <- dir(file.path("/", config$data.dir, config$bedpe.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bedpe.file)
+bedpe.file <- unlist(lapply(config$bedpe.file, function(p) dir(file.path("/", config$data.dir, config$bedpe.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
 # Set a bedpe file
-bed.file <- dir(file.path("/", config$data.dir, config$bed.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$bed.file)
+bed.file <- unlist(lapply(config$bed.file, function(p) dir(file.path("/", config$data.dir, config$bed.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
 # Set hiC data file
-hic.file <- dir(file.path("/", config$data.dir, config$hic.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$hic.file)
+hic.file <- unlist(lapply(config$hic.file, function(p) dir(file.path("/", config$data.dir, config$hic.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
 # Set GWAS data file
-gwas.file <- dir(file.path("/", config$data.dir, config$gwas.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$gwas.file)
+gwas.file <- unlist(lapply(config$gwas.file, function(p) dir(file.path("/", config$data.dir, config$gwas.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
 # Categorical bed file
-cat.file <- dir(file.path("/", config$data.dir, config$cat.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$cat.file)
+cat.file <- unlist(lapply(config$cat.file, function(p) dir(file.path("/", config$data.dir, config$cat.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
 # Region Table file
 saved.coord.path <- dir(file.path("/", config$data.dir, config$reg.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
 saved.coord <- read_delim(saved.coord.path, "\t", col_names = F, show_col_types = F)
@@ -156,7 +157,7 @@ ui <- page_sidebar(
     # text input to choose genomic coordinates:
     span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:14%; margin-top:-50px" )),
       # Reference genome
-    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh19 - H. sapiens)", 
+    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh37 - H. sapiens)", 
                                                              "hg38 (GRCh38 - H. sapiens)", 
                                                              "T2T (CHM13 - H. sapiens)",
                                                              "mm10 (GRCm38 - M. musculus)",
