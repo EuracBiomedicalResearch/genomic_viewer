@@ -68,13 +68,13 @@ default:
   # Specific file formats section.
   # Note: Specify the following keys information for every file section below:
   # 1) 'dir': directory containing the files specified in that block.
-  # 2) 'file': A file name or part of a file name that matches a file/list of
-  #           files with the same format.
+  # 2) 'file': A file name/list or part of a file name that matches a file/list 
+  #           of files with the same format.
   # 3) 'names': list of the sample names to be displayed.
 
   # BIGWIG files section.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.file: "treat_pileup_chr5.bw"
+  bw.file: ["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"]
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
   # BEDPE files section.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
@@ -127,9 +127,9 @@ Each group follows the same pattern:
 
 - `*.dir` — subdirectory, or array of subdirectories relative to `data.dir`;
 
-- `*.file` — file name or extension;
+- `*.file` — a single file name, extension, or a list of multiple patterns;
 
-- `*.names` — array of sample names that will be displayed.  
+- `*.names` — list of sample names that will be displayed.  
 
 **Notes:** The `*.names` field is present for all file groups except one, which does
 not require track labeling. This exception is specified in the relative chunk of
@@ -154,7 +154,7 @@ subdirectories common to all files are also accepted
   
   - a full directory name (e.g. `"RNAseq"`);
   
-  - an array with multiple directory names, when files of the same type are 
+  - a list with multiple directory names, when files of the same type are 
     saved in different folders (e.g. `["RNAseq", "ATACseq"]`);
     
   - an empty string `""` for no directory.
@@ -164,12 +164,15 @@ Paths with subdirectories are also allowed (e.g. `"RNAseq/untreated"`)
 
 3) The `*.file` field accepts:
 
-  - a full file name (e.g. `"RNAseq_sample1_rep1.bed"`);
+  - a single full file name (e.g. `"RNAseq_sample1_rep1.bed"`);
+  
+  - a list with multiple file names whose order will be preserved for plotting 
+    (e.g. `["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"])`
 
   - a file extension (e.g. `".bed"`);
 
   - a regular expression or wildcards, useful to match multiple files 
-    (below a note for how to apply them);
+    (For advanced users! Below a note for how to apply them);
 
   - an empty string `""` for no file.
 
@@ -188,17 +191,26 @@ example *configuration file*:
 ```
   # BIGWIG files section.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.file: "treat_pileup_chr5.bw"
+  bw.file: ["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"]
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
 
 ```
-The file pattern `"treat_pileup_chr5.bw"` is searched in the 
-`""GSE212908_RAW_ATAC_bigwig""` directory. Upon [***Genomic Viewer*** 
-installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation)
-two files matching this pattern will be available from the specified folder:
-`"GSM6560954_cortex_12_treat_pileup_chr5.bw"` and 
-`"GSM6560956_cortex_15_treat_pileup_chr5.bw"`. There are several alternatives to 
-obtain the same result through regular expressions and wildcards, for instance:
+Here, two full file names are specified in a list as the `bw.file` key value: 
+`"GSM6560954_cortex_12_treat_pileup.bw"` and `"GSM6560956_cortex_15_treat_pileup.bw"`.
+These two files are made available in the `"GSE212908_RAW_ATAC_bigwig` directory 
+upon [***Genomic Viewer*** installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation).
+
+To mention a shorter alternative that gives exactly the same output, we can 
+specify as `bw.file` value a common pattern in the two file names, like 
+`"treat_pileup_chr5.bw"`.
+
+The advantage of using full names is that the order in which files are specified 
+by the user is preserved during data plotting, while the shorter pattern matching 
+will sort the files alphabetically. This must be considered when setting sample 
+labels in the `*.names` key.
+
+Advanced users may also specify file-name patterns using regular expressions and 
+wildcards, for example:
 
   - by using the operator `|`, which allows to
     specify two alternative patterns to be matched (e.g 
@@ -213,7 +225,8 @@ obtain the same result through regular expressions and wildcards, for instance:
     This example is too elaborated for this use case, but is for illustrative
     purpose only.
 
-When multiple files match, they are:
+When multiple files match through regular expressions or short common pattern, 
+they are:
 
   - sorted alphabetically;
 
@@ -222,14 +235,16 @@ When multiple files match, they are:
 
 4) The `*.names` field accepts:
 
-  - arrays of strings (e.g. `["sample1", "sample2"", ..]`).
+  - a list of track names (e.g. `["sample1", "sample2"", ..]`).
   
-  - empty arrays for no name `[""]`.
+  - an empty list for no name `[""]`.
   
-Track names are read in the order specified by the user, so they must match the 
-alphabetical order of the files.
+Track names follow the user-specified order and must match the order of files in
+`*.file`, or the alphabetical order of files matched via patterns or regular 
+expressions.
 
-**Tip:** when you have a long list of files the easiest way to ensure a matching
+**Tip:** when you have a long list of files that you do not want to specify by 
+full file names, the easiest way to ensure a matching
 between files and track names is to add either 1, 2,..9 or A, B,..Z at the 
 beginning of the file names to respect the alphabetical order.
 
@@ -293,35 +308,6 @@ To work with multiple sessions:
 
 - be sure that the desired file from which to search the data is into the 
   application directory before startup.
-
-
-
-<!-- 
-
- - The assignment of bw.names to tracks inside the respective files is not at
-   all user friendly and very prone to errors. How should the user know what
-   is the alphabetical order of all items? I would prefer something more
-   explicit.
--->
-
-<!-- General recommendatation:
-
- I have used a (hopefully) consistent way for formatting text. Yours was full
- emphasis markup that did not improve readability. Please stick to this now.
-
- - Consistently write ***Genome Viewer*** as virtually the almost only font
-   variant.
- - Buttons are only *ButtonName*. Eg. 'Hitting the *Go* button'.
- - Same with all the panels and other graphical elements we refer by name:
-   only their name is emphasized with markup. *Stats* panel.
-   *Input coordinates:* panel.
- - Genomic file types are written as they should be (BED, BEDPE, BAM, bugWig).
- - A graphics file format is upper case (PNG, SVG, PDF, ...) and a file
-   extension used in a file name is lower case (.png, .svg, .pdf).
- - Tried to avoid using 'The user...' sentences in many cases. Indirect speech
-   is better. 'You' and 'One' is also ok in some cases.A
-
--->
 
 </details>
 
@@ -551,42 +537,42 @@ and right sidebar and the central window.
 
 **Left sidebar**
 
-| Section/Button     | Function                                              |
-|--------------------|-------------------------------------------------------|
-| Reference genome   | Select a reference genome form list.                  |
-| Insert coordinates | Choose chromosome to visualize from dropdown menu and |
-|                    | enter start and end coordinates.                      |
-| Load coordinates   | Load a BED format file with a list of saved genomic   |
-|                    | coordinates. If present, the file specified in the    |
-|                    | configuration file will be loaded as default.         |
-| Go button          | Generate plot according to the selected options.      |
-| Save button        | Export plot choosing among different formats:         |
-|                    | SVG, PDF, PNG, JPG.                                   |
+| Section/Button        | Function                                             |
+|-----------------------|------------------------------------------------------|
+| Reference genome      | Select a reference genome form list.                 |
+| Insert coordinates    | Choose chromosome to visualize from dropdown menu and|
+|                       | enter start and end coordinates.                     |
+| Load/edit coordinates | Load a BED format file with a list of saved genomic  |
+|                       | coordinates. If present, the file specified in the   |
+|                       | configuration file will be loaded as default.        |
+| Go button             | Generate plot according to the selected options.     |
+| Save button           | Export plot choosing among different formats:        |
+|                       | SVG, PDF, PNG, JPG.                                  |
 
 
 **Right sidebar**
 
-| Section/Button     | Function                                              |
-|--------------------|-------------------------------------------------------|
-| Choose chromosome  | Select a chromosome to plot by hovering over the plot |
-|                    | and clicking.                                         |
-| Search by gene     | Search the genomic coordinates of a gene              |
-| bigWig plot mode   | Choose if plotting bigWig tracks in profile or heatmap|
-|                    | mode. Both plots can also be generated simultaneously.|
-| Autoscale settings | Define grouping rule for autoscaling bigWig tracks.   |
-| Expand category    | Expand tracks loaded from categorical BED files to    |
-|                    | avoid categories overlap.                             |
-| Expand transcripts | Alternative to gene label track, plots transcript     |
-|                    | isoforms individually.                                |
-| Chromosome ideogram| If checked, shows the chromosome ideogram in the plot.|
+| Section/Button       | Function                                              |
+|----------------------|-------------------------------------------------------|
+| Choose chromosome    | Select a chromosome to plot by hovering over the plot |
+|                      | and clicking.                                         |
+| Search by gene       | Search the genomic coordinates of a gene              |
+| bigWig plot mode     | Choose if plotting bigWig tracks in profile or heatmap|
+|                      | mode. Both plots can also be generated simultaneously.|
+| Autoscale settings   | Define grouping rule for autoscaling bigWig tracks.   |
+| Expand category      | Expand tracks loaded from categorical BED files to    |
+|                      | avoid categories overlap.                             |
+| Expand transcripts   | Alternative to gene label track, plots transcript     |
+|                      | isoforms individually.                                |
+| Chromosome ideogram  | If checked, shows the chromosome ideogram in the plot.|
 
 **Central window**
 
-| Section/Button     | Function                                              |
-|--------------------|-------------------------------------------------------|
-| Plot, Data, Stats  | Click to access the corresponding navigation tab and  |
-|                    | related functions.                                    |
-| Zoom section       | Increase/decrease genomic range in the plot.          |
+| Section/Button       | Function                                              |
+|----------------------|-------------------------------------------------------|
+| Plot, Data, Stats    | Click to access the corresponding navigation tab and  |
+|                      | related functions.                                    |
+| Zoom section         | Increase/decrease genomic range in the plot.          |
 
 </details>
 </div>
@@ -637,7 +623,7 @@ fields available from the same panel followed by hitting the *Go* button.
      alt="GV insert coordinates panel for genome navigation"
      width="25%">
 
-#### Load coordinates
+#### Load/edit coordinates
 
 The user can navigate across a list of previously saved coordinates by
 specifying a region table BED file to be uploaded through the [configuration
@@ -677,7 +663,7 @@ Similarly, if you want to remove a coordinate from the uploaded list, you can
 select the entry form the dropdown list and next click the *Remove* button.
 The new custom coordinates list can also be exported for later re-use.
 
-To restore the initial setting of the *Load coordinates* panel it is sufficient
+To restore the initial setting of the *Load/edit coordinates* panel it is sufficient
 to click the *Reset* button at the panel's bottom.
 
 #### Choose chromosome
@@ -1309,7 +1295,7 @@ graphics in the upper right sidebar.
 <img src="GV_choose_chrom.png" alt="GV interactive chromosome hover plot"
      width="25%">
 
-Clicking on chromosome 5 passes the coordinates to the *Load coordinates* panel
+Clicking on chromosome 5 passes the coordinates to the *Load/edit coordinates* panel
 on the left sidebar. Make sure that the *Plot* navigation tab is selected in the
 main central window. Next, click the *Go* button to generate the genomic plot.
 
@@ -1324,7 +1310,7 @@ In the Manhattan plot, we notice a pileup of significant SNPs close to the right
 chromosome end. We want to look in more detail at this region, so we use the
 *drag and drop zoom bar* at the bottom of the plot. For quick access, we have
 already preloaded these coordinates as a custom coordinates list. This is
-accessed via the *Load Coordinates* panel in the left sidebar. By clicking on
+accessed via the *Load/edit Coordinates* panel in the left sidebar. By clicking on
 the first entry in the list, the corresponding coordinates (relative to the gene
 *SLC34A1*) are passed to the tool and the *Insert Coordinates* panel will
 automatically update.
@@ -1372,7 +1358,7 @@ As before, you can use the *drag and drop zoom bar* or *zoom buttons* to extend
 the visualized window until the rightmost anchor of the loop and until additional 
 loops on the left side of *SLC34A1* are displayed. Also in this case we saved
 for you the coordinates for a quick access. To select them, click the second entry
-in the *Load coordinates* drop down menu.
+in the *Load/edit coordinates* drop down menu.
 
 <img src="GV_tutorial_SLC34A1_TAD.png"
      alt="GV flanking region with TADs of SLC34A1 locus"
