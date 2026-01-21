@@ -196,7 +196,7 @@ ui <- page_sidebar(
              )
          )),
     
-    card(tags$b("Load coordinates:", style = "font-size: 90%; text-align:center"),
+    card(tags$b("Load/edit coordinates:", style = "font-size: 90%; text-align:center"),
          # Button to upload a user defined file of saved coordinates.
          tags$head(
            tags$style("
