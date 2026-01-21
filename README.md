@@ -263,7 +263,7 @@ during a working session:
 - The genomic visualization can be exported as a high quality plot in different
   file formats with the <strong>Save</strong> button.
 - A custom list of coordinates dynamically created during the working session
-  can be exported and saved in the <strong>Load coordinates</strong> panel.
+  can be exported and saved in the <strong>Load/edit coordinates</strong> panel.
 - Raw data corresponding to what is shown in the selected genomic region can be
   downloaded as individual files in the <strong>Data</strong> navigation panel.
 
