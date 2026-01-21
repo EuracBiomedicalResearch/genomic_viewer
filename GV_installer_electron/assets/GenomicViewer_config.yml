@@ -24,7 +24,7 @@ default:
 
   # BIGWIG files section.
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.file: ["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"]
+  bw.file: ["GSM6560954_cortex_12_treat_pileup_chr5.bw", "GSM6560956_cortex_15_treat_pileup_chr5.bw"]
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
   # BEDPE files section.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
