@@ -102,7 +102,6 @@ application running.
 1. Extract the `windows-x64` installer file.
 2. Start setup by double-click on `genomicviewer-gui-installer-1.0.0 Setup` file.
 3. Follow the installer wizard instructions.
-<br/><br/>
 
 **Uninstallation:**
 
@@ -110,7 +109,7 @@ application running.
 2. Follow the "Remove App Data" instructions to remove app-associated data. 
   (*Note: user's own data saved in the data folder are preserved*).
 3. Uninstall application from `Windows Start Menu > Settings > Apps > Uninstall`.
-
+<br/><br/>
 
 
 #### <span style = "font-size: 1.2em;">**macOS**</span>
@@ -128,14 +127,13 @@ application running.
 2. Start setup by double-click on `GenomicViewer.dmg` file.
 3. Drag the `.app` bundle to the `Application` folder.
 4. Follow the installation wizard instructions.
-<br/><br/>
 
 **Uninstallation:**
 
 1. Start `GenomicViewer.dmg` package.
 2. FOllow the "Remove App Data" instructions.
 3. Drag the `GenomicViewer.app` bundle to `Trash`.
-
+<br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Linux**</span>
 
