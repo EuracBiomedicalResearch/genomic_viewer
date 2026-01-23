@@ -16,7 +16,7 @@ and analyzing genomic data hosted in a Docker container.
 
 1.  [Overview](#overview)
 2.  [System Requirements](#system-requirements)
-3.  [Installation](#installation)
+3.  [Installation and Uninstallation](#installation)
 4.  [Getting Started](#getting-started)
 5.  [Source Code](#source-code)
 
@@ -69,7 +69,7 @@ Software and Hardware
 
 ------------------------------------------------------------------------
 
-## Installation
+## Installation and Removal
 
 <details open>
 
@@ -104,6 +104,15 @@ application running.
 3. Follow the installer wizard instructions.
 <br/><br/>
 
+**Uninstallation:**
+
+1. Start `genomicviewer-gui-installer-1.0.0 Setup` file.
+2. Follow the "Remove App Data" instructions to remove app-associated data. 
+  (*Note: user's own data saved in the data folder are preserved*).
+3. Uninstall application from `Windows Start Menu > Settings > Apps > Uninstall`.
+
+
+
 #### <span style = "font-size: 1.2em;">**macOS**</span>
 
 **Prerequisites:**
@@ -120,6 +129,13 @@ application running.
 3. Drag the `.app` bundle to the `Application` folder.
 4. Follow the installation wizard instructions.
 <br/><br/>
+
+**Uninstallation:**
+
+1. Start `GenomicViewer.dmg` package.
+2. FOllow the "Remove App Data" instructions.
+3. Drag the `GenomicViewer.app` bundle to `Trash`.
+
 
 #### <span style = "font-size: 1.2em;">**Linux**</span>
 
@@ -157,6 +173,21 @@ application running.
    `./genomicviewer-gui-installer-x86_64.AppImage --no-sandbox` based on your
    Linux setup.
 2. Follow the installer wizard instructions.
+
+**Uninstallation**<br>
+***For Genomic Viewer installed as root user:***
+1. Launch `genomicviewer-gui-installer-1.0.0_amd64` or
+   `genomicviewer-gui-installer-1.0.0-1.x86_64` command in a terminal.
+2. Follow the "Remove App Data" instructions.
+3. Remove the application package by running 
+  `sudo apt remove genomicviewer-gui-installer-1.0.0_amd64.deb` or 
+  `sudo dnf remove genomicviewer-gui-installer-1.0.0_amd64.rpm`.
+
+
+***For Genomic Viewer installed as non-root user:***
+1. Run the self-contained app image `genomicviewer-gui-installer-x86_64.AppImage`.
+2. Follow the "Remove App Data" instructions.
+3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
 </div>
 </details>
@@ -263,7 +294,7 @@ during a working session:
 - The genomic visualization can be exported as a high quality plot in different
   file formats with the <strong>Save</strong> button.
 - A custom list of coordinates dynamically created during the working session
-  can be exported and saved in the <strong>Load/edit coordinates</strong> panel.
+  can be exported and saved in the <strong>Load coordinates</strong> panel.
 - Raw data corresponding to what is shown in the selected genomic region can be
   downloaded as individual files in the <strong>Data</strong> navigation panel.
 
@@ -292,7 +323,6 @@ User Interface Overview
 </summary>
 
 <div>
-    
 Brief description of the ***Genomic Viewer*** graphical interface structure.
 
 <h4><strong>Main Window</strong></h4>
