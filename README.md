@@ -106,7 +106,7 @@ application running.
 **Uninstallation:**
 
 1. Start `genomicviewer-gui-installer-1.0.0 Setup` file.
-2. Follow the "Remove App Data" instructions to remove app-associated data. 
+2. Follow the *"Remove App Data"* instructions to remove app-associated data. 
   (*Note: user's own data saved in the data folder are preserved*).
 3. Uninstall application from `Windows Start Menu > Settings > Apps > Uninstall`.
 <br/><br/>
@@ -131,7 +131,7 @@ application running.
 **Uninstallation:**
 
 1. Start `GenomicViewer.dmg` package.
-2. FOllow the "Remove App Data" instructions.
+2. Follow the *"Remove App Data"* instructions.
 3. Drag the `GenomicViewer.app` bundle to `Trash`.
 <br/><br/>
 
@@ -160,8 +160,7 @@ application running.
    `genomicviewer-gui-installer-1.0.0-1.x86_64.rpm` file, depending on your
    linux distribution.
 3. Launch the application setup by executing
-   `genomicviewer-gui-installer-1.0.0_amd64` or
-   `genomicviewer-gui-installer-1.0.0-1.x86_64` command in a terminal.
+   `genomicviewer-gui-installer` command in a terminal.
 
 ***To install Genomic Viewer as non-root user:***
 
@@ -176,15 +175,15 @@ application running.
 ***For Genomic Viewer installed as root user:***
 1. Launch `genomicviewer-gui-installer-1.0.0_amd64` or
    `genomicviewer-gui-installer-1.0.0-1.x86_64` command in a terminal.
-2. Follow the "Remove App Data" instructions.
+2. Follow the *"Remove App Data"* instructions.
 3. Remove the application package by running 
-  `sudo apt remove genomicviewer-gui-installer-1.0.0_amd64.deb` or 
-  `sudo dnf remove genomicviewer-gui-installer-1.0.0_amd64.rpm`.
+  `sudo apt remove genomicviewer-gui-installer` or 
+  `sudo dnf remove genomicviewer-gui-installer`.
 
 
 ***For Genomic Viewer installed as non-root user:***
 1. Run the self-contained app image `genomicviewer-gui-installer-x86_64.AppImage`.
-2. Follow the "Remove App Data" instructions.
+2. Follow the *"Remove App Data"* instructions.
 3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
 </div>
