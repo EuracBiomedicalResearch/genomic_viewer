@@ -281,6 +281,8 @@ ui <- page_sidebar(
                         # Warning message in case there is no data
                         tags$head(tags$style(".shiny-output-error{visibility: hidden;}")),
                         tags$head(tags$style(".shiny-output-error:after{content: 'There is no data in this range. Try with different coordinates.'; visibility: visible; color: slategrey; position: absolute; top: 10px; left: 70px;}")),
+                        # Notification of selected reference genome
+                        uiOutput("current.ref"),
                         # Main plot
                         tags$head(tags$style(HTML("#res svg g#svg-pan-zoom-controls {
                                                     transform: translate(880px, 300px) scale(0.5) !important;
@@ -455,11 +457,31 @@ server <- function(input, output, session){
   ########################## CARD PLOT
   ##---------------------- Output selected coordinates text:
   output$sel.coord <- renderText({paste("chr", reactiveChr(), ": ", reactiveChrstart(), "-", reactiveChrend(), sep="")})
+  ##---------------------- Show/hide current reference genome as warning for the user: 
+  plot.ready <- reactiveVal(FALSE)
+  show.ref.message <- reactiveVal(TRUE)
+  
+  observeEvent(input$go, {
+    plot.ready(TRUE)
+    show.ref.message(FALSE)
+  })
+  
+  observeEvent(input$ref.genome, {
+    plot.ready(FALSE)
+    show.ref.message(TRUE)
+  })
+  
+  output$current.ref <- renderUI({
+    if (!show.ref.message()) return(NULL)
+    div("The current reference genome is: ", tags$strong(input$ref.genome), tags$br(), tags$em("Press Go to continue or choose the correct reference"))
+  })
+  
   ##---------------------- Output genomic view plot:
   
     tracks <- reactive({
+      req(plot.ready())
       genes.hgnc <- genes.hgnc()
-     req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 | 
+      req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 | 
            sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
       plotgardener.shiny.function(bw.file = bw.file, 
                                                                           hic.file = hic.file, 
@@ -496,6 +518,7 @@ server <- function(input, output, session){
   })
   
   image <- reactive({
+    req(plot.ready())
     genes.hgnc <- genes.hgnc()
     cond <- req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
     if (!cond) return(NULL)
@@ -1112,6 +1135,7 @@ server <- function(input, output, session){
     updateTextInput(session = getDefaultReactiveDomain(), "chr", value = genes.hgnc$chromosome_name[which(genes.hgnc$gene_symbol == input$gene.search)])
     updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = genes.hgnc$start_position[which(genes.hgnc$gene_symbol == input$gene.search)])
     updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = genes.hgnc$end_position[which(genes.hgnc$gene_symbol == input$gene.search)])
+    shinyjs::delay(100, shinyjs::click("go"))
     }
   })
   ##------------------------ END OF Search by gene
@@ -1221,6 +1245,14 @@ server <- function(input, output, session){
         print(chrstartNew + 500)
       } else print(input$chrend)
     })
+    ## Ref gen
+    refgenNew <- eventReactive(input$add, {
+      if (!is.na(input$ref.genome)) {
+        print(sapply(strsplit(input$ref.genome," "), `[`, 1))
+      } else {
+        print("")
+      }
+    })
     
     ## Add coordinates to Selectize drop-down list
     ### Aggiungerle solo se non é giá presente la stessa coordinata
@@ -1269,10 +1301,11 @@ server <- function(input, output, session){
     # message.
     observeEvent(input$ok, {
       coord.list <- coord.list()
+      refgenNew <- refgenNew()
       # Check that data object exists and is data frame.
       if (!is.null(input$region.name) && str_count(coord.list[grep(coord.list[length(coord.list)], coord.list)], ":") < 3){ 
         vals$data <- input$region.name
-        coord.list[length(coord.list)] <- paste(coord.list[length(coord.list)], vals$data, sep=":")
+        coord.list[length(coord.list)] <- paste(coord.list[length(coord.list)], refgenNew, vals$data, sep=":")
         updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.list, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
         coord.list(coord.list)
         removeModal()
@@ -1321,7 +1354,7 @@ server <- function(input, output, session){
       filename = function() { "User_Defined_RegionTable.bed" },
       content = function(file) {
         coord.list <- coord.list()
-        write_delim(as.data.frame(str_split_fixed(coord.list , ":", n=4)), file = file, delim = "\t", col_names = F)
+        write_delim(as.data.frame(str_split_fixed(coord.list , ":", n=5)), file = file, delim = "\t", col_names = F)
       })
     ##----------------------- END OF User selected coordiates REGION TABLE
     
