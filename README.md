@@ -16,7 +16,7 @@ and analyzing genomic data hosted in a Docker container.
 
 1.  [Overview](#overview)
 2.  [System Requirements](#system-requirements)
-3.  [Installation and Uninstallation](#installation)
+3.  [Installation and Removal](#installation)
 4.  [Getting Started](#getting-started)
 5.  [Source Code](#source-code)
 
