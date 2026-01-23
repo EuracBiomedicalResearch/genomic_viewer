@@ -5,6 +5,34 @@ const os = require('os');
 const { spawn, exec } = require('child_process');
 const createDesktopShortcut = require('create-desktop-shortcuts');
 
+//Uninstallation settings
+function scheduleWindowsCleanup() {
+  const appName = app.getName(); // e.g., 'Genomic Viewer'
+  const roamingPath = path.join(os.homedir(), 'AppData', 'Roaming', appName);
+  const localPath = path.join(os.homedir(), 'AppData', 'Local', appName);
+  const cachePath = app.getPath('cache');
+
+  // Use a PowerShell command to delete on next reboot
+  const cleanupScript = `
+  Start-Sleep -Seconds 2
+$paths = @("${roamingPath.replace(/\\/g, '\\\\')}", "${localPath.replace(/\\/g, '\\\\')}", "${cachePath.replace(/\\/g, '\\\\')}")
+foreach ($p in $paths) {
+    if (Test-Path $p) {
+        Remove-Item $p -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+`;
+
+  const tmpFile = path.join(os.tmpdir(), 'cleanup.ps1');
+  fs.writeFileSync(tmpFile, cleanupScript);
+
+  // Spawn PowerShell to run after exit
+  spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', tmpFile], {
+    detached: true,
+    stdio: 'ignore'
+  }).unref();
+}
+
 // ----------------------------
 // Handle Squirrel Events first
 // ----------------------------
@@ -13,16 +41,64 @@ if (squirrelEvent) {
   switch (squirrelEvent) {
     case '--squirrel-install':
     case '--squirrel-updated':
-    case '--squirrel-uninstall':
-    case '--squirrel-obsolete':
-      console.log('Squirrel event detected:', squirrelEvent);
-      app.quit(); // quit immediately
-      process.exit(0); // stop further JS execution
+      console.log('Squirrel install/update detected:', squirrelEvent);
+      app.quit();
+      process.exit(0);
       break;
+
+    case '--squirrel-uninstall':
+      console.log('Squirrel uninstall detected. Scheduling cleanup...');
+      // Schedule Roaming + Cache cleanup
+      scheduleWindowsCleanup();
+      app.quit();
+      process.exit(0);
+      break;
+
+    case '--squirrel-obsolete':
+      console.log('Squirrel obsolete detected:', squirrelEvent);
+      app.quit();
+      process.exit(0);
+      break;
+
     default:
       break;
   }
-} 
+}
+
+
+// ===============================
+// TRACK FILES CREATED BY THE APP
+// ===============================
+const createdFilesPath = path.join(
+  app.getPath('userData'),
+  'created-files.json'
+);
+
+function readCreatedFiles() {
+  if (!fs.existsSync(createdFilesPath)) {
+    return { launcherScripts: [], shortcuts: [] };
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(createdFilesPath, 'utf8'));
+  } catch {
+    return { launcherScripts: [], shortcuts: [] };
+  }
+}
+
+function writeCreatedFiles(data) {
+  fs.mkdirSync(path.dirname(createdFilesPath), { recursive: true });
+  fs.writeFileSync(createdFilesPath, JSON.stringify(data, null, 2));
+}
+
+function trackCreatedFile(type, filePath) {
+  const data = readCreatedFiles();
+  if (!data[type].includes(filePath)) {
+    data[type].push(filePath);
+    writeCreatedFiles(data);
+  }
+}
+// END track files created by app
 
 // Create main window
 function createWindow() {
@@ -309,6 +385,8 @@ ipcMain.handle('save-launcher-file', async (event, { scriptPath, platform }) => 
     if (platform !== 'win32') {
       fs.chmodSync(scriptPath, 0o755);
     }
+	
+	trackCreatedFile('launcherScripts', scriptPath);
 
     return { success: true };
   } catch (err) {
@@ -481,6 +559,60 @@ ipcMain.handle('create-shortcut', async (event, { scriptPath }) => {
 }
 
 return { success: result };
+});
+
+let shortcutPath;
+
+if (process.platform === 'win32') {
+  shortcutPath = path.join(os.homedir(), 'Desktop', 'Genomic Viewer.lnk');
+} else if (process.platform === 'linux') {
+  shortcutPath = path.join(os.homedir(), 'Desktop', 'Genomic Viewer.desktop');
+} else if (process.platform === 'darwin') {
+  shortcutPath = path.join(os.homedir(), 'Desktop', 'Genomic Viewer.app');
+}
+
+if (shortcutPath) {
+  trackCreatedFile('shortcuts', shortcutPath);
+}
+
+// =====================================
+// Remove all app data (Windows / macOS / Linux)
+// =====================================
+ipcMain.handle('remove-app-data', async () => {
+  try {
+    // 1️ Remove tracked files (launchers + shortcuts)
+    const tracked = readCreatedFiles();
+
+    [...tracked.launcherScripts, ...tracked.shortcuts].forEach((filePath) => {
+      try {
+        fs.rmSync(filePath, { recursive: true, force: true });
+      } catch {}
+    });
+
+    // 2️ Remove Electron data
+    if (process.platform === 'win32') {
+  scheduleWindowsCleanup(); // deletion scheduled after exit
+} else {
+  // macOS
+  if (process.platform === 'darwin') {
+    const libData = path.join(os.homedir(), 'Library', 'Application Support', 'genomicviewer-gui-installer');
+    try { fs.rmSync(libData, { recursive: true, force: true }); } catch {}
+  }
+
+  // Linux
+  if (process.platform === 'linux') {
+    const localData = path.join(os.homedir(), '.local', 'share', 'genomicviewer-gui-installer');
+    try { fs.rmSync(localData, { recursive: true, force: true }); } catch {}
+  }
+
+  try { fs.rmSync(app.getPath('userData'), { recursive: true, force: true }); } catch {}
+  try { fs.rmSync(app.getPath('cache'), { recursive: true, force: true }); } catch {}
+}
+
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
 });
 
 

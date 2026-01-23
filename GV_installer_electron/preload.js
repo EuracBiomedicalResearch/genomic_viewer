@@ -13,5 +13,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   copyConfigFile: (info) => ipcRenderer.invoke('copy-config-file', info),
   copyExampleData: (info) => ipcRenderer.invoke('copy-example-data', info),
   createShortcut: (info) => ipcRenderer.invoke('create-shortcut', info),
-  exitApp: () => ipcRenderer.invoke('exit-app')
+  exitApp: () => ipcRenderer.invoke('exit-app'),
+  removeAppData: () => ipcRenderer.invoke('remove-app-data')
 });
