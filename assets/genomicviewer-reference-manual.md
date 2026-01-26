@@ -600,7 +600,7 @@ list of available gene names and the gene annotation labels in the main plot
 output. When you change reference genome from the menu a message will appear in
 the main windows as a warning.
 
-<img src="GV_ref_change_message.png" alt="GV reference genome message" width="60%">
+<img src="GV_ref_change_message.png" alt="GV reference genome message" width="70%">
 
 </details>
 </div>
@@ -697,8 +697,6 @@ the gene of interest appears you can click on it and the tool will
 automatically load its coordinates. Note that changing the reference genome
 after selecting a gene the coordinates will not update automatically, but
 you have to search again for the gene in the menu.
-<!-- Ideally, change of the reference genome should clear the Load coordinates
- panel. To be implemented! -->
 
 <img src="GV_search_gene.png" alt="GV search by gene function" width="30%">
 
@@ -1429,9 +1427,6 @@ functional consequences that do not affect the coding sequence, reinforcing the
 hypothesis of a potential regulatory elements-mediated effect. Of note, the 
 rs6420094 was already observed in association with diabetic kidney disease (DKD) 
 (Zhang et al 2023)[[4]](#ref4), while there is still no report for the others.  
-<!-- Well, this is like the carrot in front of the mule. What's up now with
-these SNPs? Dive in, we want to tell a story! Where are they exactly located.
-Are they even changing the codeing sequence? -->
 
 On the other hand, having access to the exact coordinates of peaks and regulatory
 elements allows to gather details on the corresponding sequence, investigate the 
@@ -1441,8 +1436,6 @@ for experimental testing.
 Deepening these aspects is out of the aim of this tutorial, but provides an example 
 on how to exploit ***Genomic Viewer***-derived information for further biological 
 exploration.
-
-<!-- How? You owe the reader what he might do from here on. -->
 
 
 ### Evaluation of data (Stats tab)
@@ -1497,21 +1490,18 @@ interest facilitating biological interpretation and hypothesis building.
 In this example we investigated public data from the human kidney cortex and
 from patients with CKD to identify single nucleotide variants that may impact
 renal health. Looking at the Manhattan plot from a CKD GWA study on chromosome 5,
-revealed a locus of interest with signifcantly associated SNPs. A more detailed 
+revealed a locus of interest with significantly associated SNPs. A more detailed 
 investigation of this region indicates that at least 6 of the most significant 
 SNPs fall inside the *SLC34A1* gene. Of these, one was already reported in 
-association with DKD (Zhang et al 2023)[[4]](#ref4)<!-- Please also consider/discuss the fact that SNP
-proximity is not sufficient to causality! Clearly, this gene is the best
-candidate by function.  How many other genes we have there within a reasonable
-distance? And repeat what you have found about the SNPs in the previous section,
-where I have asked for more information. --> This gene encodes for a
-renal‐specific sodium–phosphate cotransporter responsible for the readsorption
-of filtered sodium and phosphate and is expressed in the proximal tubule within
-the renal cortex (Fearn et al.  2018)[[3]](#ref3). The clinical relevance of
-*SLC34A1* is supported by recent literature reporting its downregulation in
-acute kidney injury (Wilflingseder et al.)[[5]](#ref5). However SNPs proximity is 
-not sufficient to infer causality, thus we integrated epigenetic data from healthy
-individuals to obtain further cues on functional aspects of the locus. 
+association with DKD (rs6420094 - Zhang et al 2023)[[4]](#ref4). This gene 
+encodes for a renal‐specific sodium–phosphate cotransporter responsible for the 
+readsorption of filtered sodium and phosphate and is expressed in the proximal 
+tubule within the renal cortex (Fearn et al.  2018)[[3]](#ref3). The clinical 
+relevance of *SLC34A1* is supported by recent literature reporting its 
+downregulation in acute kidney injury (Wilflingseder et al.)[[5]](#ref5). 
+However SNPs proximity is not sufficient to infer causality, thus we integrated 
+epigenetic data from healthy individuals to obtain further cues on functional 
+aspects of the locus. 
 These data revealed that *SLC34A1* is in an open chromatin region, as demonstrated 
 from the overlap with ATAC-seq profiles and annotated peaks (Kidney cortex 12 
 and 15, ATAC peaks tracks) which also contains several regulatory elements. 
@@ -1526,26 +1516,13 @@ potentially interacting with multiple other genes. Knowing this is important to
 still consider other genes to be affected by the identified SNPs. Validating all 
 the target genes that interact with the enhancer requires specificexperimental 
 designs, like enhancer sequence mutagenesis or CRISPRi followed by RT-qPCR or 
-RNAseq.<!-- Again, what are the distal elements, do they
-have any connection with CKD? How can we make use of this finding? What would be
-possible further steps? (And why haven't they been described here?) -->
+RNAseq.
 Altogether, these observations indicate that the SNPs in the *SLC34A1* locus may 
 alter the function of epigenetic regulatory elements, which in turn can affect 
 the expression of the gene. The latter hypothesis can be demonstrated upon the 
 comparison of expression data (either RT-qPCR or RNA-seq) from individuals 
 affected by the SNPs or healthy. Unfortunately we do not have access to these data.
 
-<!-- So far, I am not convinced. You have listed a
-couple of features near the SNPs, but how close are they? Would it be enough to
-hypothetize that the SNPs are tagging changes in the regulatory elements? -->
-<!-- Well, the first is lab
-work. Ok. But the second we could also do. Why don't we have these data then
-already in the example dataset? And please finish this paragraph with a concrete
-message, dont' leave stuff open here. -->
-
-<!-- Please add a paragraph on limitations. Not excuses why data are not in the
-example or why you did not further dig into some follow-up worthy idea :-) Real
-limitations. What can be improved in the app? -->
 In summary, this tutorial illustrates how to use ***Genomic Viewer*** through a 
 complete exploratory workflow —from genome navigation to data export and 
 interpretation— using to integrate genetic and epigenetic datasets to move from 
@@ -1574,7 +1551,7 @@ constrained by resolution, normalization choices, and dataset specificity, and
 may not capture condition- or disease-specific chromatin states.
 
 From a technical perspective, Genomic Viewer is primarily designed for
-visualization and lightweight data inspection rather than large-scale or fully
+visualization and local data inspection rather than large-scale or fully
 customizable analyses. The application does not modify, preprocess, or normalize
 input files, and assumes that all datasets are already harmonized with respect
 to genome build, coordinate system, and formatting. Interactive actions are
@@ -1583,25 +1560,26 @@ cannot directly edit tracks, dynamically change file assignments, or execute
 custom computations within the interface.
 
 In addition, graphical customization is intentionally limited. Some visual
-parameters—such as color assignment for tracks—are automatically determined by
+parameters —such as color assignment for tracks— are automatically determined by
 the application and cannot be explicitly controlled by the user. Certain
 graphical actions provide alternative representations (e.g. different plot
 styles for a given data type), but these changes are applied globally to all
 loaded files of the same format, preventing mixed visualization outputs within
 a single track category. Performance and scalability further depend on
-client-side rendering and input file size, which may limit the number of tracks
-or the genomic window that can be explored smoothly in a single session.
+the computer rendering performance and input file size, which may limit the 
+number of tracks or the genomic window that can be explored smoothly in a single 
+session.
 
 Finally, ***Genomic Viewer*** currently supports a restricted set of reference
-genomes, with built-in annotations available for human and mouse only. While the
-underlying design allows extension to additional organisms, such support is not
-yet implemented in the current release.
+genomes, with built-in annotations available for several versions of human and 
+mouse only. While the underlying design allows extension to additional organisms, 
+such support is not yet implemented in the current release.
 
-Despite these limitations, Genomic Viewer is intended as a
+Despite these limitations, ***Genomic Viewer*** is intended as a
 hypothesis-generation platform that helps users prioritize loci, variants, and
-regulatory elements, providing a structured starting point for downstream
-computational analyses or targeted experimental validation using specialized
-tools.
+regulatory elements, or identifying differential coverage sites, providing a 
+structured starting point for downstream computational analyses or targeted 
+experimental validation using specialized tools.
 
 </details>
 </div>
@@ -1673,4 +1651,5 @@ super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun
 
 </details>
 </div>
+------------------------------------------------------------------------
 
