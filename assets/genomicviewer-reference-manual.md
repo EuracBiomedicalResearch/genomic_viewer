@@ -590,14 +590,17 @@ genome can be selected from a built-in list available form a dropdown menu at
 the top of the left sidebar. The reference genome and all user-supplied data
 files (via the the [configuration file](#configuration)) have to match. At
 ***Genomic Viewer*** startup the human hg19 (GRCh37) version of the reference
-genome is loaded by default.
+genome is loaded by default. 
 
 <img src="GV_ref_genome.png" alt="GV select reference genome menu" width="25%">
 
 Changing the selected working reference genome will affect the list of
 chromosomes in the *Insert coordinates* panel, the chromosome hover plot, the
 list of available gene names and the gene annotation labels in the main plot
-output.
+output. When you change reference genome from the menu a message will appear in
+the main windows as a warning.
+
+<img src="GV_ref_change_message.png" alt="GV reference genome message" width="25%">
 
 </details>
 </div>
@@ -630,14 +633,15 @@ specifying a region table BED file to be uploaded through the [configuration
 file](#configuration) or by accessing local files in a running ***Genomic
 Viewer*** session. The provided coordinates list file must be structured as a
 BED file with a minimum of three tab separated columns corresponding to:
-chromosome, start, and end. It is recommended to have a fourth column with a an
+chromosome, start, and end. It is recommended to have a fourth and fifth column 
+specifying the reference genome to which the coordinates refer and an
 ID for the corresponding genomic region. Column headers should be avoided.
 
 An example of region table BED file is reported below:
 
 ```
-chr5	177365507	177412577	SLC34A1
-chr5	177372928	177499184	SLC34A1_zoomOut
+chr5	177365507	177412577	hg38  SLC34A1
+chr5	177372928	177499184	hg38  SLC34A1_zoomOut
 ```
 
 Once the region file is uploaded, the coordinates become available in the
@@ -652,8 +656,9 @@ modifying a previously uploaded table. The *Add* and *Remove* buttons below the
 selection dropdown menu allow to access these options. In particular, to add a
 new entry to the an existing list or to create a new one after clicking the
 *Add* button a pop-up window will appear reporting the selected coordinates and
-allowing the user to assign a name to the region. By clicking *Ok* the entry
-will be added to the list.
+allowing the user to assign a name to the region. The current reference genome 
+to which the coordinates refer is automatically added after the end coordinate 
+field. By clicking *Ok* the entry will be added to the list.
 
 <img src="GV_load_coordinates_add.png"
      alt="GV load coordinates panel for adding new coordinates to list"
@@ -663,8 +668,8 @@ Similarly, if you want to remove a coordinate from the uploaded list, you can
 select the entry form the dropdown list and next click the *Remove* button.
 The new custom coordinates list can also be exported for later re-use.
 
-To restore the initial setting of the *Load/edit coordinates* panel it is sufficient
-to click the *Reset* button at the panel's bottom.
+To restore the configuration settings of the *Load/edit coordinates* panel it is 
+sufficient to click the *Reset* button at the panel's bottom.
 
 #### Choose chromosome
 
@@ -805,8 +810,6 @@ or is color-coded in a heatmap through the `plotgardener` function
 
 The appropriate plot is chosen in the *Select bigwig plot mode* menu in the
 right sidebar. The plot is recreated automatically afterwards.
-<!-- why then not also replot when selecting a gene from Search by gene? This
- I have already suggested. -->
 
 <img src="GV_bigwig_mode.png"
      alt="GV bigwig plot mode dropdown menu"
@@ -1670,5 +1673,4 @@ super-enhancer dynamics in repair after ischemic acute kidney injury. Nat Commun
 
 </details>
 </div>
-------------------------------------------------------------------------
 
