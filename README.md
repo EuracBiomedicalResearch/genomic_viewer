@@ -250,7 +250,7 @@ choose the appropriate reference.  When you first launch the ***Genomic
 Viewer*** application, it automatically loads the default reference genome
 (currently hg19). For instructions on changing to another reference genome,
 refer to <em>Reference Genomes</em> paragraph in the
-[Features and Usage section](./genomicviewer-reference-manual.md#features-and-usage).
+[Features and Usage section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>4. Navigate</strong> </h4>
 
@@ -266,7 +266,7 @@ generated through the <strong>Go</strong> button, a chromosome ideogram will
 show the position and extent of the displayed region. For more details about
 genomic navigation, see the <em>Genomic Navigation</em> paragraph in the
 [Features and Usage
-section](./genomicviewer-reference-manual.md#features-and-usage).
+section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>5. Explore datasets</strong> </h4>
 
@@ -296,7 +296,7 @@ during a working session:
   downloaded as individual files in the <strong>Data</strong> navigation panel.
 
 A more in detail description of these functions is given in the [Features and
-Usage section](./genomicviewer-reference-manual.md#features-and-usage).
+Usage section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>7. Share your session</strong> </h4>
 
