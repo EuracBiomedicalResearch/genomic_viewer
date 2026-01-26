@@ -600,7 +600,7 @@ list of available gene names and the gene annotation labels in the main plot
 output. When you change reference genome from the menu a message will appear in
 the main windows as a warning.
 
-<img src="GV_ref_change_message.png" alt="GV reference genome message" width="25%">
+<img src="GV_ref_change_message.png" alt="GV reference genome message" width="60%">
 
 </details>
 </div>
