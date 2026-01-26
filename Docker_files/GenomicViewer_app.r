@@ -1124,7 +1124,7 @@ server <- function(input, output, session){
   
   observeEvent(genes.hgnc(), {
     genes.hgnc <- genes.hgnc()
-    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$gene_symbol, options = list(maxOptions = 12), server = TRUE)
+    updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$gene_symbol, server = TRUE)
   })
   
   #output$sel.gene <- renderText({input$gene.search})
