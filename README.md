@@ -18,7 +18,8 @@ and analyzing genomic data hosted in a Docker container.
 2.  [System Requirements](#system-requirements)
 3.  [Installation](#installation)
 4.  [Getting Started](#getting-started)
-5.  [Source Code](#source-code)
+5.  [Tutorial](#tutorial)
+6.  [Source Code](#source-code)
 
 </details>
 
@@ -380,18 +381,19 @@ Stats.](assets/GV_navigation_panels.png)
 </details>
 
 ------------------------------------------------------------------------
+## Tutorial
 
 <details open>
 <summary style="font-size: 1.3em; font-weight: bold; color:#039BE5;">
 Tutorial
 </summary>
 
-<div>
 
 A complete **Tutorial** showing a usage example with the ***Genomic Viewer***
 built-in test data is described in the
 [Tutorial](assets/genomicviewer-reference-manual.md#tutorial) section of the
 reference manual.
+
 
 ------------------------------------------------------------------------
 
