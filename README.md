@@ -321,6 +321,7 @@ User Interface Overview
 </summary>
 
 <div>
+    
 Brief description of the ***Genomic Viewer*** graphical interface structure.
 
 <h4><strong>Main Window</strong></h4>
