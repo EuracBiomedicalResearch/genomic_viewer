@@ -187,6 +187,37 @@ application running.
 2. Follow the *"Remove App Data"* instructions.
 3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
+
+#### <span style = "font-size: 1.2em;">**Cross-platform Installer-free**</span>
+
+**Prerequisites:**
+
+- Install Docker Desktop as described in the appropriate esction above.
+- Download the `example_data` and `GenomicViewer_config.yml` file from 
+[Github](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron/assets).
+
+**Setting up installer-free parameters:**
+1. Open Docker Desktop. Go to `Docker Hub` and search for 
+`sarlago/shiny-docker-genomicviewer2`. 
+2. Click on the corresponding image and then `Pull`. Once pulled, the image will
+  appear under `Images`.
+3. Click the *Run* button ▶️ and under `Optional settings` enter the following
+   parameters:
+   - `Container name`, optional e.g. `GenomicViewer`;
+   - `Ports` > `Host port`, leave the first field emty, type `8180` in the 
+      second field;
+   - `Volumes` > `Host path`, click the three dots and select the local folder 
+      with your data and configuration file;
+   - `Volumes` > `Container path`, type in `/data`;
+   - click `Run`.
+   
+   ![](assets/GV_docker_run.png)
+   
+4. Once the app is ready, click the link displayed in the Log  
+   `Listening on http://0.0.0.0:8180⁠`to open the app in your browser.
+5. After the first setup you can directly start the app from docker `Containers`,
+   entering the container and clicking *Run* ▶️.
+
 </div>
 </details>
 
@@ -321,7 +352,6 @@ User Interface Overview
 </summary>
 
 <div>
-    
 Brief description of the ***Genomic Viewer*** graphical interface structure.
 
 <h4><strong>Main Window</strong></h4>
@@ -382,6 +412,7 @@ Stats.](assets/GV_navigation_panels.png)
 </details>
 
 ------------------------------------------------------------------------
+
 ## Tutorial
 
 <details open>
