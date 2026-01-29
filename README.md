@@ -172,7 +172,7 @@ application running.
    Linux setup.
 2. Follow the installer wizard instructions.
 
-**Uninstallation**<br>
+**Uninstallation:**<br>
 ***For Genomic Viewer installed as root user:***
 1. Launch `genomicviewer-gui-installer-1.0.0_amd64` or
    `genomicviewer-gui-installer-1.0.0-1.x86_64` command in a terminal.
@@ -211,7 +211,7 @@ application running.
    - `Volumes` > `Container path`, type in `/data`;
    - click `Run`.
    
-   ![](assets/GV_docker_run.png)
+   <img src="assets/GV_docker_run.png" width="60%"/>
    
 4. Once the app is ready, click the link displayed in the Log  
    `Listening on http://0.0.0.0:8180⁠`to open the app in your browser.
