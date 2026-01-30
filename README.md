@@ -56,7 +56,7 @@ Software and Hardware
 #### <span>**Operating System**</span>
 
 -   Windows 10 or higher
--   macOS 11 with Apple M1 ARM64 or higher
+-   macOS with Intel x64 or Apple M1 ARM64 and higher
 -   Linux (Debian-based or Red Hat-based)
 
 #### <span>**Hardware Recommendations**</span>
@@ -95,12 +95,12 @@ application running.
 -   Enable the Windows Subsystem for [Linux
     WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) (optional, if
     not enabled ***Genomic Viewer installer*** will do this for you).
--   Download `genomicviewer-gui-installer` file for Windows from
-    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron).
+-   Download `windows-x64.zip` installer file for Windows from
+    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases).
 
 **Installation:**
 
-1. Extract the `windows-x64` installer file.
+1. Extract the `windows-x64.zip` installer file.
 2. Start setup by double-click on `genomicviewer-gui-installer-1.0.0 Setup` file.
 3. Follow the installer wizard instructions.
 
@@ -119,21 +119,19 @@ application running.
 
 -   Install [Docker Desktop for
     macOS](https://docs.docker.com/desktop/setup/install/mac-install/).
--   Download `genomicviewer-gui-installer` file for macOS from
-    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron).
+-   Download `genomicviewer-run-macos.zip` file for macOS from
+    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases).
 
 **Installation:**
 
-1. Extract the `macos-arm64` installer file.
-2. Start setup by double-click on `GenomicViewer.dmg` file.
-3. Drag the `.app` bundle to the `Application` folder.
-4. Follow the installation wizard instructions.
+1. Extract the downloaded folder with configuration, example data and launcher file.
+2. Search and open a `Terminal` from `Spotlight`.
+3. Drag the `GenomicViewer-gui.run.sh` and the `data` folder in Terminal.
+4. Press Enter.
 
 **Uninstallation:**
 
-1. Start `GenomicViewer.dmg` package.
-2. Follow the *"Remove App Data"* instructions.
-3. Drag the `GenomicViewer.app` bundle to `Trash`.
+1. Drag the `genomicviewer-run-macos` folder to `Trash`.
 <br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Linux**</span>
@@ -146,8 +144,8 @@ application running.
     users can still use docker if [rootless
     mode](https://docs.docker.com/engine/security/rootless/) is configured on
     their system.
--   Download `genomicviewer-gui-installer` file for Linux from
-    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron).<br> **Note:**
+-   Download `linux-x64.zip` installer file for Linux from
+    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases).<br> **Note:**
     Linux installer provides both *.deb* package for Debian-based
     distributions and *.rpm* package for Red Hat-based distributions. A
     self-contained app is also available for non-root users.
@@ -192,7 +190,7 @@ application running.
 
 **Prerequisites:**
 
-- Install Docker Desktop as described in the appropriate esction above.
+- Install Docker Desktop as described in the appropriate section above.
 - Download the `example_data` and `GenomicViewer_config.yml` file from 
 [Github](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron/assets).
 
