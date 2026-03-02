@@ -38,8 +38,8 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
   cat.tab.list <- list()
   if(length(cat.file) > 0){
     for (i in 1:length(cat.file)){
-      cat.tab <- read_delim(cat.file[i], "\t", col_names = F, col_types = list(X2 = col_integer(), X3 = col_integer()))
-      colnames(cat.tab)[1:4] <- c("chr", "start", "end", "category")
+      cat.tab <- read_delim(cat.file[i], "\t", col_names = T, col_types = list(start = col_integer(), end = col_integer()))
+      #colnames(cat.tab)[1:4] <- c("chr", "start", "end", "category")
       cat.tab <- dplyr::filter(cat.tab, chr == chrom & start >= Start & end <= End)
       cat.tab.list[[i]] <- cat.tab
     } 

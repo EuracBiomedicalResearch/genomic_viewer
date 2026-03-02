@@ -15,7 +15,6 @@ library(readr)
 library(stringr)
 library(sqldf)
 library(ggpubr)
-
 library(circlize)
 library(ggraph)
 library(igraph)
@@ -75,6 +74,26 @@ if (length(missing.keys) > 0) {
     call. = FALSE
   )
 }
+
+# Ensure no data is loaded when values are empty
+# Define group of keays for each file type
+keys.prefix <- unique(sapply(strsplit(names(config),"\\."), `[`, 1))
+keys.group <- lapply(keys.prefix, function(x) names(config)[grep(paste0(x, "\\."), names(config))])
+# Check if are all empty
+config.new <- c()
+for (g in 1:length(keys.group)){
+  if(all(unlist(lapply(keys.group[[g]], function(x) config[[x]] == "")) == TRUE)){
+    # Replace with double space to avoid unwanted files laoding
+    config.entry <- lapply(keys.group[[g]], function(x) gsub("", "  ", config[[x]]))
+    config.new <- c(config.new, config.entry)
+  } else {
+    config.entry <- lapply(keys.group[[g]], function(x) config[[x]])
+    config.new <- c(config.new, config.entry)
+  }
+}
+# Add key names to new config
+names(config.new) <- names(config)
+config <- config.new
 
 # Validate expected extensions are correctly assigned to keys
 # Define expected extensions for certain keys
@@ -333,7 +352,7 @@ ui <- page_sidebar(
                 # GO button upset
                 actionButton("run.stat2", "Run", width = "25%"),
                 # print piechart with peaks annotation
-                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = 350)  %>% withSpinner(), verbatimTextOutput('warn.message3')),
+                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = "auto")  %>% withSpinner(), verbatimTextOutput('warn.message3')),
                 # GO button annotation
                 actionButton("run.stat3", "Run", width = "25%"),
                 # print circos of 3D contacts
@@ -954,7 +973,8 @@ server <- function(input, output, session){
                                        bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
                                   genome = gsub( " .*", "", input$ref.genome))
       }
-    }, res = 100)
+    }, res = 100, 
+       height = function(){150*length(bed.file)})
     
     ## For circos plot
     vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
@@ -1016,10 +1036,10 @@ server <- function(input, output, session){
       vals4$chr <-  input$chr
       vals4$start <- input$chrstart
       vals4$end <- input$chrend
-      # Specifiy if data not plotted in warning message
+      # Specify if data not plotted in warning message
       large.data <- c(config$cat.names[which(file.size(cat.file) > 400e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")}) ### not working 
+        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")}) 
       } 
       
     })
@@ -1270,7 +1290,7 @@ server <- function(input, output, session){
       }
     })
     
-    ## Add name to selected genomic range through a pop-up window
+    ## Add reference genome and name to selected genomic range through a pop-up window
     # reactiveValues object for storing current data set.
     vals <- reactiveValues(data = NULL)
     
@@ -1315,7 +1335,7 @@ server <- function(input, output, session){
     })
     
     
-    #####----------------- REMOVE visualized coordinates to coordinates list
+    #####----------------- REMOVE visualized coordinates from coordinates list
     ## Save coordinates to variables
     ## Chr
     chrRem <- eventReactive(input$remove, {
@@ -1328,7 +1348,7 @@ server <- function(input, output, session){
     })
     ## Chr end
     chrendRem <- eventReactive(input$remove, {
-       chrom.cen.df <- chrom.cen.df() #UNCOMMENT THIS LINE IN THE REAL CODE
+       chrom.cen.df <- chrom.cen.df()
       if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
       } else print(input$chrend)
     })
@@ -1348,7 +1368,7 @@ server <- function(input, output, session){
       #print(coord.list())
     })
     
-    #####----------------- EXPORT updated coordinates coordinates to file
+    #####----------------- EXPORT updated coordinates to file
     ## Arrange coordinates to table  
     output$export <- downloadHandler(
       filename = function() { "User_Defined_RegionTable.bed" },

@@ -44,10 +44,10 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     # set max y when autoscale is not selected (autoscale all samples together)
     if(is.null(bw.autoscale)){
       for (i in 1:length(bw.file)){
-        maxScore[[i]] <- max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score)
+        maxScore[[i]] <- round(max(readBigwig(bw.file[i], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score), 1)
       }
       if (!max(unlist(maxScore)) == 0){
-        maxScore <- rep(list(c(0, max(unlist(maxScore)))), length(bw.file)) } else {
+        maxScore <- rep(list(c(0, round(max(unlist(maxScore)), 1))), length(bw.file)) } else {
           maxScore <- rep(list(c(0, 10)), length(bw.file))
         }
       # Individual autoscale checked
@@ -57,14 +57,14 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     } else { #maxScore <- list()
       for (l in 1:length(bw.autoscale)){
         maxGroup <- sapply(bw.autoscale[[l]], function(x) max(readBigwig(bw.file[which(bw.names == x)], chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)$score))
-        maxScore <- c(maxScore, rep(list(c(0, max(maxGroup))), length(bw.autoscale[[l]])))
+        maxScore <- c(maxScore, rep(list(c(0, round(max(maxGroup), 1))), length(bw.autoscale[[l]])))
         nameScore <- c(nameScore, bw.names[which(bw.names %in% bw.autoscale[[l]])])
       }
       maxScore <- c(maxScore, rep(list(NULL), length(bw.file) - length(maxScore)))
       nameScore <- c(nameScore, setdiff(bw.names, nameScore))
       names(maxScore) <- as.factor(nameScore)
-      # Sort scores according to samples names in alphabetical order so you loop on the correctly in the plot section
-      maxScore[order(factor(names(maxScore)))]
+      # Sort scores according to samples names in bw.names as defined in config so you loop on them correctly in the plot section
+      maxScore <- maxScore[order(match(names(maxScore), bw.names))]
     }
 
     print(paste("Scale for bigwig files has been set to:", maxScore))
@@ -138,11 +138,30 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
             resolution = 500000
           }
      
-      hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
-         chrom = as.numeric(chr), assembly = genome,
-         chromstart = start, chromend = end,
-        resolution = resolution, res_scale = "BP", norm = "KR"
-          ) 
+         # Ensure resolution availability
+         if (resolution %in% strawr::readHicBpResolutions(hic.file[i])){
+           hic.res <- resolution
+         } else {  
+           available.res <- strawr::readHicBpResolutions(hic.file[i])
+           hic.res <- available.res[which.min(abs(available.res - resolution))] 
+         }
+         
+         # Ensure chromosome naming compatibility
+         if (length(grep("chr", strawr::readHicChroms(hic.file[i])$name)) > 0){
+           hic.chrom <- paste0("chr", chr)
+         } else { hic.chrom <- as.character(chr) 
+         }
+         # Ensure normalization method availability
+         if ("KR" %in% strawr::readHicNormTypes(hic.file[i])){
+           hic.norm <- "KR"
+         } else { hic.norm <- strawr::readHicNormTypes(hic.file[i])[1] 
+         }
+         
+         hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
+                                            chrom = hic.chrom, assembly = genome,
+                                            chromstart = start, chromend = end,
+                                            resolution = hic.res, res_scale = "BP", norm = hic.norm
+         ) 
         } 
       }
     }

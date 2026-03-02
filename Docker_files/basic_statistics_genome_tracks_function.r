@@ -265,12 +265,16 @@ peaks.annotation.function <- function(bed.file, bed.names, genome){
   }
 anno.plot.list <- list()
 for (i in 1:length(bed.file)){
-  anno.p <- genomicElementDistribution(import(bed.file[i], format = "BED", genome = genome), 
+  con <- read_delim(bed.file[i], delim = "\t", col_names = F, col_select = c(1:3), show_col_types = F)
+  bed3 <- tempfile("bed3.bed")
+  write_delim(con, file = bed3, delim = "\t", col_names = F)
+  anno.p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome), 
                                        TxDb = get(paste("TxDb.", org, ".UCSC.", genome, ".knownGene", sep="")))
   anno.plot.list[[i]] <- anno.p$plot
+  unlink(bed3)
 }
 
-ggpubr::ggarrange(plotlist = anno.plot.list, nrow = ceiling(length(anno.plot.list)/3), labels = bed.names)
+ggpubr::ggarrange(plotlist = anno.plot.list, nrow = ceiling(length(anno.plot.list)/2), ncol = 2, labels = bed.names)
   ## End of function
 }
 
@@ -686,10 +690,10 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
   # for every separate bedpe
   for (i in 1:length(bedpe.file)){
   # Read contacts for entire genome
-  bed1 <- read_delim(bedpe.file[i], col_select = c(1,2,3), col_names = F)
-  bed2 <- read_delim(bedpe.file[i], col_select = c(4,5,6), col_names = F)
+  bed1 <- read_delim(bedpe.file[i], delim = "\t", col_select = c(1,2,3), col_names = F)
+  bed2 <- read_delim(bedpe.file[i], delim = "\t", col_select = c(4,5,6), col_names = F)
   # bedpe of the zoomed region
-  bedpe.zoom <- read_delim(bedpe.file[i], col_names = F) %>% dplyr::filter( X1 == chrom & X2 >= zoom_start & X4 == chrom & X6 <= zoom_end)
+  bedpe.zoom <- read_delim(bedpe.file[i], delim = "\t", col_names = F) %>% dplyr::filter( X1 == chrom & X2 >= zoom_start & X4 == chrom & X6 <= zoom_end)
   bedpe.zoom[, c(1,4)] <- paste("zoom_", chrom, sep="")
   
   
