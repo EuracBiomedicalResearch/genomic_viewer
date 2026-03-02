@@ -62,7 +62,7 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
       }
       maxScore <- c(maxScore, rep(list(NULL), length(bw.file) - length(maxScore)))
       nameScore <- c(nameScore, setdiff(bw.names, nameScore))
-      names(maxScore) <- as.factor(nameScore)
+      names(maxScore) <- nameScore
       # Sort scores according to samples names in bw.names as defined in config so you loop on them correctly in the plot section
       maxScore <- maxScore[order(match(names(maxScore), bw.names))]
     }
@@ -165,7 +165,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
         } 
       }
     }
-    
     
     ################################## END PREPROCESSING OF FILES ####################
   
@@ -594,7 +593,6 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     
     
   }
-
 }
 
 

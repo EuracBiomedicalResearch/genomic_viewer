@@ -1,5 +1,5 @@
 
-## The following script will be used to generate plots for the statistical analysis of peaks and arches graphs
+## The following script will be used to generate plots for the statistical analysis of peaks and archs graphs
 
 ########################################## Barplot of total and selected region peaks number (bed)
 
@@ -7,7 +7,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
   chrom <- paste0("chr", chr)
   print("Calculating peaks nr")
   # Read bed files and peaks nr
-  bed.tab.list <- list() ## 
+  bed.tab.list <- list() ## Capire se serve davvero storare questa info o se posso evitare
   peaks.nr <- c() # For total nr of peaks
   peaks.nr.sel <- c() # For peaks nr in the selected region
   for (i in 1:length(bed.file)){
@@ -233,12 +233,12 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
     }
   
   peaklist <-  c(bed.peaks.list, bedpe.peaks.list)
-  names(peaklist) <- names <- c(bed.names, bedpe.names)
+  names(peaklist) <- c(bed.names, bedpe.names)
   ups <- overlap_upset_plot(peaklist = peaklist, verbose = T)
 
 
   peaklist2 <- c(unlist(bed.peaks.list.s), bedpe.peaks.list.s)
-  names(peaklist2) <-c(bed.names, bedpe.names)
+  names(peaklist2) <- c(bed.names, bedpe.names)
   peaklist2 <- Filter(function(x) length(x) > 0, peaklist2) # remove empty sublists
   if (length(peaklist2) > 1){
     ups2 <- overlap_upset_plot(peaklist = unlist(peaklist2), verbose = T)
@@ -268,7 +268,7 @@ for (i in 1:length(bed.file)){
   con <- read_delim(bed.file[i], delim = "\t", col_names = F, col_select = c(1:3), show_col_types = F)
   bed3 <- tempfile("bed3.bed")
   write_delim(con, file = bed3, delim = "\t", col_names = F)
-  anno.p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome), 
+    anno.p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome), 
                                        TxDb = get(paste("TxDb.", org, ".UCSC.", genome, ".knownGene", sep="")))
   anno.plot.list[[i]] <- anno.p$plot
   unlink(bed3)
@@ -347,7 +347,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
     plotText(label = leadSNP$snp, 
              x = leadSNP$pos*(12/chr.len) + 0.2 ,  
-             y = h - ((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))), #äy = y.coord-(-log10(leadSNP$p)*6/14), 
+             y = h - ((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))), #y = y.coord-(-log10(leadSNP$p)*6/14), 
              check.overlap = T,
              repel = T,
              params = params,
@@ -356,7 +356,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     } else if (nrow(leadSNP) > 10){
       plotText(label = leadSNP$snp[1:10], 
                x = leadSNP$pos[1:10]*(12/chr.len) + 0.2 , 
-               y = h- ((-log10(leadSNP$p[1:10])*(y.coord-5.99))/-log10(min(leadSNP$p[1:10]))), 
+               y = h - ((-log10(leadSNP$p[1:10])*(y.coord-5.99))/-log10(min(leadSNP$p[1:10]))), 
                check.overlap = T,
                repel = T,
                params = params,
@@ -424,97 +424,105 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   
   # Run zoom-in just if the selected region is smaller than the whole chromosome
   
-  # Run zoom-in just if the selected region is smaller than the whole chromosome
-  
   if (end < chr.len){
-    ## Add zoom-in inset of the user selected region
-    annoZoomLines(
-      chrom = chr,
-      plot = mp,
-      prams = params,
-      chromstart = start,
-      chromend = end,
-      y0 = 6, y1 = 5.5,
-      x1 = c(0, 12),
-      default.units = "cm"
+  ## Add zoom-in inset of the user selected region
+  annoZoomLines(
+    chrom = chr,
+    plot = mp,
+    prams = params,
+    chromstart = start,
+    chromend = end,
+    y0 = 6, y1 = 5.5,
+    x1 = c(0, 12),
+    default.units = "cm"
+  )
+  
+  ## Define starting y coord for zoom panels
+  y.coord.z <- 5 * i
+  
+  ## Loop over every GWAS of input
+  for (i in 1:length(gwas.file)){
+    man.data.t <- read_delim(gwas.file[i], "\t", col_names = T)
+    
+    ## Define lead SNPs to be plotted wit their name specified
+    leadSNP <- filter(man.data.t, chrom == chr & p < sign.p & pos <= end & pos >= start) %>% dplyr::arrange(p)
+    
+    ## Create Manhattan plot of the selected chromosome
+    mp2 <- plotManhattan(
+      data = man.data.t,
+      fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
+      trans = "-log10",
+      sigVal = sign.p, sigLine = TRUE, sigCol = "#7ecdbb",  col = "grey",
+      lty = 2, range = c(0, 20),
+      y = y.coord.z,
+      default.units = "cm",
+      params = region,
+      label = "zoom"
     )
     
-    ## Define starting y coord for zoom panels
-    y.coord.z <- 5 * i
-    
-    ## Loop over every GWAS of input
-    for (i in 1:length(gwas.file)){
-      man.data.t <- read_delim(gwas.file[i], "\t", col_names = T)
-      
-      ## Define lead SNPs to be plotted wit their name specified
-      leadSNP <- filter(man.data.t, chrom == chr & p < sign.p & pos <= end & pos >= start) %>% dplyr::arrange(p)
-      
-      ## Create Manhattan plot of the selected chromosome
-      mp2 <- plotManhattan(
-        data = man.data.t,
-        fill = colorby("p", palette = colorRampPalette(paletteer_c("grDevices::Plasma", 30))),
-        trans = "-log10",
-        sigVal = sign.p, sigLine = TRUE, sigCol = "#7ecdbb",  col = "grey",
-        lty = 2, range = c(0, 20),
-        y = y.coord.z,
-        default.units = "cm",
-        params = region,
-        label = "zoom"
-      )
-      
-      #y.coord.z <- y.coord.z - (5*i)
-      ## Annotate significant SNPs
-      if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
-        plotText(label = leadSNP$snp,
-                 x = (12*(leadSNP$pos-start))/(end-start),  
-                 y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7, 
-                 check.overlap = T,
-                 repel = T,
-                 params = region,
-                 rot = 35,
-                 fontsize = 8)
-      } else if (nrow(leadSNP) > 10){
-        plotText(label = leadSNP$snp[1:10], 
-                 x = (12*(leadSNP$pos-start))/(end-start), 
-                 y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7 , 
-                 check.overlap = T,
-                 repel = T,
-                 params = region,
-                 rot = 35,
-                 fontsize = 8)
-      }
-      
-      
-      ## Plot graph title
-      plotText(
-        label = paste("Zoom-in: ", gwas.names[i], sep=""),
-        x = 6, y = "-6b",
-        fontsize = 8, fontface = "bold", just = "center",
-        params = region
-      )
+    #y.coord.z <- y.coord.z - (5*i)
+    ## Annotate significant SNPs
+    if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
+      plotText(label = leadSNP$snp,
+               x = (12*(leadSNP$pos-start))/(end-start),  
+               y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7, 
+               check.overlap = T,
+               repel = T,
+               params = region,
+               rot = 35,
+               fontsize = 8)
+      #print((12*(leadSNP$pos-start))/(end-start))
+      #print(y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p)- 0.5)
+    } else if (nrow(leadSNP) > 10){
+      plotText(label = leadSNP$snp[1:10], 
+               x = (12*(leadSNP$pos-start))/(end-start), 
+               y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7 , 
+               check.overlap = T,
+               repel = T,
+               params = region,
+               rot = 35,
+               fontsize = 8)
+      #print((12*(leadSNP$pos-start))/(end-start))
+      #print(y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p)- 0.5)
     }
     
-    ### Annotations once for every input dataset
-    ## Annotate genome label
-    annoGenomeLabel(
-      plot = mp2, 
-      y = "0.5b",
-      fontsize = 8, 
-      scale = "Mb",
-      params = region
-    )
-    ## Annotate y-axis
-    annoYaxis(
-      plot = mp2,
-      at = seq(0, 20, by = 10),
-      axisLine = TRUE, fontsize = 8
-    )
-    ## Plot y-axis label
+
+    ## Plot graph title
     plotText(
-      label = "-log10(p-value)", x = -1, y = y.coord.z+2.5, rot = 90,
+      label = paste("Zoom-in: ", gwas.names[i], sep=""),
+      x = 6, y = "-6b",
       fontsize = 8, fontface = "bold", just = "center",
       params = region
     )
+    
+  }
+  
+  ### Annotations once for every input dataset
+  ## Annotate genome label
+  annoGenomeLabel(
+    plot = mp2, 
+    y = "0.5b",
+    fontsize = 8, 
+    scale = "Mb",
+    params = region
+  )
+  #> genomeLabel[genomeLabel2]
+  print("4 OK")
+  
+  ## Annotate y-axis
+  annoYaxis(
+    plot = mp2,
+    at = seq(0, 20, by = 10),
+    axisLine = TRUE, fontsize = 8
+  )
+  #> yaxis[yaxis2]
+
+  ## Plot y-axis label
+  plotText(
+    label = "-log10(p-value)", x = -1, y = y.coord.z+2.5, rot = 90,
+    fontsize = 8, fontface = "bold", just = "center",
+    params = region
+  )
   }
   
 }
@@ -613,6 +621,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   plots[[i]] <- p
   #print(plots[[i]])
   }
+  
   # define nr of columns for final plot
   if(length(cat.file) <= 9){
     n.col =  3
