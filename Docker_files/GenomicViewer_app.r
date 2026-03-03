@@ -48,7 +48,7 @@ options(shiny.port = 8180)
 
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-## Load config_gen file with genome annotations, not modifyiable bu the user.
+## Load config_gen file with genome annotations, not modifiable by the user.
 config_gen <- config::get(file = "GenomicViewer_config_gen.yml")
 
 ## Load config file and handle parsing errors like invalid YAML, bad indentation, missing ":".
@@ -302,7 +302,7 @@ ui <- page_sidebar(
                         tags$head(tags$style(".shiny-output-error:after{content: 'There is no data in this range. Try with different coordinates.'; visibility: visible; color: slategrey; position: absolute; top: 10px; left: 70px;}")),
                         # Notification of selected reference genome
                         uiOutput("current.ref"),
-                        # Main plot
+                        # SVG zoom button position
                         tags$head(tags$style(HTML("#res svg g#svg-pan-zoom-controls {
                                                     transform: translate(880px, 300px) scale(0.5) !important;
                                                   }"))),
@@ -471,7 +471,6 @@ server <- function(input, output, session){
   reactiveCat <- reactive({
     exp.cat <- c(!config$cat.names %in% input$cat.mode)
   })
-
   
   ########################## CARD PLOT
   ##---------------------- Output selected coordinates text:
@@ -496,7 +495,6 @@ server <- function(input, output, session){
   })
   
   ##---------------------- Output genomic view plot:
-  
     tracks <- reactive({
       req(plot.ready())
       genes.hgnc <- genes.hgnc()
@@ -533,7 +531,6 @@ server <- function(input, output, session){
     #req(!is.null(tracks()))
     svgPanZoom(svglite:::inlineSVG(tracks()), 
                panEnabled = T, controlIconsEnabled = T, viewBox = T, width = "auto", height = "900px") #width = "auto", height = "auto",
-    
   })
   
   image <- reactive({
@@ -1204,7 +1201,7 @@ server <- function(input, output, session){
       coord <- gsub(" ", "", coord) # remove eventual white spaces
     }
   })
-    # if there is a coord file update the list from whcih the used can select
+    # if there is a coord file update the list from which the used can select
     observeEvent(coord(), {
       coord <- coord()
       updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
@@ -1488,7 +1485,6 @@ server <- function(input, output, session){
       
     })
     
-    
     # --- HANDLE "ENTER" ---
     observeEvent(input$confirm.enter, { 
       if (isTRUE(individual.scale.state())) { 
@@ -1530,9 +1526,9 @@ server <- function(input, output, session){
       
       return(autoscale.groups)
     })
+    ##----------------------- END BigWig autoscale options dialog
   
-    ##------------------------ Save plot as PDF
-    
+    ##------------------------ Save plot as PDF or user selected format
     
     # Reactive to store the chosen file format
     chosen.format <- reactiveVal(NULL)
