@@ -60,10 +60,10 @@ config <- tryCatch(
 )
 
 # Validate required keys in config file
-required.keys <- c("data.dir", "bw.dir", "bw.file", "bw.names", "bedpe.dir", 
-                   "bedpe.file", "bedpe.names", "bed.dir", "bed.file", 
-                   "bed.names", "hic.dir", "hic.file", "hic.names", "gwas.dir", 
-                   "gwas.file", "gwas.names", "cat.dir", "cat.file", "cat.names", 
+required.keys <- c("data.dir", "bw.dir", "bw.file", "bw.names", "bedpe.dir",
+                   "bedpe.file", "bedpe.names", "bed.dir", "bed.file",
+                   "bed.names", "hic.dir", "hic.file", "hic.names", "gwas.dir",
+                   "gwas.file", "gwas.names", "cat.dir", "cat.file", "cat.names",
                    "reg.dir", "reg.file")
 missing.keys <- setdiff(required.keys, names(config))
 
@@ -108,7 +108,7 @@ expected.ext <- list(
 )
 compressed.ext <- c(".gz", ".zip", ".bz2", ".xz", ".tgz", ".tar")
 
-# Check config keys 
+# Check config keys
 for (key in names(config)) {
   # Only process keys ending with .file
   if (grepl("\\.file$", key, ignore.case = TRUE)) {
@@ -162,7 +162,6 @@ bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 shiny::addResourcePath('www', '/shiny-app-GenomicViewer/www')
 # Define UI -----------------------------------------------------
 ui <- page_sidebar(
-  #title = span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:10%;" )),
   sidebar = sidebar(
     # graphics tags
     style = "background-color:#f2f0eb; height: 100%;",
@@ -176,12 +175,12 @@ ui <- page_sidebar(
     # text input to choose genomic coordinates:
     span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:14%; margin-top:-50px" )),
       # Reference genome
-    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh37 - H. sapiens)", 
-                                                             "hg38 (GRCh38 - H. sapiens)", 
+    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh37 - H. sapiens)",
+                                                             "hg38 (GRCh38 - H. sapiens)",
                                                              "T2T (CHM13 - H. sapiens)",
                                                              "mm10 (GRCm38 - M. musculus)",
                                                              "mm39 (GRCm39 - M. musculus)"), selectize = F),
-    card(tags$b("Insert coordinates:", style = "font-size: 90%; text-align:center"),  
+    card(tags$b("Insert coordinates:", style = "font-size: 90%; text-align:center"),
          # Chr
          tags$style(HTML(".selectize-dropdown-content {max-height: 100px !important;  /* ~5 items */
                                                     overflow-y: auto !important;   /* enable scrolling */
@@ -193,28 +192,28 @@ ui <- page_sidebar(
          ),
          # coordinates
          div(style="display:flex; align-items:center; gap:8px; margin-top:-30px; margin-left:-7px;",
-             tags$label("start", style="margin:0; padding-bottom:15px; width:16%; text-align:right;"),  
-             numericInput( 
-               "chrstart", 
-               NULL, 
-               value = 28000000, 
-               min = 1, 
+             tags$label("start", style="margin:0; padding-bottom:15px; width:16%; text-align:right;"),
+             numericInput(
+               "chrstart",
+               NULL,
+               value = 28000000,
+               min = 1,
                max = NA,
                width = "100%"
              )
-         ), 
+         ),
          div(style="display:flex; align-items:center; gap:8px; margin-top:-30px; margin-bottom:-5px; margin-left:-7px;",
              tags$label("end", style="margin:0; padding-bottom:15px; width:19%; text-align:right;"),
-             numericInput( 
-               "chrend", 
-               NULL, 
-               value = 28500000, 
-               min = 1, 
+             numericInput(
+               "chrend",
+               NULL,
+               value = 28500000,
+               min = 1,
                max = NA,
-               width = "100%" 
+               width = "100%"
              )
          )),
-    
+
     card(tags$b("Load/edit coordinates:", style = "font-size: 90%; text-align:center"),
          # Button to upload a user defined file of saved coordinates.
          tags$head(
@@ -236,15 +235,15 @@ ui <- page_sidebar(
        }
     ")
          ),
-         div(class = "button-only-fileinput", 
+         div(class = "button-only-fileinput",
              fileInput("upload.coord", label = NULL, buttonLabel = "Upload...", multiple = F, accept = c(".bed", ".tsv", ".txt"), placeholder = "Config table loaded"),
              style="font-size:85%; padding: 1px 1px; margin-bottom: -17px; font-color: black; margin-top:-20px;"),
-         
+
          # List of user-defined coordinates
          div(style="align-items:center; gap:10px; margin-top:-30px; margin-bottom:-10px;",
              tags$label("Select from menu", style="margin:0; padding-bottom:2px; padding-top:10px; text-align:left; font-size:90%;"),
              selectizeInput(
-               inputId = "select", 
+               inputId = "select",
                label = NULL,
                choices = saved.coord,
                multiple = F,
@@ -263,36 +262,36 @@ ui <- page_sidebar(
                                                                   style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: white; margin-top:20px;"))
          ),
     ),
-    
+
     div(style = "margin-left:5px; margin-rigth:5px; display:flex; justify-content:space-between; gap:2px;",
         # GO button
         tags$style(HTML("  #go {
-    background-color: #494949;  
-    color: white;               
-    border: 1px solid #494949;    
+    background-color: #494949;
+    color: white;
+    border: 1px solid #494949;
     border-radius: 4px;
     font-weight: 500;
   }
   #go:hover {
     background-color: #f2f0eb;
-    color: #494949;           
-    border-color: #f2f0eb;   
-    border: 1px solid #494949;    
+    color: #494949;
+    border-color: #f2f0eb;
+    border: 1px solid #494949;
     border-radius: 4px;
   }
 ")),
         actionButton("go", tags$b("Go"), style = "flex:1;"),
-        
+
         # Download button
         actionButton("ask.download", "Save", icon = icon("download"), style = "flex:1;"),
     )),
-  
+
   # Card
   page_fillable(
     layout_columns(
       navset_card_underline(
             title = "Selected genomic region",
-            div(style = "overflow-y: hidden;", h6(textOutput("sel.coord"), style = "font-size:14px; padding:8px 8px;")), 
+            div(style = "overflow-y: hidden;", h6(textOutput("sel.coord"), style = "font-size:14px; padding:8px 8px;")),
               # Panel with plot ----------------------------------------------------------------------------------
             nav_panel("Plot", class = "gap-2 p-0 border-0 align-items-top margin-bottom-240px",
                       div(
@@ -314,14 +313,14 @@ ui <- page_sidebar(
                         ),
                         # Zoom section
                         div(id = "stickyBottomPanel", style="display:flex; flex-direction:column; width:100%",
-                            plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T), 
-                            fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"), 
-                                     column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
-                                     column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                            plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T),
+                            fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"),
+                                     column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
+                                     column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                                      column(width = 1,actionButton("z10out", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                                      column(width = 2, h6(tags$b("Zoom-in:")), style = "padding: 3px 5px; text-align:right"),
-                                     column(width = 1,actionButton("z2in", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
-                                     column(width = 1,actionButton("z5in", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"), 
+                                     column(width = 1,actionButton("z2in", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
+                                     column(width = 1,actionButton("z5in", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                                      column(width = 1,actionButton("z10in", "10x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px")
                             ) ) )
             ),
@@ -379,7 +378,7 @@ ui <- page_sidebar(
                       selectizeInput('gene.search', 'Search by gene', selected = "", choices = character(0), width = "100%"),
                       #textOutput('sel.gene'),
                       # Select mode for bigwig plotting
-                      column(width = 12, 
+                      column(width = 12,
                       selectInput('bw.mode', "Select bigwig plot mode", bw.mode, selectize=FALSE, width = "100%"),
                       # Bigwig autoscale group options
                       actionButton("bw.autoscale", "Autoscale settings", width = "100%", style = "font-size: 75%; font-weight: 600; padding:3px 3px; color: black; background-color: #f2f0eb; border-color: slategrey;")),
@@ -398,27 +397,27 @@ ui <- page_sidebar(
 
 # Define SERVER logic ---------------------------------------------------
 server <- function(input, output, session){
-  
+
   ##---------------------- Read reference genome related files
   # Genes hgnc symbol
   genes.hgnc <- eventReactive(input$ref.genome, {
   genes.hgnc.path <- file.path(config_gen$genes.hgnc.dir, paste(gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep=""))
   genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
   })
-  
+
   ### For chromosomes plotting
   chrom.cen.df <- eventReactive(input$ref.genome, {
   chrom.cen.path <- file.path(config_gen$chrom.cen.dir, paste("chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep=""))
   chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
   })
-  
+
   ### For chromosome id drop down menu
   observeEvent(chrom.cen.df(), {
     chrom.cen.df <- chrom.cen.df()
     updateSelectizeInput(session = getDefaultReactiveDomain(), "chr", selected = gsub("chr", "", chrom.cen.df$chr)[1], choices = gsub("chr", "", chrom.cen.df$chr))#, options = list(maxOptions = 12), server = TRUE)
     print(input$chr)
   })
-  
+
   ### For cytoband
   Cytoband <- eventReactive(input$ref.genome, {
     ref.genome <- gsub( " .*", "", input$ref.genome)
@@ -434,25 +433,28 @@ server <- function(input, output, session){
       return(cytoband)
     }
   })
-  
-  
+
+
   ##---------------------- Establish reactive events
   reactiveChr <- eventReactive(input$go, {
     print(input$chr)
   })
   ## Chr start
   reactiveChrstart <- eventReactive(input$go, {
-    if (is.na(input$chrstart) | input$chrstart <= 0) { print(1) } 
+    if (is.na(input$chrstart) | input$chrstart <= 0) { print(1) }
     else {print(input$chrstart)}
   })
   ## Chr end
   reactiveChrend <- eventReactive(input$go, {
     chrom.cen.df <- chrom.cen.df()
     start <- reactiveChrstart()
-    if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
-    } else if (is.na(input$chrend) | input$chrend < 500) { 
+    if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) {
+      print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+    } else if (is.na(input$chrend) | input$chrend < 500) {
       print(start + 500)
-    } else print(input$chrend)
+    } else {
+      print(input$chrend)
+    }
   })
   ## Update Chr start end when unwanted values are entered
   observeEvent(input$go, {
@@ -471,79 +473,79 @@ server <- function(input, output, session){
   reactiveCat <- reactive({
     exp.cat <- c(!config$cat.names %in% input$cat.mode)
   })
-  
+
   ########################## CARD PLOT
   ##---------------------- Output selected coordinates text:
   output$sel.coord <- renderText({paste("chr", reactiveChr(), ": ", reactiveChrstart(), "-", reactiveChrend(), sep="")})
-  ##---------------------- Show/hide current reference genome as warning for the user: 
+  ##---------------------- Show/hide current reference genome as warning for the user:
   plot.ready <- reactiveVal(FALSE)
   show.ref.message <- reactiveVal(TRUE)
-  
+
   observeEvent(input$go, {
     plot.ready(TRUE)
     show.ref.message(FALSE)
   })
-  
+
   observeEvent(input$ref.genome, {
     plot.ready(FALSE)
     show.ref.message(TRUE)
   })
-  
+
   output$current.ref <- renderUI({
     if (!show.ref.message()) return(NULL)
     div("The current reference genome is: ", tags$strong(input$ref.genome), tags$br(), tags$em("Press Go to continue or choose the correct reference"))
   })
-  
+
   ##---------------------- Output genomic view plot:
     tracks <- reactive({
       req(plot.ready())
       genes.hgnc <- genes.hgnc()
-      req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 | 
+      req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 |
            sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
-      plotgardener.shiny.function(bw.file = bw.file, 
-                                                                          hic.file = hic.file, 
-                                                                          bed.file = bed.file, 
-                                                                          bedpe.file = bedpe.file,
-                                                                          bw.names = config$bw.names,
-                                                                          hic.names = config$hic.names,
-                                                                          bed.names = config$bed.names,
-                                                                          bedpe.names = config$bedpe.names,
-                                                                          gwas.file = gwas.file,
-                                                                          gwas.names = config$gwas.names,
-                                                                          cat.file = cat.file,
-                                                                          cat.names = config$cat.names,
-                                                                          cat.collapse = reactiveCat(),
-                                                                          chr = reactiveChr(), #input$chr, 
-                                                                          start = reactiveChrstart(), #input$chrstart, 
-                                                                          end = reactiveChrend(), #input$chrend,
-                                                                          bw.mode = input$bw.mode,
-                                                                          bw.autoscale = grouped.bw.items(),
-                                                                          expand.transcripts = reactiveTranscript(),
-                                                                          genes.hgnc = genes.hgnc,
-                                                                          genome = gsub( " .*", "", input$ref.genome),
-                                                                          cytoband = Cytoband(),
-                                                                          ideogram = reactiveIdeogram())
+      plotgardener.shiny.function(bw.file = bw.file,
+                                  hic.file = hic.file,
+                                  bed.file = bed.file,
+                                  bedpe.file = bedpe.file,
+                                  bw.names = config$bw.names,
+                                  hic.names = config$hic.names,
+                                  bed.names = config$bed.names,
+                                  bedpe.names = config$bedpe.names,
+                                  gwas.file = gwas.file,
+                                  gwas.names = config$gwas.names,
+                                  cat.file = cat.file,
+                                  cat.names = config$cat.names,
+                                  cat.collapse = reactiveCat(),
+                                  chr = reactiveChr(), #input$chr,
+                                  start = reactiveChrstart(), #input$chrstart,
+                                  end = reactiveChrend(), #input$chrend,
+                                  bw.mode = input$bw.mode,
+                                  bw.autoscale = grouped.bw.items(),
+                                  expand.transcripts = reactiveTranscript(),
+                                  genes.hgnc = genes.hgnc,
+                                  genome = gsub( " .*", "", input$ref.genome),
+                                  cytoband = Cytoband(),
+                                  ideogram = reactiveIdeogram())
     # } else {return(NULL)}
-      
+
     })
-  
+
   output$res <- renderSvgPanZoom({
     #req(!is.null(tracks()))
-    svgPanZoom(svglite:::inlineSVG(tracks()), 
+    svgPanZoom(svglite:::inlineSVG(tracks()),
                panEnabled = T, controlIconsEnabled = T, viewBox = T, width = "auto", height = "900px") #width = "auto", height = "auto",
   })
-  
+
   image <- reactive({
     req(plot.ready())
     genes.hgnc <- genes.hgnc()
     cond <- req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
     if (!cond) return(NULL)
-    
+
     outfile <- tempfile(fileext='.png')
     png(outfile, width =1200, height=900, res = 120)
-    plotgardener.shiny.function(bw.file = bw.file, 
-                                hic.file = hic.file, 
-                                bed.file = bed.file, 
+    plotgardener.shiny.function(bw.file = bw.file,
+                                hic.file = hic.file,
+                                bed.file = bed.file,
                                 bedpe.file = bedpe.file,
                                 bw.names = config$bw.names,
                                 hic.names = config$hic.names,
@@ -554,8 +556,8 @@ server <- function(input, output, session){
                                 cat.file = cat.file,
                                 cat.names = config$cat.names,
                                 cat.collapse = reactiveCat(),
-                                chr = reactiveChr(), #input$chr, 
-                                start = reactiveChrstart(), #input$chrstart, 
+                                chr = reactiveChr(), #input$chr,
+                                start = reactiveChrstart(), #input$chrstart,
                                 end = reactiveChrend(), #input$chrend,
                                 bw.mode = input$bw.mode,
                                 bw.autoscale = grouped.bw.items(),
@@ -569,32 +571,31 @@ server <- function(input, output, session){
          alt = "genomic viewer image")
     #} else {return(NULL)}
   })
-  
+
   output$plot.test <- renderImage({
     req(image())
     image()
   }, deleteFile = F)
 
   ##-------------------- Output zooming region plot:
-  
+
   output$plot <- renderPlot({
     x.ext <- (input$chrend - input$chrstart)*25/100
-   p <- ggplot() + 
+   p <- ggplot() +
       geom_rect(aes(xmin = input$chrstart - x.ext, xmax = input$chrend + x.ext, ymin = 10, ymax = 11), fill = "grey") +
       geom_rect(aes(xmin = input$chrstart, xmax = input$chrend, ymin = 10, ymax = 11), fill = "salmon", colour = "darkred") +
-     #xlab("Select a region to ZOOM") +
       theme_void() +
       theme(axis.text.x = element_text(size = 12),
             axis.ticks.x = element_line(),
             legend.position = "none",
             axis.title.x = element_text(face = "bold", size=15),
-            plot.margin = unit(c(0,0,0.25,0), "cm")) 
+            plot.margin = unit(c(0,0,0.25,0), "cm"))
     p
   },
   width = "auto",
   height = 35
- ) 
-  
+ )
+
   ##-------------------- Zooming when click on zoom buttons:
   ########## ZOOM-OUT
    ## Zoom out 2x
@@ -604,9 +605,9 @@ server <- function(input, output, session){
       s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
       # Modify if values exceed chr size
-      if (input$chrstart - zoom <= 0){ 
+      if (input$chrstart - zoom <= 0){
         s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
-      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
         e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
       }) %>%  bindEvent(input$z2out)
    ## Zoom out 5x
@@ -616,9 +617,9 @@ server <- function(input, output, session){
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
      # Modify if values exceed chr size
-     if (input$chrstart - zoom <= 0){ 
+     if (input$chrstart - zoom <= 0){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
-     if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+     if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
      }) %>%  bindEvent(input$z5out)
    ## Zoom out 10x
@@ -628,9 +629,9 @@ server <- function(input, output, session){
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + zoom)
      # Modify if values exceed chr size
-     if (input$chrstart - zoom <= 0){ 
+     if (input$chrstart - zoom <= 0){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
-     if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+     if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
      }) %>%  bindEvent(input$z10out)
    ########## ZOOM-IN
@@ -642,8 +643,8 @@ server <- function(input, output, session){
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = mid.region + zoom)
      # Modify if values exceed chr size
-     if ((input$chrend - input$chrstart) <= 500){ 
-       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+     if ((input$chrend - input$chrstart) <= 500){
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
      }) %>%  bindEvent(input$z2in)
    ## Zoom out 5x
@@ -654,8 +655,8 @@ server <- function(input, output, session){
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = mid.region + zoom)
      # Modify if values exceed chr size
-     if ((input$chrend - input$chrstart) <= 500){ 
-       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+     if ((input$chrend - input$chrstart) <= 500){
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
      }) %>%  bindEvent(input$z5in)
    ## Zoom out 10x
@@ -666,13 +667,13 @@ server <- function(input, output, session){
      s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = mid.region - zoom)
      e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = mid.region + zoom)
      # Modify if values exceed chr size
-     if ((input$chrend - input$chrstart) <= 500){ 
-       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+     if ((input$chrend - input$chrstart) <= 500){
+       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
      }) %>%  bindEvent(input$z10in)
 
 
-  
+
   ##-------------------- Update chr start end upon click on zoomed range
   observeEvent(input$plot_brush, {
     chrom.cen.df <- chrom.cen.df()
@@ -680,21 +681,21 @@ server <- function(input, output, session){
     x <- input$plot_brush
     # Define START min
     s <- updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = round(x$xmin, 0))
-    if (x$xmin <= 0){ 
+    if (x$xmin <= 0){
       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
     # Define END max
     e <- updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = round(x$xmax, 0))
-    if ( x$xmax > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){ 
+    if ( x$xmax > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])}
     # Define SMALLER RANGE
-    if ((x$xmax - x$xmin) <= 500){ 
-      s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart) 
+    if ((x$xmax - x$xmin) <= 500){
+      s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
-    
+
     session$resetBrush("plot_brush")
   })
-  
-  
+
+
   ########################## CARD DATA
   ######################################################## DATA TAB
 
@@ -707,13 +708,13 @@ server <- function(input, output, session){
                                          chr = reactiveChr(),
                                          Start = reactiveChrstart(),
                                          End = reactiveChrend())
-                
-                data.table 
+
+                data.table
   })
-  
+
   ######################################################## DATA TAB
   ###### Bed file table view
-  
+
   # Rendering tables dependent on user input.
   observeEvent(length(bed.file), {
     x <- c(1:length(bed.file))
@@ -723,9 +724,9 @@ server <- function(input, output, session){
       }, caption = config$bed.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
-    
+
   })
-  
+
   # Rendering UI and outputtign tables dependent on user input.
   output$view_bed <- renderUI({
     x <- c(1:length(bed.file))
@@ -733,8 +734,8 @@ server <- function(input, output, session){
       uiOutput(paste0('bed', i))
       })
   })
-  
-  
+
+
   # Download peaks
   observeEvent(length(bed.file),{
     x <- c(1:length(bed.file))
@@ -746,17 +747,17 @@ server <- function(input, output, session){
         })
     })
   })
-  
+
   output$bed_save <- renderUI({
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadBed", i), paste0("Download ", config$bed.names[i]))
     })
   })
-  
+
 
   ###### Bedpe file table view
-  
+
   # Rendering tables dependent on user input.
   observeEvent(length(bedpe.file), {
     x <- c(1:length(bedpe.file))
@@ -767,7 +768,7 @@ server <- function(input, output, session){
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
   })
-  
+
   # Rendering UI and outputting tables dependent on user input.
   output$view_bedpe <- renderUI({
     x <- c(1:length(bedpe.file))
@@ -775,8 +776,8 @@ server <- function(input, output, session){
       uiOutput(paste0('bedpe', i))
     })
   })
-  
-  
+
+
   # Download arches
   observeEvent(length(bedpe.file),{
     x <- c(1:length(bedpe.file))
@@ -788,17 +789,17 @@ server <- function(input, output, session){
         })
     })
   })
-  
+
   output$bedpe_save <- renderUI({
     x <- c(1:length(bedpe.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadBedpe", i), paste0("Download ", config$bedpe.names[i]))
     })
   })
-  
-  
+
+
   ###### Categorical bed file table view
-  
+
   # Rendering tables dependent on user input.
   observeEvent(length(cat.file), {
     x <- c(1:length(cat.file))
@@ -809,7 +810,7 @@ server <- function(input, output, session){
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
   })
-  
+
   # Rendering UI and outputtign tables dependent on user input.
   output$view_cat <- renderUI({
     x <- c(1:length(cat.file))
@@ -817,8 +818,8 @@ server <- function(input, output, session){
       uiOutput(paste0('cat', i))
     })
   })
-  
-  
+
+
   # Download categorical peaks
   observeEvent(length(cat.file),{
     x <- c(1:length(cat.file))
@@ -830,17 +831,17 @@ server <- function(input, output, session){
         })
     })
   })
-  
+
   output$cat_save <- renderUI({
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadCat", i), paste0("Download ", config$cat.names[i]))
     })
   })
-  
-  
+
+
   ###### GWAS file table view
-  
+
   # Rendering tables dependent on user input.
   observeEvent(length(gwas.file), {
     x <- c(1:length(gwas.file))
@@ -851,7 +852,7 @@ server <- function(input, output, session){
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
   })
-  
+
   # Rendering UI and outputting tables dependent on user input.
   output$view_gwas <- renderUI({
     x <- c(1:length(gwas.file))
@@ -859,8 +860,8 @@ server <- function(input, output, session){
       uiOutput(paste0('gwas', i))
     })
   })
-  
-  
+
+
   # Download GWAS
   observeEvent(length(gwas.file),{
     x <- c(1:length(gwas.file))
@@ -872,14 +873,14 @@ server <- function(input, output, session){
         })
     })
   })
-  
+
   output$gwas_save <- renderUI({
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadgwas", i), paste0("Download ", config$gwas.names[i]))
     })
   })
-  
+
   ######################################################## STATS TAB
   vals <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
   ## For bed files peak count
@@ -895,36 +896,36 @@ server <- function(input, output, session){
       output$warn.message1 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")})
     }
   })
-  
+
 
     output$peak.nr <- renderPlot({
             if(!is.null(vals$bed.file) & length(vals$bed.file) > 0){
-        basic_statistics_genome_tracks(bed.file = vals$bed.file, 
+        basic_statistics_genome_tracks(bed.file = vals$bed.file,
                                      bed.names = config$bed.names[which(file.size(bed.file) < 400e+06)],
-                                     chr = vals$chr,  
-                                     Start = vals$start, 
+                                     chr = vals$chr,
+                                     Start = vals$start,
                                      End = vals$end,
                                      filetype = "bed")
       }
     }, res = 100)
-    
-    
-  
+
+
+
 
   ## For bedpe files peak count
     output$arches.nr <- renderPlot({
       if(!is.null(vals$bedpe.file) & length(vals$bedpe.file) > 0){
-       basic_statistics_genome_tracks(bed.file = vals$bedpe.file, 
+       basic_statistics_genome_tracks(bed.file = vals$bedpe.file,
                                    bed.names = config$bedpe.names[which(file.size(bedpe.file) <= 45e+06)],
-                                   chr = vals$chr,  
-                                   Start = vals$start, 
+                                   chr = vals$chr,
+                                   Start = vals$start,
                                    End = vals$end,
                                    filetype = "bedpe")
       }
     }, res = 100)
   ## For upset plot
     vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
-    
+
     observeEvent(input$run.stat2, {
       vals2$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
       vals2$bedpe.file <- bedpe.file[which(file.size(bedpe.file) <= 45e+06)]
@@ -937,16 +938,16 @@ server <- function(input, output, session){
         output$warn.message2 <- renderText({paste(large.data,"data larger than", ceiling(45e+06/2^20), "Mb not plotted",  collapse = " ")})
       }
     })
-    
+
     output$upset <- renderPlot({
-      if(!is.null(vals2$bed.file) & !is.null(vals2$bedpe.file) & length(vals2$bed.file) > 0 & length(vals2$bedpe.file) > 0 | 
+      if(!is.null(vals2$bed.file) & !is.null(vals2$bedpe.file) & length(vals2$bed.file) > 0 & length(vals2$bedpe.file) > 0 |
          !is.null(vals2$bed.file) & length(vals2$bed.file) > 1 | !is.null(vals2$bedpe.file) & length(vals2$bedpe.file) > 1){
-        peaks_intersection_venn_function(bed.file = vals2$bed.file, 
-                                      bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)], 
-                                       bedpe.file = vals2$bedpe.file, 
-                                       bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)], 
-                                       chr = vals2$chr, 
-                                       Start = vals2$start, 
+        peaks_intersection_venn_function(bed.file = vals2$bed.file,
+                                      bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
+                                       bedpe.file = vals2$bedpe.file,
+                                       bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)],
+                                       chr = vals2$chr,
+                                       Start = vals2$start,
                                        End = vals2$end,
                                       genome = gsub( " .*", "", input$ref.genome))
       }
@@ -954,7 +955,7 @@ server <- function(input, output, session){
 
   ## For annotation plot
     vals3 <- reactiveValues(bed.file=NULL)
-    
+
     observeEvent(input$run.stat3, {
       vals3$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
       # Specifiy if data not plotted in warning message
@@ -963,19 +964,19 @@ server <- function(input, output, session){
         output$warn.message3 <- renderText({paste(large.data,"data larger than", ceiling(45e+06/2^20), "Mb not plotted",  collapse = " ")})
       }
     })
-    
+
     output$annotation <- renderPlot({
       if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
-        peaks.annotation.function(bed.file = vals3$bed.file, 
-                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
+        peaks.annotation.function(bed.file = vals3$bed.file,
+                                  bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
                                   genome = gsub( " .*", "", input$ref.genome))
       }
-    }, res = 100, 
+    }, res = 100,
        height = function(){150*length(bed.file)})
-    
+
     ## For circos plot
     vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
-    
+
     observeEvent(input$run.stat6, {
       vals6$bedpe.file <- bedpe.file[which(file.size(bedpe.file) <= 400e+06)]
       vals6$chr <-  input$chr
@@ -987,10 +988,10 @@ server <- function(input, output, session){
         output$warn.message6 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")})
       }
     })
-    
+
    # output$circos <- renderPlot({
     #  if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
-     #   circos.function(bedpe.file = vals6$bedpe.file, 
+     #   circos.function(bedpe.file = vals6$bedpe.file,
       #                  chromosome = vals6$chr,
        #                 genome = "hg38",
         #                zoom_start = vals6$start,
@@ -999,13 +1000,13 @@ server <- function(input, output, session){
            #             bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)])
   #    }
    # }, res = 100)
-    
+
     circos.image <- reactive({
       genes.hgnc <- genes.hgnc()
       if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
         outfile2 <- tempfile(fileext='.png')
         png(outfile2, width = 900, height = 1200, res = 120)
-        circos.function(bedpe.file = vals6$bedpe.file, 
+        circos.function(bedpe.file = vals6$bedpe.file,
                         chromosome = vals6$chr,
                         genome = gsub( " .*", "", input$ref.genome),
                         zoom_start = vals6$start,
@@ -1018,16 +1019,16 @@ server <- function(input, output, session){
              alt = "circos image")
       }
     })
-    
+
     output$circos <- renderImage({
           req(!is.null(circos.image()))
       circos.image()
     }, deleteFile = T)
-    
-    
+
+
     ## For categories hierarchy plot
     vals4 <- reactiveValues(cat.file=NULL, chr = "1", start = 28000000, end = 28500000)
-    
+
     observeEvent(input$run.stat4, {
       vals4$cat.file <- cat.file[which(file.size(cat.file) <= 400e+06)]
       vals4$chr <-  input$chr
@@ -1036,23 +1037,23 @@ server <- function(input, output, session){
       # Specify if data not plotted in warning message
       large.data <- c(config$cat.names[which(file.size(cat.file) > 400e+06)])
       if(!isEmpty(large.data)){
-        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")}) 
-      } 
-      
+        output$warn.message4 <- renderText({paste(large.data,"data larger than", ceiling(400e+06/2^20), "Mb not plotted",  collapse = " ")})
+      }
+
     })
     output$categories.pie <- renderPlot({
       if(!is.null(vals4$cat.file) & length(vals4$cat.file) > 0){
-        categorical.pie.function(cat.file = vals4$cat.file, 
+        categorical.pie.function(cat.file = vals4$cat.file,
                                  cat.names = config$cat.names[which(file.size(cat.file) < 400e+06)],
                                  chr = vals4$chr,
                                  Start = vals4$start,
                                  End = vals4$end)
       }
     })
-    
+
     ## For Manhattan plot
     vals5 <- reactiveValues(gwas.file=NULL, chr = "1", start = 28000000, end = 28500000)
-    
+
     observeEvent(input$run.stat5, {
       vals5$gwas.file <- gwas.file[which(file.size(gwas.file) <= 800e+06)]
       vals5$chr <-  input$chr
@@ -1066,10 +1067,10 @@ server <- function(input, output, session){
     })
     output$manhattan <- renderPlot({
       if(!is.null(vals5$gwas.file) & length(vals5$gwas.file) > 0){
-        manhattan.plot.function(gwas.file = vals5$gwas.file, 
-                              Chr = vals5$chr, 
-                              start = vals5$start, 
-                              end = vals5$end, 
+        manhattan.plot.function(gwas.file = vals5$gwas.file,
+                              Chr = vals5$chr,
+                              start = vals5$start,
+                              end = vals5$end,
                               sign.p = 10e-8,
                               chr.len.df = chrom.cen.df(),
                               gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)],
@@ -1077,8 +1078,8 @@ server <- function(input, output, session){
         }
       }, res = 100)
 
-  
-  
+
+
   ##--------------------- Chromosome plot and additional options
     ## Plot
   output$chr.plot <- renderPlot({
@@ -1099,11 +1100,11 @@ server <- function(input, output, session){
       theme(legend.position = "none",
             axis.ticks.x = element_line(linewidth = 2, linetype = 2),
             axis.text.x = element_text(angle = 90, face = "bold"))
-    
+
   }, height = 150, width = "auto")
-    
+
   ## Hover output
-  
+
   output$chr.info <- renderText({
     chrom.cen.df <- chrom.cen.df()
     if(!is.null(input$chr.hover)){
@@ -1111,13 +1112,14 @@ server <- function(input, output, session){
       if (floor(as.numeric(hover[1],0)) >= 1) {
         if(as.numeric(hover[2]) <= chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[floor(as.numeric(hover[1],0))])]) {
           paste0(chrom.cen.df$chr[round(floor(as.numeric(hover[1],0)))], ": click to select")
-        } }
+        }
+      }
     }
-    
+
   })
-  
+
   ## Update chr start end upon click on chr plot
-  
+
   observeEvent(input$chr.click, {
     chrom.cen.df <- chrom.cen.df()
     # We'll use the input$controller variable multiple times, so save it as x for convenience.
@@ -1127,23 +1129,24 @@ server <- function(input, output, session){
         updateTextInput(session = getDefaultReactiveDomain(), "chr", value = gsub("chr", "", chrom.cen.df$chr[x2$x]))
         updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
         updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == chrom.cen.df$chr[x2$x])])
-      } }
+      }
+    }
   })
   ##--------------------- END OF Chromosome plot and additional options
-  
+
   ##------------------------ Search by gene
-  
+
   gene.names <- reactive({
     if (!input$gene.search == ""){
     sel.gene <- input$gene.search
     }
   })
-  
+
   observeEvent(genes.hgnc(), {
     genes.hgnc <- genes.hgnc()
     updateSelectizeInput(session = getDefaultReactiveDomain(), "gene.search", selected = "", choices = genes.hgnc$gene_symbol, server = TRUE)
   })
-  
+
   #output$sel.gene <- renderText({input$gene.search})
 
   observeEvent(gene.names(),{
@@ -1156,21 +1159,21 @@ server <- function(input, output, session){
     }
   })
   ##------------------------ END OF Search by gene
-  
+
   ##------------------------ Expand transcripts checkbox
   reactiveTranscript <- eventReactive(input$checkbox, {
     print(input$checkbox)
   })
   ##------------------------ END OF Expand transcripts checkbox
-  
+
   ##------------------------ Show chromosome Ideogram checkbox
   reactiveIdeogram <- eventReactive(input$checkideo, {
     print(input$checkideo)
   })
   ##------------------------ END OF chromosome Ideogram checkbox
-  
-    ##----------------------- User selected coordiates REGION TABLE
-    ##----------------------- START OF User selected coordinates REGION TABLE
+
+  ##----------------------- User selected coordiates REGION TABLE
+  ##----------------------- START OF User selected coordinates REGION TABLE
   coord <- reactive({
     if (!is.null(saved.coord) & is.null(input$upload.coord)){
       coord <- saved.coord
@@ -1206,7 +1209,7 @@ server <- function(input, output, session){
       coord <- coord()
       updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
     })
-    # transform coordinates form loaded table to usable array  
+    # transform coordinates form loaded table to usable array
     pass.coord <- reactive({
       if (!input$select == ""){
         pass <- unlist(strsplit(input$select, ":"))
@@ -1221,9 +1224,9 @@ server <- function(input, output, session){
         updateNumericInput(session = getDefaultReactiveDomain(), "chrend", value = as.numeric(pass.coord[3]))
       }
     })
-    
-    ################################## ACTIONS ON THE COORDINATES FROM THE USER DEFINED LIST ###############################  
-    
+
+    ################################## ACTIONS ON THE COORDINATES FROM THE USER DEFINED LIST ###############################
+
     # initialize coordinates list based on user selection
     coord.list <- reactiveVal(value = saved.coord)
     #print(coord.list)
@@ -1231,13 +1234,13 @@ server <- function(input, output, session){
       user.coord <- coord.list(coord())
       #print(coord.list)
     })
-    
+
     # Reset user defined region table
     observeEvent(input$reset.user.coord, {
       reset("upload.coord")
       updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = saved.coord, options = list(maxOptions = 20, dropdownParent = 'body'), server = TRUE)
     })
-    
+
     #####----------------- ADD visualized coordinates to coordinates list
     ## Save coordinates to variables
     ## Chr
@@ -1246,9 +1249,13 @@ server <- function(input, output, session){
     })
     ## Chr start
     chrstartNew <- eventReactive(input$add, {
-      if (!is.na(input$chrstart) & input$chrstart <= 0) {print(1)
-      } else if (is.na(input$chrstart)) {print(1)}
-      else {print(input$chrstart)}
+      if (!is.na(input$chrstart) & input$chrstart <= 0) {
+        print(1)
+      } else if (is.na(input$chrstart)) {
+        print(1)
+      } else {
+        print(input$chrstart)
+      }
     })
     ## Chr end
     chrendNew <- eventReactive(input$add, {
@@ -1270,7 +1277,7 @@ server <- function(input, output, session){
         print("")
       }
     })
-    
+
     ## Add coordinates to Selectize drop-down list
     ### Aggiungerle solo se non é giá presente la stessa coordinata
     observeEvent(input$add,{
@@ -1283,14 +1290,13 @@ server <- function(input, output, session){
       if (isEmpty(grep(coord.new[length(coord.new)], coord.list))){
         # updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.new, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
         coord.list(coord.new)
-        #print(coord.list())
       }
     })
-    
+
     ## Add reference genome and name to selected genomic range through a pop-up window
     # reactiveValues object for storing current data set.
     vals <- reactiveValues(data = NULL)
-    
+
     dataModal <- function(failed = FALSE) {
       coord.list <- coord.list()
       modalDialog(
@@ -1300,19 +1306,19 @@ server <- function(input, output, session){
         span(coord.list[length(coord.list)]),
         if (failed)
           div(tags$b("These coordinates already exist, to change the name remove the old one from the list before.", style = "color: red;")),
-        
+
         footer = tagList(
           modalButton("Cancel"),
           actionButton("ok", "OK")
         )
       )
     }
-    
+
     # Show modal when button is clicked.
     observeEvent(input$add, {
       showModal(dataModal())
     })
-    
+
     # When OK button is pressed, attempt to load the data set. If successful,
     # remove the modal. If not show another modal, but this time with a failure
     # message.
@@ -1320,7 +1326,7 @@ server <- function(input, output, session){
       coord.list <- coord.list()
       refgenNew <- refgenNew()
       # Check that data object exists and is data frame.
-      if (!is.null(input$region.name) && str_count(coord.list[grep(coord.list[length(coord.list)], coord.list)], ":") < 3){ 
+      if (!is.null(input$region.name) && str_count(coord.list[grep(coord.list[length(coord.list)], coord.list)], ":") < 3){
         vals$data <- input$region.name
         coord.list[length(coord.list)] <- paste(coord.list[length(coord.list)], refgenNew, vals$data, sep=":")
         updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.list, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
@@ -1330,8 +1336,8 @@ server <- function(input, output, session){
         showModal(dataModal(failed = TRUE))
       }
     })
-    
-    
+
+
     #####----------------- REMOVE visualized coordinates from coordinates list
     ## Save coordinates to variables
     ## Chr
@@ -1349,7 +1355,7 @@ server <- function(input, output, session){
       if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
       } else print(input$chrend)
     })
-    
+
     ## Remove coordinates to Selectize drop-down list
     ### Remove just if matching
     observeEvent(input$remove,{
@@ -1359,14 +1365,14 @@ server <- function(input, output, session){
       coord.list <- coord.list()
       coord.new <- c(coord.list[coord.list != grep(paste(paste("chr", chrRem, sep=""), chrstartRem, chrendRem, sep=":"), coord.list, value = T)])
       #print(coord.new)
-      
+
       updateSelectizeInput(session = getDefaultReactiveDomain(), "select", selected = "", choices = coord.new, options = list(maxOptions = 20, plugins = list("remove_button")), server = TRUE)
       coord.list(coord.new)
       #print(coord.list())
     })
-    
+
     #####----------------- EXPORT updated coordinates to file
-    ## Arrange coordinates to table  
+    ## Arrange coordinates to table
     output$export <- downloadHandler(
       filename = function() { "User_Defined_RegionTable.bed" },
       content = function(file) {
@@ -1374,25 +1380,25 @@ server <- function(input, output, session){
         write_delim(as.data.frame(str_split_fixed(coord.list , ":", n=5)), file = file, delim = "\t", col_names = F)
       })
     ##----------------------- END OF User selected coordiates REGION TABLE
-    
+
     ##----------------------- START BigWig autoscale options dialog
-    
+
     # Set reactive values with bw names to be listed
     bw.items <- reactiveVal(c(config$bw.names))
-    
+
     # Track number of groups and their IDs
     group.count <- reactiveVal(0)
     group.ids <- reactiveVal(character(0))
-    
+
     # Initialize the individual scale to false and update it on interaction
     individual.scale.state <- reactiveVal(F)
     observeEvent(input$individual.scale, {
       individual.scale.state(input$individual.scale)
     })
-    
+
     # Store final accepted settings
     user.selection <- reactiveVal(NULL)
-    
+
     # --- OPEN MODAL ---
     observeEvent(input$bw.autoscale, {
       showModal(modalDialog(
@@ -1406,8 +1412,8 @@ server <- function(input, output, session){
         ),
         tags$hr(),
         # Option 2: Autoscale groups
-        
-        conditionalPanel( 
+
+        conditionalPanel(
           condition = "!input.individual.scale",  # Hide if checkbox selected
           fluidRow(column(width = 5, h6("2) Autoscale Groups")),
                    column(width = 7, uiOutput("add.group.ui"), style = "align:left;")), # add group
@@ -1420,17 +1426,17 @@ server <- function(input, output, session){
         )
       ))
     })
-    
+
     # --- DYNAMIC UI for Add Group button ---
     output$add.group.ui <- renderUI({
       req(!isTRUE(individual.scale.state()))
-      
+
       # Compute which items are still available overall
       selected.values <- unlist(lapply(group.ids(), function(id) input[[id]]))
       selected.values <- selected.values[!is.na(selected.values)]
-      
+
       all.selected <- length(unique(selected.values)) >= length(bw.items())
-      
+
       if (all.selected) {
         # If all items are used, disable adding new groups
         tags$span("All available items have been assigned — no more groups can be added.",
@@ -1439,22 +1445,22 @@ server <- function(input, output, session){
         actionButton("add.group", "+ Add", style = "font-size:80%; padding: 5px 5px; border-color:slategrey")
       }
     })
-    
-    
+
+
     # --- ADD GROUP ---
-    observeEvent(input$add.group, { 
-      # Compute max number of groups allowed 
-      max.groups <- length(bw.items()) 
-      # Only add a group if we haven't reached the maximum 
-      if (group.count() < max.groups) { 
-        # Uncheck individual scale when user starts adding groups 
-        updateCheckboxInput(session, "individual.scale", value = FALSE) 
-        id <- paste0("group.", group.count() + 1) 
-        group.count(group.count() + 1) 
-        group.ids(c(group.ids(), id)) 
-      } 
+    observeEvent(input$add.group, {
+      # Compute max number of groups allowed
+      max.groups <- length(bw.items())
+      # Only add a group if we haven't reached the maximum
+      if (group.count() < max.groups) {
+        # Uncheck individual scale when user starts adding groups
+        updateCheckboxInput(session, "individual.scale", value = FALSE)
+        id <- paste0("group.", group.count() + 1)
+        group.count(group.count() + 1)
+        group.ids(c(group.ids(), id))
+      }
     })
-    
+
     # --- RENDER AUTOSCALE GROUP UI ---
     output$groups.ui <- renderUI({
       req(group.ids())
@@ -1463,7 +1469,7 @@ server <- function(input, output, session){
       # Collect all selected values across groups
       selected.values <- unlist(lapply(group.ids(), function(id) input[[id]]))
       selected.values <- selected.values[!is.na(selected.values)]
-      
+
       # Each group can select from items not already chosen elsewhere,
       # plus whatever it already selected (so it doesn’t disappear)
       tagList(
@@ -1471,7 +1477,7 @@ server <- function(input, output, session){
           other.selected <- unlist(lapply(setdiff(group.ids(), id), function(gid) input[[gid]]))
           other.selected <- other.selected[!is.na(other.selected)]
           remaining.choices <- setdiff(bw.items(), other.selected)
-          
+
           selectizeInput(
             inputId = id,
             label = paste("Group", gsub("group.", "", id)),
@@ -1482,57 +1488,57 @@ server <- function(input, output, session){
           )
         })
       )
-      
+
     })
-    
+
     # --- HANDLE "ENTER" ---
-    observeEvent(input$confirm.enter, { 
-      if (isTRUE(individual.scale.state())) { 
+    observeEvent(input$confirm.enter, {
+      if (isTRUE(individual.scale.state())) {
         user.selection(list(mode = "individual"))
-      } else if (!isTRUE(individual.scale.state()) & length(group.ids()) > 0) { 
-        selected.groups <- lapply(group.ids(), function(id) input[[id]]) 
+      } else if (!isTRUE(individual.scale.state()) & length(group.ids()) > 0) {
+        selected.groups <- lapply(group.ids(), function(id) input[[id]])
         # Remove empty or NULL groups
         selected.groups <- Filter(function(x) !is.null(x) && length(x) > 0, selected.groups)
         if (length(selected.groups) > 0) {
-          names(selected.groups) <- paste0("Group ", seq_along(selected.groups)) 
+          names(selected.groups) <- paste0("Group ", seq_along(selected.groups))
           user.selection(list(mode = "autoscale", groups = selected.groups))
         } else {
           user.selection(NULL)
         }
-      }  else {
+      } else {
         user.selection(NULL)
       }
-      removeModal() 
+      removeModal()
     })
-    
+
     # --- REACTIVE OUTPUT: grouped items to be used for plotgardener plotting function ---
-    grouped.bw.items <- reactive({ 
-      # If no selection yet, return NULL 
-      if (is.null(user.selection()) || length(user.selection()) == 0) { 
-        return(NULL) } 
-      all.items <- bw.items() 
-      if (user.selection()$mode == "individual") { 
-        # each item in its own array 
-        return(lapply(all.items, function(x) c(x))) } 
-      # autoscale mode 
-      selected.groups <- user.selection()$groups # list of arrays 
-      if (is.null(selected.groups) || length(selected.groups) == 0) { 
-        return(NULL) # no groups selected 
-      } 
-      grouped.items <- unlist(selected.groups) 
-      ungrouped.items <- setdiff(all.items, grouped.items) 
-      # combine groups + single-item arrays for ungrouped 
-      autoscale.groups <- c(selected.groups, lapply(ungrouped.items, function(x) c(x))) 
-      
+    grouped.bw.items <- reactive({
+      # If no selection yet, return NULL
+      if (is.null(user.selection()) || length(user.selection()) == 0) {
+        return(NULL) }
+      all.items <- bw.items()
+      if (user.selection()$mode == "individual") {
+        # each item in its own array
+        return(lapply(all.items, function(x) c(x))) }
+      # autoscale mode
+      selected.groups <- user.selection()$groups # list of arrays
+      if (is.null(selected.groups) || length(selected.groups) == 0) {
+        return(NULL) # no groups selected
+      }
+      grouped.items <- unlist(selected.groups)
+      ungrouped.items <- setdiff(all.items, grouped.items)
+      # combine groups + single-item arrays for ungrouped
+      autoscale.groups <- c(selected.groups, lapply(ungrouped.items, function(x) c(x)))
+
       return(autoscale.groups)
     })
     ##----------------------- END BigWig autoscale options dialog
-  
+
     ##------------------------ Save plot as PDF or user selected format
-    
+
     # Reactive to store the chosen file format
     chosen.format <- reactiveVal(NULL)
-    
+
     # Open modal to ask for format
     observeEvent(input$ask.download, {
       showModal(modalDialog(
@@ -1551,14 +1557,14 @@ server <- function(input, output, session){
         )
       ))
     })
-    
+
     # When user confirms, store format and trigger download
     observeEvent(input$file.format, {
       req(input$file.format)
       chosen.format(input$file.format)
       print(chosen.format())
     })
-    
+
     # Actual download handler
     output$plot.save <- downloadHandler(
       filename = function() {
@@ -1570,7 +1576,7 @@ server <- function(input, output, session){
         fmt <- chosen.format()
         # Tell user the plot is saving
         session$sendCustomMessage("savingMessage", list(text = "Saving... please wait."))
-        
+
         if (fmt == "pdf") {
           pdf(file, width = 12, height = 8 )
         } else if (fmt == "svg") {
@@ -1580,9 +1586,9 @@ server <- function(input, output, session){
         } else if (fmt == "jpg") {
           jpeg(file, width =3000, height=2300, res = 300 )
         }
-        plotgardener.shiny.function(bw.file = bw.file, 
-                                    hic.file = hic.file, 
-                                    bed.file = bed.file, 
+        plotgardener.shiny.function(bw.file = bw.file,
+                                    hic.file = hic.file,
+                                    bed.file = bed.file,
                                     bedpe.file = bedpe.file,
                                     bw.names = config$bw.names,
                                     hic.names = config$hic.names,
@@ -1593,8 +1599,8 @@ server <- function(input, output, session){
                                     cat.file = cat.file,
                                     cat.names = config$cat.names,
                                     cat.collapse = reactiveCat(),
-                                    chr = reactiveChr(), #input$chr, 
-                                    start = reactiveChrstart(), #input$chrstart, 
+                                    chr = reactiveChr(), #input$chr,
+                                    start = reactiveChrstart(), #input$chrstart,
                                     end = reactiveChrend(), #input$chrend,
                                     bw.mode = input$bw.mode,
                                     bw.autoscale = grouped.bw.items(),
@@ -1604,13 +1610,13 @@ server <- function(input, output, session){
                                     cytoband = Cytoband(),
                                     ideogram = reactiveIdeogram())
         dev.off()
-        
+
         # Tell user the plot has been saved
         session$sendCustomMessage("savingMessage", list(text = "Saved!"))
-        
+
       })
     ##------------------------ END OF Save plot as PDF
-    
+
     session$onSessionEnded(function() { stopApp() })
 }
 
