@@ -46,25 +46,67 @@ source("basic_statistics_genome_tracks_function.r")
 options(shiny.host = "0.0.0.0")
 options(shiny.port = 8180)
 
+#' Central switch to find out what type of application we are running.
+#'
+#' @returns `TRUE`, if the code is running inside the container, `FALSE` if
+#' the code is running in a local development environment.
+in.container <- function()
+{
+  return( Sys.getenv("GV_DEVELOPMENT")=="" )
+}
+
 ######----------------------------------------------------------- READING DATSETS FROM CONFIG FILE
 Sys.setenv(R_CONFIG_ACTIVE = "default")
-## Load config_gen file with genome annotations, not modifiable by the user.
-config_gen <- config::get(file = "GenomicViewer_config_gen.yml")
+
+if( in.container() ) {
+  ## Load internal, not modifiable config file with genome annotations.
+  config_gen <- config::get(file = "GenomicViewer_config_gen.yml")
+  ## By putting "" at the beginning of the path, we make it append "/" and
+  ## obtain an absolute path.
+  usrConfPath <- file.path("", "data", "GenomicViewer_config.yml")
+} else {
+  config_gen <- list()
+  usrConfPath <- file.path(Sys.getenv("HOME"), "projects", "eurac",
+                           "genomic_viewer", "local",
+                           "GenomicViewer_config.yml")
+}
 
 ## Load config file and handle parsing errors like invalid YAML, bad indentation, missing ":".
 config <- tryCatch(
-  config::get(file = "/data/GenomicViewer_config.yml"),
+  config::get(file = usrConfPath),
   error = function(e) {
     stop("#### CONFIGURATION ERROR #### \n GenomicViewer_config.yml: ", e$message, call. = FALSE)
   }
 )
 
-# Validate required keys in config file
+# Entries `chrom.cen.dir` and `genes.hgnc.dir` are hidden from the user. They
+# are specified in the internal config file in the container version, but they
+# need to be stated in the development version. We implement the following
+# logic:
+# - If there is one of these entries in the user-supplied config file, we take
+#   it, even in the case of a container installation. That way we can perform an
+#   override in the future.
+# - If the respective key is missing in user-supplied config file in the
+#   container version of the app, we copy the values of that key as defined in
+#   the internal config file. This basically serves as a default/fallback. (If
+#   these keys are missing in the developer version, we don't copy and will
+#   throw an error when checking for missing keys below.)
+# This is implemented for any key defined in the container internal config file,
+# and applies specifically to `chrom.cen.dir` and `genes.hgnc.dir`.
+if( in.container() )
+  for( genKey in names(config_gen) )
+    if( ! genKey %in% names(config) )
+      config[[genKey]] <- config_gen[[genKey]]
+
+# Validate required keys in config file (including those copied from the
+# container version internal config file).
 required.keys <- c("data.dir", "bw.dir", "bw.file", "bw.names", "bedpe.dir",
                    "bedpe.file", "bedpe.names", "bed.dir", "bed.file",
                    "bed.names", "hic.dir", "hic.file", "hic.names", "gwas.dir",
                    "gwas.file", "gwas.names", "cat.dir", "cat.file", "cat.names",
-                   "reg.dir", "reg.file")
+                   "reg.dir", "reg.file",
+                   # Hidden from the user, specified in container internal cfg.
+                   "chrom.cen.dir", "genes.hgnc.dir")
 missing.keys <- setdiff(required.keys, names(config))
 
 if (length(missing.keys) > 0) {
@@ -75,15 +117,15 @@ if (length(missing.keys) > 0) {
   )
 }
 
-# Ensure no data is loaded when values are empty
-# Define group of keays for each file type
+# Ensure no data are loaded when values are empty
+# Define group of keys for each file type
 keys.prefix <- unique(sapply(strsplit(names(config),"\\."), `[`, 1))
 keys.group <- lapply(keys.prefix, function(x) names(config)[grep(paste0(x, "\\."), names(config))])
 # Check if are all empty
 config.new <- c()
 for (g in 1:length(keys.group)){
   if(all(unlist(lapply(keys.group[[g]], function(x) config[[x]] == "")) == TRUE)){
-    # Replace with double space to avoid unwanted files laoding
+    # Replace with double space to avoid unwanted files being loaded
     config.entry <- lapply(keys.group[[g]], function(x) gsub("", "  ", config[[x]]))
     config.new <- c(config.new, config.entry)
   } else {
@@ -136,21 +178,42 @@ for (key in names(config)) {
   }
 }
 
-## Read data from config file
+#' Get the content of a directory with matching file names.
+#'
+#' In directory [root]/[sub.dir] and lists all files in this directory matching
+#' the regular expression `file.patt`. If the application is running inside
+#' a container, we prefix the directory with `/` to have an absolute path.
+#' @param root Root directory name.
+#' @param sub.dir Subdirectory name.
+#' @param file.patt Pattern to match file names against.
+#' @return List of matched file names.
+listDataDir <- function(root, sub.dir, file.patt)
+{
+  unlist(lapply(file.patt,
+                function(pattern) {
+                  search.path <- file.path(root, sub.dir)
+                  if( in.container() ) {
+                    search.path <- file.path("/", search.path)
+                  }
+                  dir(search.path, pattern = pattern,
+                      recursive = TRUE, include.dirs = TRUE, full.names = TRUE)
+                }))
+}
+## Read data from files listed in the config file.
 # Set a BigWig file
-bw.file <- unlist(lapply(config$bw.file, function(p) dir(file.path("/", config$data.dir, config$bw.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
+bw.file <- listDataDir(config$data.dir, config$bw.dir, config$bw.file)
 # Set a bed file
-bedpe.file <- unlist(lapply(config$bedpe.file, function(p) dir(file.path("/", config$data.dir, config$bedpe.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
+bedpe.file <- listDataDir(config$data.dir, config$bedpe.dir, config$bedpe.file)
 # Set a bedpe file
-bed.file <- unlist(lapply(config$bed.file, function(p) dir(file.path("/", config$data.dir, config$bed.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
+bed.file <- listDataDir(config$data.dir, config$bed.dir, config$bed.file)
 # Set hiC data file
-hic.file <- unlist(lapply(config$hic.file, function(p) dir(file.path("/", config$data.dir, config$hic.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
+hic.file <- listDataDir(config$data.dir, config$hic.dir, config$hic.file)
 # Set GWAS data file
-gwas.file <- unlist(lapply(config$gwas.file, function(p) dir(file.path("/", config$data.dir, config$gwas.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
+gwas.file <- listDataDir(config$data.dir, config$gwas.dir, config$gwas.file)
 # Categorical bed file
-cat.file <- unlist(lapply(config$cat.file, function(p) dir(file.path("/", config$data.dir, config$cat.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = p)))
+cat.file <- listDataDir(config$data.dir, config$cat.dir, config$cat.file)
 # Region Table file
-saved.coord.path <- dir(file.path("/", config$data.dir, config$reg.dir), recursive = T, include.dirs = T, full.names = TRUE, pattern = config$reg.file)
+saved.coord.path <- listDataDir(config$data.dir, config$reg.dir, config$reg.file)
 saved.coord <- read_delim(saved.coord.path, "\t", col_names = F, show_col_types = F)
 saved.coord <- apply(saved.coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
 saved.coord <- gsub(" ", "", saved.coord) # remove eventual white spaces
@@ -159,7 +222,14 @@ bw.mode <- c("Profile", "Heatmap", "Profile and Heatmap")
 
 
 ######----------------------------------------------------------- SHINY
-shiny::addResourcePath('www', '/shiny-app-GenomicViewer/www')
+
+if( in.container() ) {
+  shiny::addResourcePath('www', '/shiny-app-GenomicViewer/www')
+  wwwPath <- "www/GV_logo.png"
+} else {
+  wwwPath <- "GV_logo.png"
+}
+
 # Define UI -----------------------------------------------------
 ui <- page_sidebar(
   sidebar = sidebar(
@@ -168,12 +238,11 @@ ui <- page_sidebar(
     tags$style(type='text/css',
                ".selectize-dropdown-content{font-size: 85%;}
                .selectize-input { word-wrap : break-word;}
-               .selectize-input { word-break: break-word;}
-               svg { font-family: 'Arial'}"
-               ),
+               .selectize-input { word-break: break-word;}"),
     width = 300,
     # text input to choose genomic coordinates:
-    span("", img(src = "www/GV_logo.png", height = 50, style = "margin-left:14%; margin-top:-50px" )),
+    span("", img(src = wwwPath, height = 50,
+                 style = "margin-left:14%; margin-top:-50px" )),
       # Reference genome
     selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh37 - H. sapiens)",
                                                              "hg38 (GRCh38 - H. sapiens)",
@@ -303,7 +372,7 @@ ui <- page_sidebar(
                         uiOutput("current.ref"),
                         # SVG zoom button position
                         tags$head(tags$style(HTML("#res svg g#svg-pan-zoom-controls {
-                                                    transform: translate(880px, 300px) scale(0.5) !important;
+                                                    transform: translate(880px, 400px) scale(0.5) !important;
                                                   }"))),
                         # Main plot
                         div(
@@ -401,13 +470,13 @@ server <- function(input, output, session){
   ##---------------------- Read reference genome related files
   # Genes hgnc symbol
   genes.hgnc <- eventReactive(input$ref.genome, {
-  genes.hgnc.path <- file.path(config_gen$genes.hgnc.dir, paste(gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep=""))
+  genes.hgnc.path <- file.path(config$genes.hgnc.dir, paste(gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep=""))
   genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
   })
 
   ### For chromosomes plotting
   chrom.cen.df <- eventReactive(input$ref.genome, {
-  chrom.cen.path <- file.path(config_gen$chrom.cen.dir, paste("chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep=""))
+  chrom.cen.path <- file.path(config$chrom.cen.dir, paste("chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep=""))
   chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
   })
 
@@ -424,11 +493,11 @@ server <- function(input, output, session){
     if (ref.genome %in% c("hg19", "hg38", "mm10")){
       cytoband <- NULL
     } else if (ref.genome == "T2T"){
-      cytoband <- read_delim(file.path(config_gen$chrom.cen.dir, "chm13v2.0_cytobands_allchrs.bed"), delim = "\t", col_names = F)
+      cytoband <- read_delim(file.path(config$chrom.cen.dir, "chm13v2.0_cytobands_allchrs.bed"), delim = "\t", col_names = F)
       colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
       return(cytoband)
     } else if (ref.genome == "mm39"){
-      cytoband <- read_delim(file.path(config_gen$chrom.cen.dir, "cytoBand_GRCm39.txt"), delim = "\t", col_names = F)
+      cytoband <- read_delim(file.path(config$chrom.cen.dir, "cytoBand_GRCm39.txt"), delim = "\t", col_names = F)
       colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
       return(cytoband)
     }
@@ -1085,13 +1154,13 @@ server <- function(input, output, session){
   output$chr.plot <- renderPlot({
     chrom.cen.df <- chrom.cen.df()
      ggplot(chrom.cen.df) +
-      ggchicklet:::geom_rrect(aes(xmin = order - 0.25,
-                                  xmax = order + 0.25,
+      ggchicklet:::geom_rrect(aes(xmin = order - 0,
+                                  xmax = order + 0.5,
                                   ymin = cen.start,
                                   ymax = chr.len,
                                   fill = chr)) +
-      ggchicklet:::geom_rrect(aes(xmin = order - 0.25,
-                                  xmax = order + 0.25,
+      ggchicklet:::geom_rrect(aes(xmin = order - 0.,
+                                  xmax = order + 0.5,
                                   ymin = 0,
                                   ymax = cen.end,
                                   fill = chr)) +
@@ -1099,7 +1168,7 @@ server <- function(input, output, session){
       theme_void() +
       theme(legend.position = "none",
             axis.ticks.x = element_line(linewidth = 2, linetype = 2),
-            axis.text.x = element_text(angle = 90, face = "bold"))
+            axis.text.x = element_text(angle = 90, face = "bold", vjust = 1))
 
   }, height = 150, width = "auto")
 
