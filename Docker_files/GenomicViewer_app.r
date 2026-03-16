@@ -45,9 +45,10 @@ loadConfig <- function()
     usrConfPath <- file.path("", "data", "GenomicViewer_config.yml")
   } else {
     config_gen <- list()
-    usrConfPath <- file.path(Sys.getenv("HOME"), "projects", "eurac",
-                             "genomic_viewer", "Docker_files",
-                             "GenomicViewer_config.yml")
+    usrConfPath <- Sys.getenv("GV_DEVELOPMENT")
+    if( !file.exists(usrConfPath) )
+      stop("Config file GV_DEVELOPMENT=\"", usrConfPath,
+           "\" does not exist.")
   }
 
   # Load config file and handle parsing errors like invalid YAML, bad
