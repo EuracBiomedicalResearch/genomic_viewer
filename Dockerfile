@@ -17,7 +17,7 @@ RUN apt-get update \
  libssl-dev \
  libxml2-dev \
  libtiff-dev \
- libwebp-dev 
+ libwebp-dev
 
 # Install renv
 RUN R -e "install.packages('renv', repos = c(CRAN = 'https://cloud.r-project.org'))"
@@ -48,8 +48,4 @@ COPY Docker_files/ /shiny-app-GenomicViewer/
 EXPOSE 8180
 
 # Run the R Shiny app
-CMD Rscript /shiny-app-GenomicViewer/GenomicViewer_app.r
-
-
-
-###---------------------------------------
+CMD ["Rscript", "/shiny-app-GenomicViewer/GenomicViewer_app.r"]
