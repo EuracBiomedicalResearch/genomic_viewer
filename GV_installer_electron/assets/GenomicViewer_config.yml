@@ -1,30 +1,25 @@
----
-
-# Example configuration file for Genomic Viewer, used in the tutorial.
-
-# Notes:
-# 1) Starting the file with three dashes is recommended to indicate where the
-#    file begins.
-# 2) The 'default' key is required for the app to correctly recognize your
-#    configuration file.
+# Configuration is always "default".
+#
+# Rules for any type of data category "X" (e.g. "bw", "bed", "hic", ...)
+# - X.dir A subdirectory in "data.dir" containing files listed in "X.file"
+#   section. Empty string indicates path stored in "data.dir" itself.
+# - X.file: A single file name "file1" or a list of files
+#   ["file1", "file2", ...] residing in directory "X.dir". If X.file is the
+#   empty string (""), no data are loaded and X.names must be empty, too.
+# - X.names: A single label "lab1" or a list of labels ["lab1", "lab2", ...]
+#   with the same number of entries as listed in X.files. These are the labels
+#   shown in the data tracks. Must be the empty string if X.file is empty.
 
 default:
 
-  # Input files and track label handling.
-
-  # Data parent directory to search for.
+  # Root directory of all data files and subdirectories. The directory has
+  # been set during installation and is mapped to this name.
   data.dir: "data"
 
-  # Specific file formats section.
-  # Note: Specify the following keys information for every file section below:
-  # 1) 'dir': directory containing the files specified in that block.
-  # 2) 'file': A file name/list or part of a file name that matches a file/list of
-  #           files with the same format.
-  # 3) 'names': list of the sample names to be displayed.
-
-  # BIGWIG files section.
+  # bigWig directory
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.file: ["GSM6560954_cortex_12_treat_pileup_chr5.bw", "GSM6560956_cortex_15_treat_pileup_chr5.bw"]
+  bw.file: ["GSM6560954_cortex_12_treat_pileup_chr5.bw",
+            "GSM6560956_cortex_15_treat_pileup_chr5.bw"]
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
   # BEDPE files section.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
@@ -40,17 +35,15 @@ default:
   hic.names: ["HiC cortex"]
   # GWAS files section.
   gwas.dir: "GWAScatalog_KidneyDisease"
-  gwas.file: "relocatedCol_chr5.tsv"
+  gwas.file: "26831199-GCST003374-EFO_0003884.h.relocatedCol_chr5.tsv"
   gwas.names: ["GWAS CKD"]
   # Categorical BED files section.
   cat.dir: ""
   cat.file: "regulatory_elements_hg38_chr5.bed"
   cat.names: ["Regulatory Elements"]
 
-  # File with user-defined list of coordinates.
-  # Note: Specify the following keys:
-  # 1) 'dir': the directory that contains the file;
-  # 2) 'file': the file name or shorter matching substring.
-
+  # File with user-defined list of coordinates - can be used for exchanging
+  # views between collaborators or for keeping a personal list of regions of
+  # interest.
   reg.dir: ""
   reg.file: "Example_region_table.bed"

@@ -128,105 +128,74 @@ rDir <- if( in.container() ) file.path("/", config$data.dir) else config$data.di
 if( !dir.exists(rDir) )
   stop("Key `data.dir`: directory does not exist: ", rDir)
 
-# Ensure no data are loaded when values are empty
-# Define group of keys for each file type
-keys.prefix <- unique(sapply(strsplit(names(config),"\\."), `[`, 1))
-keys.group <- lapply(keys.prefix, function(x) names(config)[grep(paste0(x, "\\."), names(config))])
-# Check if are all empty
-config.new <- c()
-for (g in 1:length(keys.group)){
-  if(all(unlist(lapply(keys.group[[g]], function(x) config[[x]] == "")) == TRUE)){
-    # Replace with double space to avoid unwanted files being loaded
-    config.entry <- lapply(keys.group[[g]], function(x) gsub("", "  ", config[[x]]))
-    config.new <- c(config.new, config.entry)
-  } else {
-    config.entry <- lapply(keys.group[[g]], function(x) config[[x]])
-    config.new <- c(config.new, config.entry)
-  }
-}
-# Add key names to new config
-names(config.new) <- names(config)
-config <- config.new
+# Radical change of config policy.
+# - There is one directory where a certain type of files (e.g. BEDPE) reside.
+# - The directory has some name or is empty (""). In the latter case, we assume
+#   it's the root directory as specified by `data.dir`.
+# - In this directory, each file to be loaded is written in its full name. If
+#   the list of full names is empty or an empty string (""), nothing is done.
+# - The file names do not need to follow any naming convention.
+# - The `names` section then contains one name for each file. It has to match
+#   the number of files loaded via the .dir/.file sections. This also means it
+#   has to be empty if no .file is given.
 
-# Validate expected extensions are correctly assigned to keys
-# Define expected extensions for certain keys
-expected.ext <- list(
-  "bw.file"  = c(".bw", ".bigwig"),
-  "bedpe.file" = ".bedpe",
-  "bed.file" = c(".bed", ".bam", ".tsv", ".txt"),
-  "hic.file" = c(".hic"),
-  "gwas.file" = c(".tsv", ".txt"),
-  "cat.file" = c(".bed", ".tsv", ".txt"),
-  "reg.file" = c(".bed", ".txt", ".tsv")
-)
-compressed.ext <- c(".gz", ".zip", ".bz2", ".xz", ".tgz", ".tar")
 
-# Check config keys
-for (key in names(config)) {
-  # Only process keys ending with .file
-  if (grepl("\\.file$", key, ignore.case = TRUE)) {
-    value <- config[[key]]
-    # Skip if value is empty
-    for (v in value){
-      if (is.null(v) || v == "") next
-      # Remove compression ext
-      value <- gsub(paste(compressed.ext, collapse = "|"), "", v)
-      # Get file extension including dot, lowercased
-      ext <- paste0(".", tolower(tools::file_ext(v)))
-      # Determine expected extensions for this key
-      if (key %in% names(expected.ext)) {
-        allowed <- expected.ext[[key]]
-        # Default: accept any extension
-        next
-      } # Check if the extension is valid
-      if (!(ext %in% tolower(allowed))) {
-        stop(sprintf(
-          "#### CONFIGURATION ERROR #### \n File extension error: '%s' should have extension %s but got '%s'.",
-          key, paste(allowed, collapse = " or "), ext
-        ))
-      }
-    }
-  }
-}
-
-#' Get the content of a directory with matching file names.
+#' Verify subdirectories and dedicated file names in there exist.
 #'
-#' In directory [root]/[sub.dir] and lists all files in this directory matching
-#' the regular expression `file.patt`. If the application is running inside
-#' a container, we prefix the directory with `/` to have an absolute path.
-#' This function also checks if the directory exists and quits (!) with an error
-#' if not.
+#' In case `sub.dir` or `file.name` are empty strings, an empty list is
+#' returned. Checks if [root]/[sub.dir] exists and stops if not. Checks if
+#' [root]/[sub.dir]/[file.name] exists and stops if not.
 #' @param root Root directory name.
 #' @param sub.dir Subdirectory name.
-#' @param file.patt Pattern to match file names against.
-#' @return List of matched file names.
-listDataDir <- function(root, sub.dir, file.patt)
+#' @param file.names File name(s), can be a character vector.
+#' @return List of fully qualified file names (can be empty)
+listDataDir <- function(root, sub.dir, file.names)
 {
-  unlist(lapply(file.patt,
-                function(pattern) {
+  if( length(file.names)==1 && file.names=="" )
+    return( as.character(c()) )
+  unlist(lapply(file.names,
+                function(fname) {
                   search.path <- file.path(root, sub.dir)
                   if( in.container() ) {
                     search.path <- file.path("/", search.path)
                   }
                   if( !dir.exists(search.path) )
                     stop("Directory does not exist: ", search.path)
-                  dir(search.path, pattern = pattern,
-                      recursive = TRUE, include.dirs = TRUE, full.names = TRUE)
+                  ffn <- file.path(search.path, fname)
+                  if( !file.exists(ffn) )
+                    stop("File does not exist: ", ffn)
+                  return( ffn )
                 }))
 }
+
+assertNrNamesEqualsFiles <- function(section, files, names)
+{
+  nrNames <- length(names)
+  if( nrNames==1 && names=="" ) nrNames <- 0
+  if( length(files)!=nrNames )
+    stop("Config file section `", section,
+         "`: number of files listed and their corresponding names differ")
+}
+
 ## Read data from files listed in the config file.
 # Set a BigWig file
 bw.file <- listDataDir(config$data.dir, config$bw.dir, config$bw.file)
+assertNrNamesEqualsFiles("BigWig", bw.file, config$bw.names)
 # Set a bed file
 bedpe.file <- listDataDir(config$data.dir, config$bedpe.dir, config$bedpe.file)
+assertNrNamesEqualsFiles("BEDPE", bedpe.file, config$bedpe.names)
 # Set a bedpe file
 bed.file <- listDataDir(config$data.dir, config$bed.dir, config$bed.file)
+assertNrNamesEqualsFiles("BED", bed.file, config$bed.names)
 # Set hiC data file
 hic.file <- listDataDir(config$data.dir, config$hic.dir, config$hic.file)
+assertNrNamesEqualsFiles("HIC", hic.file, config$hic.names)
 # Set GWAS data file
 gwas.file <- listDataDir(config$data.dir, config$gwas.dir, config$gwas.file)
+assertNrNamesEqualsFiles("GWAS", gwas.file, config$gwas.names)
 # Categorical bed file
 cat.file <- listDataDir(config$data.dir, config$cat.dir, config$cat.file)
+assertNrNamesEqualsFiles("Cat.BED", cat.file, config$cat.names)
 # Region Table file
 saved.coord.path <- listDataDir(config$data.dir, config$reg.dir, config$reg.file)
 
