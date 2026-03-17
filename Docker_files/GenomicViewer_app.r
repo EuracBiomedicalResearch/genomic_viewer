@@ -478,17 +478,18 @@ server <- function(input, output, session){
   ### For cytoband
   Cytoband <- eventReactive(input$ref.genome, {
     ref.genome <- gsub( " .*", "", input$ref.genome)
-    if (ref.genome %in% c("hg19", "hg38", "mm10")){
-      cytoband <- NULL
-    } else if (ref.genome == "T2T"){
-      cytoband <- read_delim(file.path(config$chrom.cen.dir, "chm13v2.0_cytobands_allchrs.bed"), delim = "\t", col_names = F)
-      colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
-      return(cytoband)
-    } else if (ref.genome == "mm39"){
-      cytoband <- read_delim(file.path(config$chrom.cen.dir, "cytoBand_GRCm39.txt"), delim = "\t", col_names = F)
-      colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
-      return(cytoband)
-    }
+    ref2CytoFN <- c("hg19" = "cytoBand_hg19.txt",
+                    "hg38" = "cytoBand_hg38.txt",
+                    "mm10" = "cytoBand_mm10.txt",
+                    "T2T"  = "chm13v2.0_cytobands_allchrs.bed",
+                    "mm39" = "cytoBand_GRCm39.txt")
+    cytoFN <- ref2CytoFN[ref.genome]
+    stopifnot("Internal failure: No cytoband file name for reference genome." =
+                ref.genome %in% names(ref2CytoFN))
+    cytoband <- read_delim(file.path(config$chrom.cen.dir, cytoFN),
+                           delim = "\t", col_names = FALSE)
+    colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
+    return(cytoband)
   })
 
 

@@ -526,98 +526,53 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   )
   y.coord = y.coord + 1
 
-  print(y.coord)
-
 #####------------------------------------------------ CHROMOSOME IDEOGRAM
-# Plot chromosome ideogram:
+  if(ideogram == TRUE) {
+    # Taken from an instance of plotIdeogram("chr1", assembly = "hg19")
+    colors <- c("gneg"    = "#FFFFFF",
+                "gpos25"  = "#DEE0E4",
+                "gpos50"  = "#D0D3D9",
+                "gpos75"  = "#C3C6CE",
+                "gpos100" = "#B5B9C3",
+                "acen"    = "#d7e9b4",
+                "gvar"    = "#A8ADB8",
+                "stalk"   = "#c4e3f2")
+    ## Define region and cytoband data
+    chrom <- paste0("chr", chr)
+    region <- pgParams(chrom = chrom, chromstart = start, chromend = end,
+                       assembly = genome)
+    cytoband_data <- dplyr::filter(cytoband, seqnames == chrom)
+    ## Plot cytoband as ggplot object and add zoom highlight
+    ideo <- ggplot(cytoband_data, aes(y = seqnames, xmin = start, xmax = end,
+                                      fill = gieStain)) +
+      geom_rect(aes(ymin = 0, ymax = 2)) +
+      ggchicklet:::geom_rrect(aes(xmin=0, xmax=max(end), ymin = 0, ymax = 2),
+                              fill="transparent", color="slategray") +
+      theme_void() +
+      theme(legend.position = "none") +
+      scale_fill_manual(values = colors) +
+      annotate(geom = "rect", ymin = 0, ymax = 2,
+               xmin = region$chromstart, xmax = region$chromend,
+               color = "darkred", fill = "darkred", alpha = 0.5) +
+      scale_x_continuous(expand = c(0, 0))
 
-  if(ideogram == TRUE){
+    chromLen <- chromSizes[[chrom]]
+    ideogramPlot <- plotGG(ideo,
+                           x = 0.5 , y = "1.75b",
+                           width = 15 * chromLen / maxChromSize,
+                           height = 0.5, params = region,
+                           just = c("left", "bottom"),
+                           default.units = "cm")
+    ## Needed for annoZoomLines
+    ideogramPlot$chrom <- chrom
 
-    ## Plot and place ideogram
-    if (genome[1] %in% c("hg19", "hg38", "mm10")){
-
-      ideogramPlot <- plotIdeogram(
-        chrom = paste("chr", chr, sep=""), assembly = genome,
-        x = 0.75, y = "1.75b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5,
-        just = c("left", "bottom"),
-        default.units = "cm")
-
-      ## Increment y coord
-      y.coord <- y.coord+0.5
-
-      ## Add highlight region
-      region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
-      annoHighlight(
-        plot = ideogramPlot, params = region,
-        fill = "darkred",
-        y = "-0.6b", height = 0.7, just = c("left", "top"), default.units = "cm"
-      )
-
-    } else {
-      ## Define region and cytoband data
-      region <- pgParams(chrom = paste("chr", chr, sep=""), chromstart = start, chromend = end)
-      cytoband_data <- dplyr::filter(cytoband, seqnames == paste("chr", chr, sep=""))
-      ## Plot cytoband as ggplot object and add zoom highlight
-      ideo <- ggplot(cytoband_data, aes(x = seqnames, ymin = start, ymax = end, fill = gieStain)) +
-        geom_rect(aes(xmin = 0, xmax = 2)) +
-        ggchicklet:::geom_rrect(aes(xmin=0, xmax =2, ymin=0, ymax=max(end)), fill="transparent", color="slategray") +
-        coord_flip() + # Optional: Flip coordinates for a vertical ideogram
-        theme_void() +# Optional: Remove default ggplot theme elements
-        theme(legend.position = "none") +
-        scale_fill_manual(values = c(paletteer_d("RColorBrewer::Greys")[1:length(grep("gneg*|gpos*", unique(cytoband_data$gieStain)))], rev(paletteer_dynamic("cartography::pastel.pal",5 ) [1:(length( unique(cytoband_data$gieStain))-length(grep("gneg*|gpos*", unique(cytoband_data$gieStain))))]))) +
-        annotate(geom = "rect", xmin = 0, xmax = 2, ymin = region$chromstart, ymax = region$chromend, color = "darkred", fill = "darkred", alpha = 0.5)
-
-      ideogramPlot <- plotGG(ideo,
-                             x = 0.75 , y = "1.25b", width = (15 * chromSizes[[paste("chr", chr, sep="")]]) / maxChromSize, height = 0.5, params = region,
-                             just = c("left", "bottom"),
-                             default.units = "cm")
-
-      ideogramPlot$chrom <- paste("chr", chr, sep="")
-      ## Increment y coord
-      y.coord <- y.coord+0.5
-
-    }
-    y.coord = y.coord -0.85
-    print(y.coord)
+    ## Increment y coord
+    y.coord <- y.coord + 0.10
     ## Add zoom-in lines
-    annoZoomLines(params = region,
-                  plot = ideogramPlot,
-                  y0 = y.coord+0.4, x1 = c(0, 16), y1 = y.coord, default.units = "cm", just = c("left", "bottom")
-    )
-
-
-    ## Plot chromosome name
-    #plotText(
-    #  label = paste("Chromosome", chr, sep=""), fontcolor = "dark grey",
-    #  x = 4.5, y = "0.5b", just = "right")
-    #y.coord <- y.coord+0.5
-    # COmmented because redundant with GenomeLabel
-
-
+    annoZoomLines(plot = ideogramPlot, chrom = chrom,
+                  chromstart = start/chromLen, chromend = end/chromLen,
+                  y0 = y.coord, x1 = c(0, 16), y1 = y.coord - 0.4,
+                  default.units = "cm", just = c("left", "bottom"))
   }
 }
 
-
-#plotgardener.shiny.function(bw.file = bw.file,
-  #                          hic.file = hic.file,
-   #                         bed.file = bed.file,
-    #                        bedpe.file = bedpe.file,
-     #                       bw.names = config$bw.names,
-      #                      hic.names = config$hic.names,
-       #                     bed.names = config$bed.names,
-        #                    bedpe.names = config$bedpe.names,
-         #                   gwas.file = gwas.file,
-          #                  gwas.names = config$gwas.names,
-           #                 cat.file = cat.file,
-            #                cat.names = config$cat.names,
-                   #         cat.collapse = T,
-             #               chr = chr,
-              #              start = chrstart,
-               #             end = chrend,
-                #            bw.mode = "Profile",
-                 #           expand.transcripts = F,
-                  #          genes.hgnc = genes.hgnc)
-
-#chr <- "4"
-#chrstart <- 1
-#chrend <- 190214555
