@@ -504,23 +504,23 @@ server <- function(input, output, session){
 
   ##---------------------- Establish reactive events
   reactiveChr <- eventReactive(input$go, {
-    print(input$chr)
+    return(input$chr)
   })
   ## Chr start
   reactiveChrstart <- eventReactive(input$go, {
-    if (is.na(input$chrstart) | input$chrstart <= 0) { print(1) }
-    else {print(input$chrstart)}
+    if (is.na(input$chrstart) | input$chrstart <= 0) { return(1) }
+    else {return(input$chrstart)}
   })
   ## Chr end
   reactiveChrend <- eventReactive(input$go, {
     chrom.cen.df <- chrom.cen.df()
     start <- reactiveChrstart()
     if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) {
-      print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      return(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
     } else if (is.na(input$chrend) | input$chrend < 500) {
-      print(start + 500)
+      return(start + 500)
     } else {
-      print(input$chrend)
+      return(input$chrend)
     }
   })
   ## Update Chr start end when unwanted values are entered
@@ -528,7 +528,7 @@ server <- function(input, output, session){
     # handle start
     if (is.na(input$chrstart) | input$chrstart <= 0){
       updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
-      start <- 1} else {start <- print(input$chrstart)}
+      start <- 1} else {start <- input$chrstart}
     # handle end
     chrom.cen.df <- chrom.cen.df()
     if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) {
@@ -1229,13 +1229,13 @@ server <- function(input, output, session){
 
   ##------------------------ Expand transcripts checkbox
   reactiveTranscript <- eventReactive(input$checkbox, {
-    print(input$checkbox)
+    return(input$checkbox)
   })
   ##------------------------ END OF Expand transcripts checkbox
 
   ##------------------------ Show chromosome Ideogram checkbox
   reactiveIdeogram <- eventReactive(input$checkideo, {
-    print(input$checkideo)
+    return(input$checkideo)
   })
   ##------------------------ END OF chromosome Ideogram checkbox
 
@@ -1313,36 +1313,35 @@ server <- function(input, output, session){
     ## Save coordinates to variables
     ## Chr
     chrNew <- eventReactive(input$add, {
-      print(input$chr)
+      return(input$chr)
     })
     ## Chr start
     chrstartNew <- eventReactive(input$add, {
-      if (!is.na(input$chrstart) & input$chrstart <= 0) {
-        print(1)
-      } else if (is.na(input$chrstart)) {
-        print(1)
+      if (is.na(input$chrstart) || !is.na(input$chrstart) && input$chrstart <= 0) {
+        return(1)
       } else {
-        print(input$chrstart)
+        return(input$chrstart)
       }
     })
     ## Chr end
     chrendNew <- eventReactive(input$add, {
       chrom.cen.df <- chrom.cen.df()
-      if (!is.na(input$chrend) & input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
-      } else if (!is.na(input$chrend) & input$chrend < 0) {
+      if (!is.na(input$chrend) && input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) {
+        return(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      } else if (!is.na(input$chrend) && input$chrend < 0) {
         chrstartNew <- chrstartNew()
-        print(chrstartNew + 500)
+        return(chrstartNew + 500)
       } else if (is.na(input$chrend)){
         chrstartNew <- chrstartNew()
-        print(chrstartNew + 500)
-      } else print(input$chrend)
+        return(chrstartNew + 500)
+      } else return(input$chrend)
     })
     ## Ref gen
     refgenNew <- eventReactive(input$add, {
       if (!is.na(input$ref.genome)) {
-        print(sapply(strsplit(input$ref.genome," "), `[`, 1))
+        return(sapply(strsplit(input$ref.genome," "), `[`, 1))
       } else {
-        print("")
+        return("")
       }
     })
 
@@ -1410,18 +1409,17 @@ server <- function(input, output, session){
     ## Save coordinates to variables
     ## Chr
     chrRem <- eventReactive(input$remove, {
-      print(input$chr)
+      return(input$chr)
     })
     ## Chr start
     chrstartRem <- eventReactive(input$remove, {
-      if (input$chrstart <= 0) {print(1)} else {
-        print(input$chrstart)}
+      if (input$chrstart <= 0) return(1) else return(input$chrstart)
     })
     ## Chr end
     chrendRem <- eventReactive(input$remove, {
        chrom.cen.df <- chrom.cen.df()
-      if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { print(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
-      } else print(input$chrend)
+      if (input$chrend > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) { return(chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+      } else return(input$chrend)
     })
 
     ## Remove coordinates to Selectize drop-down list

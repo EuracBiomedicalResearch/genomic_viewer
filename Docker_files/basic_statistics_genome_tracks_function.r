@@ -10,8 +10,8 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
   peaks.nr <- c() # For total nr of peaks
   peaks.nr.sel <- c() # For peaks nr in the selected region
   for (i in 1:length(bed.file)){
-    bed.tab <- read_delim(bed.file[i], "\t", col_names = TRUE,
-                          show_col_types = FALSE)
+    bed.tab <- suppressMessages(read_delim(bed.file[i], "\t", col_names = TRUE,
+                          show_col_types = FALSE))
     peaks.nr <- c(peaks.nr, nrow(bed.tab))
     # For bed files or bedpe files
     if(filetype == "bed"){
