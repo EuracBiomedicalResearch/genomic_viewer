@@ -2,6 +2,8 @@
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
 
+QUIET <- suppressMessages
+
 #' Silently load libraries
 loadLibraries <- function()
 {
@@ -18,7 +20,7 @@ loadLibraries <- function()
   cat("Loading libraries")
   for( lib in libs ) {
     cat(".", sep = "")
-    suppressMessages(do.call(library, list(lib)))
+    QUIET(do.call(library, list(lib)))
   }
 }
 
@@ -354,9 +356,9 @@ ui <- page_sidebar(
             nav_panel("Plot", class = "gap-2 p-0 border-0 align-items-top margin-bottom-240px",
                       div(
                         style = "display:flex; flex-direction:column; height:100%;",
-                        # Warning message in case there is no data
+                        # Warning message in case there are no data
                         tags$head(tags$style(".shiny-output-error{visibility: hidden;}")),
-                        tags$head(tags$style(".shiny-output-error:after{content: 'There is no data in this range. Try with different coordinates.'; visibility: visible; color: slategrey; position: absolute; top: 10px; left: 70px;}")),
+                        tags$head(tags$style(".shiny-output-error:after{content: 'There are no data in this range. Try with different coordinates.'; visibility: visible; color: slategrey; position: absolute; top: 10px; left: 70px;}")),
                         # Notification of selected reference genome
                         uiOutput("current.ref"),
                         # SVG zoom button position
@@ -367,7 +369,7 @@ ui <- page_sidebar(
                         div(
                           style = "flex-grow:1; overflow-y:auto;",
                           svgPanZoomOutput(outputId = "res", width = "auto", height = "auto") %>% withSpinner(color = "salmon", type = 6, size = 0.5),
-                          imageOutput("plot.test", inline = T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),#, width = "auto", height = "10px", inline=T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),
+                          imageOutput("plot.test", inline = T) %>% withSpinner(color = "salmon", type = 6, size = 0.5),
                         ),
                         # Zoom section
                         div(id = "stickyBottomPanel", style="display:flex; flex-direction:column; width:100%",
@@ -564,42 +566,41 @@ server <- function(input, output, session){
   })
 
   ##---------------------- Output genomic view plot:
-    tracks <- reactive({
-      req(plot.ready())
-      genes.hgnc <- genes.hgnc()
-      req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 |
-           sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
-      plotgardener.shiny.function(bw.file = bw.file,
-                                  hic.file = hic.file,
-                                  bed.file = bed.file,
-                                  bedpe.file = bedpe.file,
-                                  bw.names = config$bw.names,
-                                  hic.names = config$hic.names,
-                                  bed.names = config$bed.names,
-                                  bedpe.names = config$bedpe.names,
-                                  gwas.file = gwas.file,
-                                  gwas.names = config$gwas.names,
-                                  cat.file = cat.file,
-                                  cat.names = config$cat.names,
-                                  cat.collapse = reactiveCat(),
-                                  chr = reactiveChr(), #input$chr,
-                                  start = reactiveChrstart(), #input$chrstart,
-                                  end = reactiveChrend(), #input$chrend,
-                                  bw.mode = input$bw.mode,
-                                  bw.autoscale = grouped.bw.items(),
-                                  expand.transcripts = reactiveTranscript(),
-                                  genes.hgnc = genes.hgnc,
-                                  genome = gsub( " .*", "", input$ref.genome),
-                                  cytoband = Cytoband(),
-                                  ideogram = reactiveIdeogram())
-    # } else {return(NULL)}
-
-    })
+  tracks <- reactive({
+    req(plot.ready())
+    genes.hgnc <- genes.hgnc()
+    req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 |
+         sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
+    plotgardener.shiny.function(bw.file = bw.file,
+                                hic.file = hic.file,
+                                bed.file = bed.file,
+                                bedpe.file = bedpe.file,
+                                bw.names = config$bw.names,
+                                hic.names = config$hic.names,
+                                bed.names = config$bed.names,
+                                bedpe.names = config$bedpe.names,
+                                gwas.file = gwas.file,
+                                gwas.names = config$gwas.names,
+                                cat.file = cat.file,
+                                cat.names = config$cat.names,
+                                cat.collapse = reactiveCat(),
+                                chr = reactiveChr(), #input$chr,
+                                start = reactiveChrstart(), #input$chrstart,
+                                end = reactiveChrend(), #input$chrend,
+                                bw.mode = input$bw.mode,
+                                bw.autoscale = grouped.bw.items(),
+                                expand.transcripts = reactiveTranscript(),
+                                genes.hgnc = genes.hgnc,
+                                genome = gsub( " .*", "", input$ref.genome),
+                                cytoband = Cytoband(),
+                                ideogram = reactiveIdeogram())
+  })
 
   output$res <- renderSvgPanZoom({
-    #req(!is.null(tracks()))
-    svgPanZoom(svglite:::inlineSVG(tracks()),
-               panEnabled = T, controlIconsEnabled = T, viewBox = T, width = "auto", height = "900px") #width = "auto", height = "auto",
+    QUIET(
+      svgPanZoom(svglite:::inlineSVG(tracks()),
+                 panEnabled = T, controlIconsEnabled = T, viewBox = T,
+                 width = "auto", height = "900px") )
   })
 
   image <- reactive({
