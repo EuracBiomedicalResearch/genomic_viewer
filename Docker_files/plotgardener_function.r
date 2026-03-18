@@ -68,8 +68,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
       maxScore <- maxScore[order(match(names(maxScore), bw.names))]
     }
 
-    print(paste("Scale for bigwig files has been set to:", maxScore))
-
   # Add colors based on bigwig score to be used in the Heatmap version of bigwig tracks
     ## Conditional binsize
     if ((end - start) < 10e+05){
@@ -83,13 +81,11 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
     } else {
       binsize = 1000000
     }
-    print(paste0("Bigwigs binsize = ", binsize))
 
     ## Define binning of the selected region
     if (bw.mode == "Heatmap" | bw.mode == "Profile and Heatmap"){
       if(!is.na(binsize)){
        bin <- seq(from = start, to = end, by = binsize)
-       print(paste("Generating ", length(bin), " bins of lenght: ", binsize))
     ## Subset the bw file based on the new binning and assign score for colouring
        score.new <- c()
         start.new <- c()
@@ -109,7 +105,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
                          end=end.new,
                          score=score.new)
          bw.list[[i]] <- bw.new
-         print("Assigning colors to bins")
           hm.colors[[i]] <- mapColors(vector = score.new, palette = colorRampPalette(c("#2D3164", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
         }
        } else {
@@ -119,7 +114,6 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
               hm.colors[[i]] <- mapColors(vector = bwScore, palette = colorRampPalette(c("#2D3164", "#E4DA64", "#E6d25c", "#EAB720","#EAA928", "#E89E16", "#F1731D", "#F5191C")), range = c(0, 50)) #c("white","#4Cb9cc", "#005691","#00366C")
          }
        }
-      print("Binning colour assigned")
     }
   }
 
@@ -159,10 +153,11 @@ plotgardener.shiny.function <- function(bw.file, hic.file, bed.file, bedpe.file,
            hic.norm <- strawr::readHicNormTypes(hic.file[i])[1]
          }
 
-         hicDataChromRegion[[i]] <- readHic(file = hic.file[i],
-                                            chrom = hic.chrom, assembly = genome,
-                                            chromstart = start, chromend = end,
-                                            resolution = hic.res, res_scale = "BP", norm = hic.norm
+         hicDataChromRegion[[i]] <- suppressMessages(
+           readHic(file = hic.file[i],
+                   chrom = hic.chrom, assembly = genome,
+                   chromstart = start, chromend = end,
+                   resolution = hic.res, res_scale = "BP", norm = hic.norm)
          )
         }
       }
@@ -204,7 +199,6 @@ params <- pgParams(
                linecolor = NA,
                y = y.coord, height = 0.1)
     y.coord <- y.coord + 0.1
-    print(y.coord)
 
 #####------------------------------------------------ HiC Matrix
     ## Plot Hi-C data in region
@@ -234,7 +228,6 @@ params <- pgParams(
         }
       }
     }
-    print(y.coord)
 
 #####------------------------------------------------ BIGWIGS
 
@@ -307,7 +300,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     )
   }
 }
-    print(y.coord)
+
 
 #####------------------------------------------------ BED
 ## Plot bed files
@@ -350,7 +343,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   y.coord <- y.coord+(0.75*conv)
        }
       }
-    print(y.coord)
+
 
 #####------------------------------------------------ CATEGORICAL BED
   ## Plot categorical bed files
@@ -395,7 +388,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
       x.pos <- x.pos+0.8
        }
     }
-    print(y.coord)
+
 
 #####------------------------------------------------ HiC LOOPS
 ## Plot loop annotations
@@ -418,7 +411,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
   y.coord <- y.coord+(2*conv)
      }
   }
-    print(y.coord)
+
 
 #####------------------------------------------------ GWAS Manhattan
 ## Plot Manhattan for GWAS
@@ -464,7 +457,7 @@ if (bw.mode == "Profile" | bw.mode == "Profile and Heatmap"){
     #  width = 0.10, height = 0.5, fontsize = 10*(conv+0.2), digits = 1, scientific = T
     #)
     }
-    print(y.coord)
+
 
 #####------------------------------------------------ GENE and GENOME TRACKS
 

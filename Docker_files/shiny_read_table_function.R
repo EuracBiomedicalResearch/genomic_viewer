@@ -4,11 +4,10 @@
 #library(dplyr)
 #library(readr)
 shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file, chr, Start, End){
-  
+
   chrom <- paste0("chr", chr)
-  
+
   # Read bed files
-  print("Reading bed tables")
   bed.tab.list <- list()
   if(length(bed.file) > 0){
     for (i in 1:length(bed.file)){
@@ -16,12 +15,11 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
      colnames(bed.tab)[1:3] <- c("chr", "start", "end")
      bed.tab <- dplyr::filter(bed.tab, chr == chrom & start >= Start & end <= End)
       bed.tab.list[[i]] <- bed.tab
-    } 
+    }
   } else {bed.tab.list[[1]] <- data.frame(chr = "", start = "", end ="")
     }
-  
+
   # Read bedpe files
-  print("Reading bedpe tables")
   bedpe.tab.list <- list()
   if(length(bedpe.file) > 0){
     for (i in 1:length(bedpe.file)){
@@ -32,9 +30,8 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
     }
   } else {bedpe.tab.list[[1]] <- data.frame(chrA = " ", startA = " ", endA =" ", chrB = " ", startB = " ", endB =" ")
   }
-  
+
   # Read categorical bed files
-  print("Reading categorical bed tables")
   cat.tab.list <- list()
   if(length(cat.file) > 0){
     for (i in 1:length(cat.file)){
@@ -42,13 +39,12 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
       #colnames(cat.tab)[1:4] <- c("chr", "start", "end", "category")
       cat.tab <- dplyr::filter(cat.tab, chr == chrom & start >= Start & end <= End)
       cat.tab.list[[i]] <- cat.tab
-    } 
+    }
   } else {cat.tab.list[[1]] <- data.frame(chr = "", start = "", end ="")
   }
-  
-  
+
+
   # Read gwas files
-  print("reading GWAS tables")
   gwas.tab.list <- list()
   if(length(gwas.file) > 0){
     in.chrom <- chrom
@@ -60,9 +56,9 @@ shiny_read_table_function <- function(bed.file, bedpe.file, cat.file, gwas.file,
    }
   } else {gwas.tab.list[[1]] <- data.frame(chrom = "", pos = "", p ="", snp = "")
     }
-  
+
   out.list <- list(bed.tab.list, bedpe.tab.list, cat.tab.list, gwas.tab.list)
-  
+
   return(out.list)
 }
 

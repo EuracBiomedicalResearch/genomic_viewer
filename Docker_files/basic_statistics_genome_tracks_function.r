@@ -5,13 +5,13 @@
 
 basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End, filetype){
   chrom <- paste0("chr", chr)
-  print("Calculating peaks nr")
   # Read bed files and peaks nr
   bed.tab.list <- list() ## Capire se serve davvero storare questa info o se posso evitare
   peaks.nr <- c() # For total nr of peaks
   peaks.nr.sel <- c() # For peaks nr in the selected region
   for (i in 1:length(bed.file)){
-    bed.tab <- read_delim(bed.file[i], "\t", col_names = T)
+    bed.tab <- read_delim(bed.file[i], "\t", col_names = TRUE,
+                          show_col_types = FALSE)
     peaks.nr <- c(peaks.nr, nrow(bed.tab))
     # For bed files or bedpe files
     if(filetype == "bed"){
@@ -26,7 +26,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
     bed.tab.list[[i]] <- bed.tab.s
     peaks.nr.sel <- c(peaks.nr.sel, nrow(bed.tab.s))
   }
-  
+
   # Summarize peaks numbers in a data frame
   peaks.nr.df <- data.frame(peaks.nr = c(peaks.nr, peaks.nr.sel),
                             category = c(rep("total", length(peaks.nr)), rep("selected", length(peaks.nr.sel))),
@@ -44,7 +44,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
           strip.text.x = element_text(size = 10)) +
     geom_text(aes(label=peaks.nr), vjust=1.6, color="white", size=4) +
     facet_wrap( ~ category, , scales = "free")
-  
+
   plot.bed.tot
 
   # End of function
@@ -59,25 +59,25 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
                      # library(ggplot2)
                      # library(ComplexUpset)
 
-      # For this type of plot we use a function that has been implemented in the EpiCompare package (https://rdrr.io/github/neurogenomics/EpiCompare/). 
+      # For this type of plot we use a function that has been implemented in the EpiCompare package (https://rdrr.io/github/neurogenomics/EpiCompare/).
       # It allows to take multiple GRanges objects (obtained from peaksets generally) and to calculate pekas overlaps and finally generate an upset plot of the intersection.
       # Generating the upset plot is important because when more than 3-5 groups of peaks are generated, the venn diagram becomes unclear and many times also impossible to represent with the most commonly used packages.
-      # The functions present in the EpiCompare package are well implemented exactly for this aim, however it was not possible to make the package working (too new maybe, published  on Feb. 17, 2025). Thus the functions from the source code where copied here and reused. 
+      # The functions present in the EpiCompare package are well implemented exactly for this aim, however it was not possible to make the package working (too new maybe, published  on Feb. 17, 2025). Thus the functions from the source code where copied here and reused.
 
       ####### EpiCompare function copied here: BEGIN
 
 overlap_upset_plot <- function(peaklist,
                                verbose=TRUE){
-  
+
   value <- NULL;
-  
+
   t1 <- Sys.time()
-  
+
   font_size <- 1
   messager("--- Running overlap_upset_plot() ---",v=verbose)
   #### Check package is available ####
   check_dep("ComplexUpset")
-  check_dep("tidyr") 
+  check_dep("tidyr")
   ### Check Peaklist Names ###
   peaklist <- check_list_names(peaklist)
   ### Set Metadata Colnames ###
@@ -102,17 +102,17 @@ overlap_upset_plot <- function(peaklist,
     unique_df <- unique(df)
     overlap_df <- rbind(overlap_df, unique_df)
   }
-  ### Adjust Font Size ###  
+  ### Adjust Font Size ###
   if(length(peaklist)>6){
     font_size <- 0.65
   }
   #### Create Upset Plot ###
   overlap_df$value <- 1
-  overlap_df <- tidyr::spread(data = overlap_df, 
-                              key = sample, 
-                              value = value, 
-                              fill=0) 
-  
+  overlap_df <- tidyr::spread(data = overlap_df,
+                              key = sample,
+                              value = value,
+                              fill=0)
+
   base_annotations <- list(
     'Intersection size'=ComplexUpset::intersection_size(),
     'Intersection ratio'=ComplexUpset::intersection_ratio(
@@ -182,7 +182,7 @@ check_list_names <- function(peaklist,
   return(peaklist)
 }
 
-report_time <- function(t1, 
+report_time <- function(t1,
                         func=NULL,
                         verbose=TRUE){
   messager(if(!is.null(func))paste0(func,"():"),
@@ -199,13 +199,12 @@ report_time <- function(t1,
 
 ######################  HERE IS INSTEAD DEFINED MY OWN FUNCTION TO APPLY EPICOMPARE ON THE DATA LOADED IN THE APP
 peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, bedpe.names, chr, Start, End, genome){
-  print("Calculating peaks overlaps upset")
   # Convert BED AND bedpe to GRanges:
     # BEDPE files are imported as object of class Paires, which is a double GRanges. Therefore to merge it into a single GRanges object a further step is needed with the spiky lib
- 
+
   q=GRanges(seqnames=paste("chr", chr, sep=""),
             ranges=IRanges(start = Start, end = End))
-  
+
   if (!is.null(bed.file) & length(bed.file) > 1 | length(bed.file) > 0 & length(bedpe.file) > 0){
    bed.peaks.list <- list()
    bed.peaks.list.s <- list()
@@ -218,7 +217,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
     bed.peaks.list.s <- list()
     bed.names <- NULL
   }
-  
+
   if (!is.null(bedpe.file) & length(bedpe.file) > 1 | length(bed.file) > 0 & length(bedpe.file) > 0){
     bedpe.peaks.list <- list()
     bedpe.peaks.list.s <- list()
@@ -231,7 +230,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
     bedpe.peaks.list.s <- list()
     bedpe.names <- NULL
     }
-  
+
   peaklist <-  c(bed.peaks.list, bedpe.peaks.list)
   names(peaklist) <- c(bed.names, bedpe.names)
   ups <- overlap_upset_plot(peaklist = peaklist, verbose = T)
@@ -243,7 +242,7 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
   if (length(peaklist2) > 1){
     ups2 <- overlap_upset_plot(peaklist = unlist(peaklist2), verbose = T)
    }
-  
+
   if(length(peaklist) > 1 & length(peaklist2) > 1){
       ggpubr::ggarrange(ups$plot, ups2$plot, ncol = 2, nrow=1, labels = c("total", "selected"))
   } else if(length(peaklist) > 1 & length(peaklist2) <=1){
@@ -256,7 +255,6 @@ peaks_intersection_venn_function <- function(bed.file, bed.names, bedpe.file, be
 
 # Plot peaks distribution over different feature levels
 peaks.annotation.function <- function(bed.file, bed.names, genome){
-  print("Calculating peaks annotation")
   ## Start of function
   if (genome %in% c("hg19", "hg38", "T2T")){
     org <- "Hsapiens"
@@ -265,10 +263,11 @@ peaks.annotation.function <- function(bed.file, bed.names, genome){
   }
 anno.plot.list <- list()
 for (i in 1:length(bed.file)){
-  con <- read_delim(bed.file[i], delim = "\t", col_names = F, col_select = c(1:3), show_col_types = F)
+  con <- read_delim(bed.file[i], delim = "\t", col_names = FALSE,
+                    col_select = c(1:3), show_col_types = FALSE)
   bed3 <- tempfile("bed3.bed")
-  write_delim(con, file = bed3, delim = "\t", col_names = F)
-    anno.p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome), 
+  write_delim(con, file = bed3, delim = "\t", col_names = FALSE)
+    anno.p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome),
                                        TxDb = get(paste("TxDb.", org, ".UCSC.", genome, ".knownGene", sep="")))
   anno.plot.list[[i]] <- anno.p$plot
   unlink(bed3)
@@ -287,14 +286,13 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   # library(plotgardener)
   # library(paletteer)
   # library(dplyr)
-  print("Calculating manhattan plot")
   ## Specifiy complete chromosome name
   chr = paste("chr", Chr, sep = "")
   ## Retrieve chromosome length for plotting
   chr.len <- chr.len.df$chr.len[chr.len.df$chr == chr]
   ## Define page height
   h <- 6*length(gwas.file)*2
-  
+
   ## Define plotting parameters for whole chromosome
   params <- pgParams(
     chrom = chr, chromstart = 1, chromend = chr.len,
@@ -302,7 +300,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     x = 0, just = c("left", "bottom"),
     width = 12, length = 12, height = 6, default.units = "cm"
   )
-  
+
   ## Define plotting parameter for zoom-in region
   region <- pgParams(
     chrom = chr, chromstart = start, chromend = end,
@@ -310,28 +308,29 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     x = 0, just = c("left", "bottom"),
     width = 12, length = 12, height = 6, default.units = "cm"
   )
-  
+
   ################# WHOLE CHROMOSOME MANHATTAN
   ## Create page
-  pageCreate(width = 12, height = h, default.units = "cm", showGuides = F) 
-  
+  pageCreate(width = 12, height = h, default.units = "cm", showGuides = F)
+
   ## Define starting y coordinate
   y.coord <- h
-  
+
   ## Loop over every GWAS of input
   for (i in 1:length(gwas.file)){
-    man.data.t <- read_delim(gwas.file[i], "\t", col_names = T)
-    
+    man.data.t <- read_delim(gwas.file[i], "\t", col_names = TRUE,
+                             show_col_types = FALSE)
+
     ## Define lead SNPs to be plotted wit their name specified
     leadSNP <- filter(man.data.t, chrom == chr & p < sign.p) %>% dplyr::arrange(p)
-    
+
     ## Plot fictitious segment
     plotRanges(data = data.frame(chr = chr, start = 1, end = chr.len),
                params = params,
                fill = "#7ecdbb",
                linecolor = NA,
                y = y.coord, height = 0.1)
-  
+
     ## Create Manhattan plot of the selected chromosome
     mp <- plotManhattan(
       data = man.data.t,
@@ -345,26 +344,25 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     )
     ## Annotate signifcant SNPs
     if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
-    plotText(label = leadSNP$snp, 
-             x = leadSNP$pos*(12/chr.len) + 0.2 ,  
-             y = h - ((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))), #y = y.coord-(-log10(leadSNP$p)*6/14), 
+    plotText(label = leadSNP$snp,
+             x = leadSNP$pos*(12/chr.len) + 0.2 ,
+             y = h - ((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))), #y = y.coord-(-log10(leadSNP$p)*6/14),
              check.overlap = T,
              repel = T,
              params = params,
              rot = 35,
              fontsize = 8)
     } else if (nrow(leadSNP) > 10){
-      plotText(label = leadSNP$snp[1:10], 
-               x = leadSNP$pos[1:10]*(12/chr.len) + 0.2 , 
-               y = h - ((-log10(leadSNP$p[1:10])*(y.coord-5.99))/-log10(min(leadSNP$p[1:10]))), 
+      plotText(label = leadSNP$snp[1:10],
+               x = leadSNP$pos[1:10]*(12/chr.len) + 0.2 ,
+               y = h - ((-log10(leadSNP$p[1:10])*(y.coord-5.99))/-log10(min(leadSNP$p[1:10]))),
                check.overlap = T,
                repel = T,
                params = params,
                rot = 35,
                fontsize = 8)
     }
-    #print(h-((-log10(leadSNP$p)*(y.coord-5.99))/-log10(min(leadSNP$p))))
-  
+
     ## Highlight genomic region on signal plot
     annoHighlight(
      plot = mp,
@@ -372,7 +370,7 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
       alpha = 0.3,
      params = region
     )
-    
+
     ## Plot graph title
     plotText(
       label = gwas.names[i],
@@ -380,22 +378,22 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
       fontsize = 8, fontface = "bold", just = "right",
       params = params
     )
-    
+
     y.coord <- y.coord + 6
-  
+
     }
-  
+
   ### Annotations once for every input dataset
   ## Annotate genome label
   annoGenomeLabel(
-    plot = mp, 
+    plot = mp,
     y = "0.5b",
-    fontsize = 8, 
+    fontsize = 8,
     scale = "Mb",
     params = params
   )
   #> genomeLabel[genomeLabel2]
-  
+
   ## Annotate y-axis
   annoYaxis(
     plot = mp,
@@ -403,14 +401,14 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     axisLine = TRUE, fontsize = 8
   )
   #> yaxis[yaxis2]
-  
+
   ## Plot y-axis label
   plotText(
     label = "-log10(p-value)", x = -1, y = "-2.5b", rot = 90,
     fontsize = 8, fontface = "bold", just = "center",
     params = params
   )
-  
+
   ## Color legend
   ## Add heatmap legend just once
   #annoHeatmapLegend(
@@ -419,11 +417,11 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   #  width = 0.3, height = 1.5, fontsize = 8, digits = 1, scientific = T,
   #  params = params
   #)
-  
+
   ################### ZOOM-IN MANHATTAN
-  
+
   # Run zoom-in just if the selected region is smaller than the whole chromosome
-  
+
   if (end < chr.len){
   ## Add zoom-in inset of the user selected region
   annoZoomLines(
@@ -436,17 +434,18 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     x1 = c(0, 12),
     default.units = "cm"
   )
-  
+
   ## Define starting y coord for zoom panels
   y.coord.z <- 5 * i
-  
+
   ## Loop over every GWAS of input
   for (i in 1:length(gwas.file)){
-    man.data.t <- read_delim(gwas.file[i], "\t", col_names = T)
-    
+    man.data.t <- read_delim(gwas.file[i], "\t", col_names = TRUE,
+                             show_col_types = FALSE)
+
     ## Define lead SNPs to be plotted wit their name specified
     leadSNP <- filter(man.data.t, chrom == chr & p < sign.p & pos <= end & pos >= start) %>% dplyr::arrange(p)
-    
+
     ## Create Manhattan plot of the selected chromosome
     mp2 <- plotManhattan(
       data = man.data.t,
@@ -459,33 +458,29 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
       params = region,
       label = "zoom"
     )
-    
+
     #y.coord.z <- y.coord.z - (5*i)
     ## Annotate significant SNPs
     if(nrow(leadSNP) > 0 & nrow(leadSNP) <= 10){
       plotText(label = leadSNP$snp,
-               x = (12*(leadSNP$pos-start))/(end-start),  
-               y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7, 
+               x = (12*(leadSNP$pos-start))/(end-start),
+               y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7,
                check.overlap = T,
                repel = T,
                params = region,
                rot = 35,
                fontsize = 8)
-      #print((12*(leadSNP$pos-start))/(end-start))
-      #print(y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p)- 0.5)
     } else if (nrow(leadSNP) > 10){
-      plotText(label = leadSNP$snp[1:10], 
-               x = (12*(leadSNP$pos-start))/(end-start), 
-               y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7 , 
+      plotText(label = leadSNP$snp[1:10],
+               x = (12*(leadSNP$pos-start))/(end-start),
+               y = y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p) - 0.7 ,
                check.overlap = T,
                repel = T,
                params = region,
                rot = 35,
                fontsize = 8)
-      #print((12*(leadSNP$pos-start))/(end-start))
-      #print(y.coord.z/i - ((y.coord.z/i)/20)* - log10(leadSNP$p)- 0.5)
     }
-    
+
 
     ## Plot graph title
     plotText(
@@ -494,21 +489,20 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
       fontsize = 8, fontface = "bold", just = "center",
       params = region
     )
-    
+
   }
-  
+
   ### Annotations once for every input dataset
   ## Annotate genome label
   annoGenomeLabel(
-    plot = mp2, 
+    plot = mp2,
     y = "0.5b",
-    fontsize = 8, 
+    fontsize = 8,
     scale = "Mb",
     params = region
   )
   #> genomeLabel[genomeLabel2]
-  print("4 OK")
-  
+
   ## Annotate y-axis
   annoYaxis(
     plot = mp2,
@@ -524,20 +518,20 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
     params = region
   )
   }
-  
+
 }
 
 # TEST FUNCTION
-#manhattan.plot.function(gwas.file = dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext), 
- #                       Chr = 20, 
-  #                      start = 45841721, 
-   #                     end = 45857405, 
+#manhattan.plot.function(gwas.file = dir(paste(config$data.dir, config$gwas.dir, sep=""), full.names = TRUE, pattern = config$gwas.ext),
+ #                       Chr = 20,
+  #                      start = 45841721,
+   #                     end = 45857405,
     #                    sign.p = 5e-6,
      #                   chr.len.df = chrom.cen.df,
       #                  gwas.names =config$gwas.names)
 
 
-################### PIECHART OF CATEGORIES FOUND IN CATEGORICAL BED: 
+################### PIECHART OF CATEGORIES FOUND IN CATEGORICAL BED:
 
 # This function generates a circular packing plot with the categories reported in the categorical bed file and their percentage in the whole genome and in the selected range
 
@@ -548,14 +542,14 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
 #library(ggplot2)
 #library(ggpubr)
 categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
-  print("Calculating categorical pie")
   ## Specifiy complete chromosome name
   chrom = paste("chr", chr, sep = "")
   plots <- list()
   for (i in 1:length(cat.file)){
     ## Prepara data for whole genome plotting
     # Read cat file
-    cat.file.r <- read_delim(cat.file[i], "\t", col_names = T) #, col_select = c(1,2,3, 'category')
+    cat.file.r <- read_delim(cat.file[i], "\t", col_names = TRUE,
+                             show_col_types = FALSE)
     ##### For total genome
     # crate dataframe with hierarchy: cat.name, categories
     subgroup <- unique(cat.file.r$category)
@@ -566,7 +560,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
     vertices.df <- rbind(vertices.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.r)))
     # generate column with percentages
     vertices.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))$Freq, 100)
-    
+
     #### For selected region
     # filter the input table based on the selected region
     cat.file.sel <- dplyr::filter(cat.file.r, chr == chrom & start >= Start & end <= End)
@@ -592,36 +586,31 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   mygraph <- graph_from_data_frame(groups.df, vertices=vertices.df)
   mygraph.sel <- graph_from_data_frame(groups.sel.df, vertices=vertices.sel.df)
   # Make the plot
-  p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) + 
+  p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) +
     geom_node_circle(aes(fill = size), color = "white") +
     geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
-    theme_void() + 
+    theme_void() +
     theme(legend.position = "none",
           plot.title = element_text(size = 16, face = "bold")) +
     scale_fill_distiller(palette =  "Blues", direction = 1) +
     ggtitle(label = "Total genome")
-  #print(p1)
   if (nrow(groups.sel.df) > 0){
-  p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) + 
+  p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) +
     geom_node_circle(aes(fill = size), color = "white") +
     geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
-    theme_void() + 
+    theme_void() +
     theme(legend.position = "none",
           plot.title = element_text(size = 16, face = "bold")) +
     scale_fill_distiller(palette =  "PuOr", direction = 1) +
     ggtitle(label = "Selected region")
-  #print(p2)
-  
+
   p <- ggpubr::ggarrange(p1, p2, nrow = 1, ncol = 2)
-  #print(p)
   } else {
     p <- ggpubr::ggarrange(p1, nrow = 1, ncol = 2)
-    #print(p)
   }
   plots[[i]] <- p
-  #print(plots[[i]])
   }
-  
+
   # define nr of columns for final plot
   if(length(cat.file) <= 9){
     n.col =  3
@@ -631,18 +620,7 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
     n.row = 4
   }
   p.final <- ggpubr::ggarrange(plotlist=plots, nrow = n.row, ncol = n.col, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
-  print(p.final)
 }
-
-
-
-## TEST function
-#categorical.pie.function(cat.file = cat.file, #dir(full.names = TRUE, pattern = config$cat.file),
- #                        cat.names = config$cat.names,
-  #                       chr = 21,
-   #                      Start = 1,
-    #                     End = 1000)
-
 
 ################### CIRCOS PLOT FROM BEDPE FILE
 
@@ -653,21 +631,14 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   #library(dplyr)
   #library(paletteer)
 
-# Test function 
-#circos.function(bedpe.file = bedpe.file, 
- #               chromosome = 1,
-  #              genome = "hg38",
-   #             zoom_start = 2800000,
-    #            zoom_end = 2850000,
-     #           genes.label =  read_delim("C:/Users/sarlago/Documents/R scripts/Shiny/ShinyLoadYML/ShinyApps/ShinyApps_hover/hgnc_symbols/hg38_gene_symbol_cleaned.bed", "\t", col_names = T, show_col_types = F),
-      #          bedpe.names = "test")
+# Test function
 
 circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end, genes.label, bedpe.names, cytoband.ext){
-  
+
   col <- c(paletteer_d("ggthemr::flat"), paletteer_d("ggthemes::gdoc"),paletteer_d("ggthemes::excel_Atlas") )
   names(col) <- paste("chr", c(1:22, "X", "Y"), sep="")
   chrom = paste("chr", chromosome, sep="")
-  
+
   ##### READING FILES #####
   # read cytoband, common for all bedpe
   if ( genome != "T2T"){
@@ -692,21 +663,25 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
 
   genes.ann <- dplyr::filter(genes.ann, chromosome_name == chrom & start_position >= zoom_start & end_position <= zoom_end) # filter just genes in the zoom region
   genes.ann$chromosome_name <- paste("zoom_", genes.ann$chromosome_name, sep="") # add zoo to the chromosome name
-  
+
   # Arrange the layout of the resulting image that may combine multiple plots based on the number of input bedpe files
-  layout(matrix(1:length(bedpe.file), length(bedpe.file), 2)) 
-  
+  layout(matrix(1:length(bedpe.file), length(bedpe.file), 2))
+
   # for every separate bedpe
   for (i in 1:length(bedpe.file)){
   # Read contacts for entire genome
-  bed1 <- read_delim(bedpe.file[i], delim = "\t", col_select = c(1,2,3), col_names = F)
-  bed2 <- read_delim(bedpe.file[i], delim = "\t", col_select = c(4,5,6), col_names = F)
+  bed1 <- read_delim(bedpe.file[i], delim = "\t", col_select = c(1,2,3),
+                     col_names = FALSE, show_col_types = FALSE)
+  bed2 <- read_delim(bedpe.file[i], delim = "\t", col_select = c(4,5,6),
+                     col_names = FALSE, show_col_types = FALSE)
   # bedpe of the zoomed region
-  bedpe.zoom <- read_delim(bedpe.file[i], delim = "\t", col_names = F) %>% dplyr::filter( X1 == chrom & X2 >= zoom_start & X4 == chrom & X6 <= zoom_end)
+  bedpe.zoom <- read_delim(bedpe.file[i], delim = "\t", col_names = FALSE,
+                           show_col_types = FALSE) %>%
+    dplyr::filter( X1 == chrom & X2 >= zoom_start & X4 == chrom & X6 <= zoom_end)
   bedpe.zoom[, c(1,4)] <- paste("zoom_", chrom, sep="")
-  
-  
-  
+
+
+
   ##### PLOT ENTIRE CHROMOSOME #####
   circos.clear()
   col_text <- "grey40"
@@ -722,7 +697,7 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
     brk <- seq(from = 1, to= max(cytoband.bed$V3[which(cytoband.bed$V1 == chrom)]), length.out=50)
   }
   circos.track(track.index = get.current.track.index(), panel.fun=function(x, y) {
-    circos.axis(h="top", major.at=brk, labels=round(brk/10^6, 1), labels.cex=0.7, 
+    circos.axis(h="top", major.at=brk, labels=round(brk/10^6, 1), labels.cex=0.7,
                 col=col_text, labels.col=col_text, lwd=0.7, labels.facing="clockwise")
   }, bg.border=F)
   ## plot contact density
@@ -732,30 +707,30 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
   bed <- data.frame(chr = cytoband.bed$V1, start = cytoband.bed$V2, end = cytoband.bed$V3, value = log10(cytoband.bed$value+1))
   circos.genomicTrackPlotRegion(bed, ylim = range(bed$value), bg.border = NA, panel.fun = function(region, value, ...) {
     circos.genomicLines(region, value, area = TRUE, border = NA, baseline = 0, col = col[chrom])
-  }, track.height = track.h) 
+  }, track.height = track.h)
   ## plot contacts arches on the whole chromosome
   circos.genomicLink(region1 = bed1, region2 = bed2, h = 0.1, col = col[chrom])
   ## add link across sectors
   circos.link(chrom, point1 = c(zoom_start, zoom_end),
-              chrom, point2 = c(zoom_start, zoom_end), 
+              chrom, point2 = c(zoom_start, zoom_end),
               col = "#00000020", border = NA, h = 0.205, w =0.1)
-  
+
   circos.clear()
-  
+
   ##### PLOT ZOOM CHROMOSOME #####
   par(mar = c(0, 0, 0, 0), new = TRUE)
-  ## initialize zoom genomic region    
+  ## initialize zoom genomic region
   circos.par("canvas.xlim" = c(-0.1, 0.1), "canvas.ylim" = c(-2.1, 2.1), clock.wise = FALSE,
              cell.padding = c(0, 0, 0, 0), gap.degree = 5, start.degree = 92.5)
   circos.genomicInitialize(data.frame(chr = paste("zoom_", chrom, sep=""), start = zoom_start, end = zoom_end), plotType = NULL)
   ## add label of genomic bp
   brk.zoom <- seq(from = zoom_start, to= zoom_end, length.out=20)
   circos.track(track.index = 1, ylim = c(0,1), panel.fun=function(x, y) {
-    circos.axis(h="top", major.at=brk.zoom, labels=round(brk.zoom/10^6, 1), labels.cex=0.6, 
+    circos.axis(h="top", major.at=brk.zoom, labels=round(brk.zoom/10^6, 1), labels.cex=0.6,
                 col=col_text, labels.col=col_text, lwd=0.7, labels.facing="clockwise")
   }, bg.border=F)
   ## Add gene label annotation
-  circos.genomicLabels(genes.ann, labels.column=5,  cex=0.4, col=col_text, line_lwd=0.5, line_col="grey80", 
+  circos.genomicLabels(genes.ann, labels.column=5,  cex=0.4, col=col_text, line_lwd=0.5, line_col="grey80",
                        side="outside", connection_height=0.05, labels_height=0.01, niceFacing = T, track.margin = c(0,0.2))
   ## add contact arches of the zoom region
   circos.genomicLink(region1 = bedpe.zoom[, c(1,2,3)], region2= bedpe.zoom[, c(4,5,6)], h = 0.2, col = "dodgerblue")
@@ -764,9 +739,9 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
   # add chromosome name in the center of the plot
   text(0, 0, paste(chrom, "\n", bedpe.names[i], sep=""), cex = 1, col = col_text)
   circos.link(paste("zoom_", chrom, sep=""), point1 = c(zoom_start, zoom_end),
-              paste("zoom_", chrom, sep=""), point2 = c(zoom_start, zoom_end), 
+              paste("zoom_", chrom, sep=""), point2 = c(zoom_start, zoom_end),
               col = "#00000020", border = NA, h = 0.205, w =0.1)
-  
-  circos.clear() 
+
+  circos.clear()
   }
 }

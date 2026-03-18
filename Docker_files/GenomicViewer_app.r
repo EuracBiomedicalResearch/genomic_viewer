@@ -202,7 +202,8 @@ saved.coord.path <- listDataDir(config$data.dir, config$reg.dir, config$reg.file
 ## Now, after all the dealing with the config file, load the libraries.
 loadLibraries()
 
-saved.coord <- read_delim(saved.coord.path, "\t", col_names = F, show_col_types = F)
+saved.coord <- read_delim(saved.coord.path, "\t", col_names = FALSE,
+                          show_col_types = FALSE)
 saved.coord <- apply(saved.coord, MARGIN = 1, function(x) paste(x, collapse = ":"))
 saved.coord <- gsub(" ", "", saved.coord) # remove eventual white spaces
 ## Set options for bw file plotting mode:
@@ -458,21 +459,28 @@ server <- function(input, output, session){
   ##---------------------- Read reference genome related files
   # Genes hgnc symbol
   genes.hgnc <- eventReactive(input$ref.genome, {
-  genes.hgnc.path <- file.path(config$genes.hgnc.dir, paste(gsub( " .*", "", input$ref.genome), "_gene_symbol_cleaned.bed", sep=""))
-  genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = T, show_col_types = F)
+    genes.hgnc.path <- file.path(config$genes.hgnc.dir,
+                                 paste(gsub( " .*", "", input$ref.genome),
+                                       "_gene_symbol_cleaned.bed", sep=""))
+  genes.hgnc <- read_delim(genes.hgnc.path, "\t", col_names = TRUE,
+                           show_col_types = FALSE)
   })
 
   ### For chromosomes plotting
   chrom.cen.df <- eventReactive(input$ref.genome, {
-  chrom.cen.path <- file.path(config$chrom.cen.dir, paste("chrom_centromeres_", gsub( " .*", "", input$ref.genome), ".txt", sep=""))
-  chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = T, show_col_types = F)
+    chrom.cen.path <- file.path(config$chrom.cen.dir,
+                                paste("chrom_centromeres_",
+                                      gsub( " .*", "", input$ref.genome),
+                                      ".txt", sep=""))
+  chrom.cen.df <- read_delim(chrom.cen.path, "\t", col_names = TRUE,
+                             show_col_types = FALSE)
   })
 
   ### For chromosome id drop down menu
   observeEvent(chrom.cen.df(), {
     chrom.cen.df <- chrom.cen.df()
     updateSelectizeInput(session = getDefaultReactiveDomain(), "chr", selected = gsub("chr", "", chrom.cen.df$chr)[1], choices = gsub("chr", "", chrom.cen.df$chr))#, options = list(maxOptions = 12), server = TRUE)
-    print(input$chr)
+    #print(input$chr)
   })
 
   ### For cytoband
@@ -487,7 +495,8 @@ server <- function(input, output, session){
     stopifnot("Internal failure: No cytoband file name for reference genome." =
                 ref.genome %in% names(ref2CytoFN))
     cytoband <- read_delim(file.path(config$chrom.cen.dir, cytoFN),
-                           delim = "\t", col_names = FALSE)
+                           delim = "\t", col_names = FALSE,
+                           show_col_types = FALSE)
     colnames(cytoband) <- c("seqnames", "start", "end", "name", "gieStain")
     return(cytoband)
   })
@@ -1239,7 +1248,8 @@ server <- function(input, output, session){
       up.coord.path <- input$upload.coord
       # test format of input file:
       coord <- tryCatch(
-        read_delim(up.coord.path$datapath, "\t", col_names = F, show_col_types = F),
+        read_delim(up.coord.path$datapath, "\t", col_names = FALSE,
+                   show_col_types = FALSE),
         error = function(e) NULL
       )
       # If reading failed
