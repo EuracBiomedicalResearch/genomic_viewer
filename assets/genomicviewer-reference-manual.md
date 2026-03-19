@@ -4,7 +4,7 @@
 <img src="GV_scheme.png" width="60%"/>
 </div>
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Description:** Genomic Viewer is a cross-platform application for visualizing
 and analyzing genomic data hosted in a Docker container.
 
@@ -33,54 +33,50 @@ and analyzing genomic data hosted in a Docker container.
 <summary>&nbsp;</summary>
 
 ***Genomic Viewer*** uses a *configuration file* to load the genomic datasets to
-be visualized. This is the only required input for starting a session. 
+be visualized. This is the only required input for starting a session.
 It defines which data are loaded and how they are visualized.
 
 During [***Genomic Viewer***
 installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation)
-a pre-filled example *configuration file*, named `GenomicViewer_config.yml`, is 
+a pre-filled example *configuration file*, named `GenomicViewer_config.yml`, is
 saved automatically in a local folder of your choice, together with demo data.
 
 ### Example configuration file
 
-The example *configuration file* is reported below. Guidelines for how to fill it 
-are present as comments in the file itself (after the `#` mark). In addition, all 
-fields and features are explained in detail in the following sections. 
+The example *configuration file* is reported below. Guidelines for how to fill it
+are present as comments in the file itself (after the `#` mark). In addition, all
+fields and features are explained in detail in the following sections.
 
 ```
----
+# Rules for any type of data category "X" (e.g. "bw", "bed", "hic", ...)
+# - X.dir A subdirectory in "data.dir" containing files listed in "X.file"
+#   section. An empty string indicates we have files in the path specified
+#   by "data.dir" (the root directory).
+# - X.file: A single file name "file1" or a list of files
+#   ["file1", "file2", ...] residing in directory "X.dir". If X.file is the
+#   empty string (""), no data are loaded and X.names must be empty, too.
+# - X.names: A single label "lab1" or a list of labels ["lab1", "lab2", ...]
+#   with the same number of entries as listed in X.files. These are the labels
+#   shown in the data tracks. Must be the empty string if X.file is empty.
 
-# Example configuration file for Genomic Viewer, used in the tutorial.
-
-# Notes:
-# 1) Starting the file with three dashes is recommended to indicate where the
-#    file begins.
-# 2) The 'default' key is required for the app to correctly recognize your
-#    configuration file.
-
+# Genomic Viewer is always using "default" section.
 default:
 
-  # Input files and track label handling.
-
-  # Data parent directory to search for.
+  # Root directory of all data files and subdirectories. The directory has
+  # been set during installation and is mapped to this name, but subdirectories
+  # can be created within "data".
   data.dir: "data"
 
-  # Specific file formats section.
-  # Note: Specify the following keys information for every file section below:
-  # 1) 'dir': directory containing the files specified in that block.
-  # 2) 'file': A file name/list or part of a file name that matches a file/list 
-  #           of files with the same format.
-  # 3) 'names': list of the sample names to be displayed.
-
-  # BIGWIG files section.
+  # bigWig directory
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.file: ["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"]
+  bw.file: ["GSM6560954_cortex_12_treat_pileup_chr5.bw",
+            "GSM6560956_cortex_15_treat_pileup_chr5.bw"]
   bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
   # BEDPE files section.
   bedpe.dir: "GSE212910_RAW_HiC_bedpe"
   bedpe.file: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
   bedpe.names: ["HiC arches"]
-  # BED or BAM files section.
+  # BED files section.
   bed.dir: "GSE212908_ATAC_peaks"
   bed.file: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
   bed.names: ["ATAC peaks"]
@@ -90,163 +86,93 @@ default:
   hic.names: ["HiC cortex"]
   # GWAS files section.
   gwas.dir: "GWAScatalog_KidneyDisease"
-  gwas.file: "relocatedCol_chr5.tsv"
+  gwas.file: "26831199-GCST003374-EFO_0003884.h.relocatedCol_chr5.tsv"
   gwas.names: ["GWAS CKD"]
   # Categorical BED files section.
   cat.dir: ""
   cat.file: "regulatory_elements_hg38_chr5.bed"
   cat.names: ["Regulatory Elements"]
 
-  # File with user-defined list of coordinates.
-  # Note: Specify the following keys:
-  # 1) 'dir': the directory that contains the file;
-  # 2) 'file': the file name or shorter matching substring.
-
+  # File with user-defined list of coordinates - can be used for exchanging
+  # views between collaborators or for keeping a personal list of regions of
+  # interest.
   reg.dir: ""
   reg.file: "Example_region_table.bed"
-
 ```
 
 ### Configuration file format and structure
 
-The ***Genomic Viewer's*** *configruation file* uses YAML syntax, consisting of 
+The ***Genomic Viewer's*** *configuration file* uses YAML syntax, consisting of
 `key: value` pairs. All the keys present in the example file must be preserved,
 but their order is not relevant. Comments are supported using `#`.
 
 The file is parsed in R using `config::get()`, which internally relies on a YAML
-parser. 
+parser.
 
-The *configuration file* begins with three dashes `---` indicating the start of 
-YAML syntax, and consists of a single `default` section. `dafault` is a required
-key for the correct recognition of your *configuration file*.
-Within this section, the base directory containing all your data is specified
-in the `data.dir` key. Moreover, each supported genomic [file type](#file-formats) 
-has its own group of keys.
+The *configuration file* consists of a single `default` section. `dafault` is a
+required key for the correct recognition of your *configuration file*.  Within
+this section, the base directory containing all your data is specified in the
+`data.dir` key. Moreover, each supported genomic [file type](#file-formats) has
+its own group of keys.
 
 Each group follows the same pattern:
 
-- `*.dir` — subdirectory, or array of subdirectories relative to `data.dir`;
+- `*.dir` — subdirectory relative to `data.dir`;
 
-- `*.file` — a single file name, extension, or a list of multiple patterns;
+- `*.file` — a single file name or a list of file names;
 
-- `*.names` — list of sample names that will be displayed.  
+- `*.names` — list of sample names that will be used when displaying the
+  respective tracks specified by `*.file`. This implies that the number of items
+  in `*.file` and `*.names` has to be the same.
 
-**Notes:** The `*.names` field is present for all file groups except one, which does
-not require track labeling. This exception is specified in the relative chunk of
-the *configuration file* itself (see example above). 
+**Notes:** The `*.names` field is present for all file groups except for `reg.dir`
+and `reg.file`.
 
-A single occurrence of each key must always be present for each file group. 
-Duplicated keys are not allowed.
+A single occurrence of each key must always be present for each file group.
+Duplicated keys are not allowed and will throw an error during parsing.
 
 ### How to correctly specify the keys value
 
-Specifying the keys value in the correct format is fundamental to ensure your 
+Specifying the keys value in the correct format is fundamental to ensure your
 files are searched properly. The rules to fill each type of key are explained
 below:
 
-
-1) The `data.dir` field accepts a quoted directory name. Directory with
-subdirectories common to all files are also accepted 
-(e.g. `"data/experiment_1/replicate_1"`).
+1) The `data.dir` field accepts a quoted directory name. The first subdirectory
+must be `data`, but successive subdirectories can be specified
+(e.g. `"data/experiment_1/replicate_1"`) in order to allow separation of 
+visualizations.
 
 
 2) The `*.dir` field relative to file type groups accepts:
-  
-  - a full directory name (e.g. `"RNAseq"`);
-  
-  - a list with multiple directory names, when files of the same type are 
-    saved in different folders (e.g. `["RNAseq", "ATACseq"]`);
-    
-  - an empty string `""` for no directory.
-    
-Paths with subdirectories are also allowed (e.g. `"RNAseq/untreated"`)
 
+  - a full directory name (e.g. `"RNAseq"`), paths with subdirectories are also
+    allowed (e.g. `"RNAseq/untreated"`);
+
+  - an empty string `""` for the base directory as given by `data.dir`.
 
 3) The `*.file` field accepts:
 
   - a single full file name (e.g. `"RNAseq_sample1_rep1.bed"`);
-  
-  - a list with multiple file names whose order will be preserved for plotting 
+
+  - a list of full file names whose order will be preserved for plotting
     (e.g. `["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"])`
 
-  - a file extension (e.g. `".bed"`);
-
-  - a regular expression or wildcards, useful to match multiple files 
-    (For advanced users! Below a note for how to apply them);
-
-  - an empty string `""` for no file.
-
-Regular expressions and wildcards are a tool for text-searching using special 
-sequence of characters to define a pattern. This can be useful when you have 
-very long or complex file names, or a long list of files to specify. It will 
-spare you time and is safer for preventing spelling errors.
-Regular expressions that you can use in the *configuration file* uses the 
-extended syntax as implemented in R and are explained into details 
-[here](https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html).
-For wildcards refer to [this page](https://cran.r-project.org/web/packages/csquares/vignettes/wildcards.html).
-
-To mention a use case, let's have a look at the `BIGWIG file section` of the 
-example *configuration file*:
-
-```
-  # BIGWIG files section.
-  bw.dir: "GSE212908_RAW_ATAC_bigwig"
-  bw.file: ["GSM6560954_cortex_12_treat_pileup.bw", "GSM6560956_cortex_15_treat_pileup.bw"]
-  bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
-
-```
-Here, two full file names are specified in a list as the `bw.file` key value: 
-`"GSM6560954_cortex_12_treat_pileup.bw"` and `"GSM6560956_cortex_15_treat_pileup.bw"`.
-These two files are made available in the `"GSE212908_RAW_ATAC_bigwig` directory 
-upon [***Genomic Viewer*** installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation).
-
-To mention a shorter alternative that gives exactly the same output, we can 
-specify as `bw.file` value a common pattern in the two file names, like 
-`"treat_pileup_chr5.bw"`.
-
-The advantage of using full names is that the order in which files are specified 
-by the user is preserved during data plotting, while the shorter pattern matching 
-will sort the files alphabetically. This must be considered when setting sample 
-labels in the `*.names` key.
-
-Advanced users may also specify file-name patterns using regular expressions and 
-wildcards, for example:
-
-  - by using the operator `|`, which allows to
-    specify two alternative patterns to be matched (e.g 
-    `"GSM6560954_cortex_12_treat_pileup_chr5.bw|GSM6560956_cortex_15_treat_pileup_chr5.bw"`
-    or in shorter form `"12_treat_pileup_chr5.bw|15_treat_pileup_chr5.bw"`);
-    
-  - by using a combination of character classes and metacharacters, 
-    e.g. `"^[A-Z0-9]+_cortex_[0-9]{2}_treat_pileup_chr5.bw"`, where `"^[A-Z0-9]+"`
-    means the file name must start (`^`) with an alphanumeric string with capital
-    letters `[A-Z0-9]` matched one or more times `+`. It follow the strings 
-    `_cortex_`, and `_treat_pileup_chr5.bw` separate by two digits `[0-9]{2}`. 
-    This example is too elaborated for this use case, but is for illustrative
-    purpose only.
-
-When multiple files match through regular expressions or short common pattern, 
-they are:
-
-  - sorted alphabetically;
-
-  - loaded in that order.
-
+  - an empty string `""` for no file. Then, the respective `*.names` field
+    must also be an empty string.
 
 4) The `*.names` field accepts:
 
-  - a list of track names (e.g. `["sample1", "sample2"", ..]`).
-  
-  - an empty list for no name `[""]`.
-  
-Track names follow the user-specified order and must match the order of files in
-`*.file`, or the alphabetical order of files matched via patterns or regular 
-expressions.
+  - a single track name;
 
-**Tip:** when you have a long list of files that you do not want to specify by 
-full file names, the easiest way to ensure a matching
-between files and track names is to add either 1, 2,..9 or A, B,..Z at the 
-beginning of the file names to respect the alphabetical order.
+  - a list of track names (e.g. `["sample1", "sample2"", ...]`).
+
+  - an empty string `""` for no names, but `*.file` must be empty in this
+    case, too.
+
+Track names are displayed in the order as they appear in `*.names` next to the
+data tracks specified by `*.file` and thus define pairs of track name 
+(`*.names`)/data file (`*.file`). In short, the _i_-th track specified in 
+`*.file` will be named with the _i_-th item listed in `*.names`.
 
 ### Error handling
 
@@ -259,42 +185,35 @@ After loading, the configuration is explicitly validated by
 
 - Unknown or misspelled keys are rejected;
 
-- Each file type section is validated against the expected format.
-
-If the configuration is invalid, the application fails fast with a clear error
-message.
+If the configuration is invalid, the application throws immediately an error.
+To speed up discovery of configuration file errors, checking is done at the
+very beginning, even before libraries are loaded.
 
 
 ### How files are discovered
 
-If no syntax error is detected in the *configuration file* ***Genomic Viewer*** 
+If no syntax error is detected in the *configuration file*, ***Genomic Viewer***
 constructs file paths for each file type group as follows:
 
-- The base directory is taken from the `data.dir` key;
+- The base directory is taken from the `data.dir` key and must exist;
 
-- The subdirectory defined in `*.dir` is appended (if provided);
+- The subdirectory defined in `*.dir` is appended (if provided) and must exist;
 
-- Files matching `*.file` are searched within that directory.
+- Files specified in `*.file` are searched within that directory and must exist.
+
+Errors are reported before startup of the GUI if any of the above points is not
+fulfilled.
 
 ### Disabling a file type
 
 If no data of a given type should be loaded, all corresponding fields must be
 defined but left empty.
 
-Use either:
-
-- an empty string: " "
-
-- or an empty array: [""]
-
-This applies to` *.dir, *.file, and *.names`.
-
-Commenting out sections is not supported.
-
-### Notes on specific file types
-
-For BAM files, it is recommended to use a regular expression ending with $
-(e.g. .bam$) to avoid accidentally matching bam.bai index files.
+This is done by setting the two fields `*.file` and `*.names` to the empty
+string, `""`. For consistency, we recommend to set `*.dir` to the empty string, 
+too, even though this is not needed (it just means to search for any files in 
+the directory given by `data.dir`). Leaving out or commenting out sections is 
+not supported and will result in an error during config file parsing.
 
 ### Multiple sessions
 
@@ -303,10 +222,10 @@ Genomic Viewer always reads a single configuration file named
 
 To work with multiple sessions:
 
-- save the *configuration file* you want to store in a safe directory, 
+- save the *configuration file* you want to store in a safe directory,
   or change the file name;
 
-- be sure that the desired file from which to search the data is into the 
+- be sure that the desired file from which to search the data is in the
   application directory before startup.
 
 </details>
@@ -358,9 +277,9 @@ chr1  213943530  213944697
 ```
 
 Make sure that your file does not have a header with column names (like `chr`,
-`start`, `end`, or a comment `#`) to ensure proper reading of the file. 
-Always specify "chr" before the chromosome number for all the [built-in reference 
-genomes](#reference-genome) (i.e. "chr1", not "1" and not trailing zeroes 
+`start`, `end`, or a comment `#`) to ensure proper reading of the file.
+Always specify "chr" before the chromosome number for all the [built-in reference
+genomes](#reference-genome) (i.e. "chr1", not "1" and not trailing zeroes
 "chr01").
 Additional columns are allowed, those will be displayed in the [*Data*
 navigation tab](#data-subsetting), but are ignored for plotting.
@@ -382,7 +301,7 @@ header, as in the example below.  Categorical BED can be used for example to
 classify peaks or functional genomic elements. For instance, several
 functional element coordinates (like the ones provided for in the
 [tutorial](#tutorial)) can be downloaded from [UCSC Table
-Browser](https://genome.ucsc.edu/cgi-bin/hgTables). The resulting file looks 
+Browser](https://genome.ucsc.edu/cgi-bin/hgTables). The resulting file looks
 like this:
 
 ```
@@ -405,7 +324,6 @@ in the [*Data* navigation tab](#data-subsetting).
 data to be organized and visualized.
 
 </details>
-</div>
 
 <div>
 <details open>
@@ -426,7 +344,6 @@ Viewer*** reads `.hic` files at different resolutions depending on the size
 of the requested genomic window to plot.
 
 </details>
-
 
 <div>
 <details open>
@@ -590,7 +507,7 @@ genome can be selected from a built-in list available form a dropdown menu at
 the top of the left sidebar. The reference genome and all user-supplied data
 files (via the the [configuration file](#configuration)) have to match. At
 ***Genomic Viewer*** startup the human hg19 (GRCh37) version of the reference
-genome is loaded by default. 
+genome is loaded by default.
 
 <img src="GV_ref_genome.png" alt="GV select reference genome menu" width="25%">
 
@@ -633,7 +550,7 @@ specifying a region table BED file to be uploaded through the [configuration
 file](#configuration) or by accessing local files in a running ***Genomic
 Viewer*** session. The provided coordinates list file must be structured as a
 BED file with a minimum of three tab separated columns corresponding to:
-chromosome, start, and end. It is recommended to have a fourth and fifth column 
+chromosome, start, and end. It is recommended to have a fourth and fifth column
 specifying the reference genome to which the coordinates refer and an
 ID for the corresponding genomic region. Column headers should be avoided.
 
@@ -656,8 +573,8 @@ modifying a previously uploaded table. The *Add* and *Remove* buttons below the
 selection dropdown menu allow to access these options. In particular, to add a
 new entry to the an existing list or to create a new one after clicking the
 *Add* button a pop-up window will appear reporting the selected coordinates and
-allowing the user to assign a name to the region. The current reference genome 
-to which the coordinates refer is automatically added after the end coordinate 
+allowing the user to assign a name to the region. The current reference genome
+to which the coordinates refer is automatically added after the end coordinate
 field. By clicking *Ok* the entry will be added to the list.
 
 <img src="GV_load_coordinates_add.png"
@@ -668,7 +585,7 @@ Similarly, if you want to remove a coordinate from the uploaded list, you can
 select the entry form the dropdown list and next click the *Remove* button.
 The new custom coordinates list can also be exported for later re-use.
 
-To restore the configuration settings of the *Load/edit coordinates* panel it is 
+To restore the configuration settings of the *Load/edit coordinates* panel it is
 sufficient to click the *Reset* button at the panel's bottom.
 
 #### Choose chromosome
@@ -682,8 +599,8 @@ of the hovered region will appear below the graph. Upon clicking the
 corresponding coordinates are passed to ***Genomic Viewer*** and the genomic
 plot or desired analysis can be generated by pressing the *Go* button.
 
-<img src="GV_choose_chrom.png" 
-alt="GV choose chromosome hover and click plot" 
+<img src="GV_choose_chrom.png"
+alt="GV choose chromosome hover and click plot"
 width="30%">
 
 #### Search by gene
@@ -758,9 +675,9 @@ sections, we describe each of them in that order.
 
 Files formatted as [HiC](#HiC) are used to plot HiC and 3D contact matrices.
 ***Genomic Viewer*** represents this type of data as triangular matrices.
-Contact scores reflecting the probability for a contact to occur, as stored in 
-the input file, are displayed as a heatmap and scaled to the 1-100 range to 
-maximize their visual evaluation. The corresponding scale bar is always reported 
+Contact scores reflecting the probability for a contact to occur, as stored in
+the input file, are displayed as a heatmap and scaled to the 1-100 range to
+maximize their visual evaluation. The corresponding scale bar is always reported
 beside the plot.
 
 These files can be quite large and for performance reasons, ***Genomic
@@ -920,11 +837,11 @@ categorical BED files through the `plotgardener` function
 To every category that is found in the input file a different color is assigned
 and listed in a legend displayed to the right of the corresponding track in the
 plot. By default all categories within the same track are *collapsed* in a single line.
-While this compact representation is convenient, overlapping categories may be 
-partially or completely hidden. To address this limitation, ***Genomic Viewer*** 
-allows users to expand categories through the *Expand categories* menu in the 
-right sidebar. In this menu users can select one or more categorical BED file to 
-expand. As a result, annotated regions that overlap in the collapsed view are 
+While this compact representation is convenient, overlapping categories may be
+partially or completely hidden. To address this limitation, ***Genomic Viewer***
+allows users to expand categories through the *Expand categories* menu in the
+right sidebar. In this menu users can select one or more categorical BED file to
+expand. As a result, annotated regions that overlap in the collapsed view are
 displayed on separate lines, making all features clearly visible.
 
 <img src="GV_expand_cat.png"
@@ -1008,10 +925,10 @@ resolution (SVG format) using the *Save* button.
 
 #### Tracks arrangement
 
-***Genomic Viewer*** is designed to minimize the effort required to generate 
-publication-quality figures. To achieve this, the overall plot size is fixed, 
-and individual tracks are automatically scaled based on their format and number. 
-Users can still adjust essential graphical parameters, but do not need to 
+***Genomic Viewer*** is designed to minimize the effort required to generate
+publication-quality figures. To achieve this, the overall plot size is fixed,
+and individual tracks are automatically scaled based on their format and number.
+Users can still adjust essential graphical parameters, but do not need to
 manually manage layout or spacing.
 
 </details>
@@ -1250,17 +1167,17 @@ In this tutorial you will learn how to:
 
 ### Loading usage example data
 
-The first step to run a ***Genomic Viewer*** session is to set up the 
-[*configuration file*](#configuration). This is used to specify which files to 
-upload. The data used in this tutorial are made available during [***Genomic 
-Viewer*** installation](#installation) together with a ready-to-use 
-configuration file. In this example we are analyzing publicly available data 
-from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)* publications.  
+The first step to run a ***Genomic Viewer*** session is to set up the
+[*configuration file*](#configuration). This is used to specify which files to
+upload. The data used in this tutorial are made available during [***Genomic
+Viewer*** installation](#installation) together with a ready-to-use
+configuration file. In this example we are analyzing publicly available data
+from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)* publications.
 
 *Note:* The dataset is limited to
 chromosome 5 to keep the installation lean. The whole datasets are specified in
 [References and Links](#references-links) and can be downloaded from there,
-placed in the `./data` folder and visualized after updating the configuration 
+placed in the `./data` folder and visualized after updating the configuration
 file with the correct file paths and labels.
 
 <img src="GV_configuration_example.png"
@@ -1270,13 +1187,13 @@ file with the correct file paths and labels.
 ### Biological question
 
 In this tutorial we are going to inspect a GWA study investigating human
-CKD with the aim to identify putative clinically 
-relevant risk loci. One way to select relevant genetic variants identified by 
-GWAS is by checking if they fall within genomically active genes or regulatory 
-elements. Therefore we are integrating GWAS with open chromatin profiling (ATAC-seq), 
+CKD with the aim to identify putative clinically
+relevant risk loci. One way to select relevant genetic variants identified by
+GWAS is by checking if they fall within genomically active genes or regulatory
+elements. Therefore we are integrating GWAS with open chromatin profiling (ATAC-seq),
 3D chromatin interactions (HiC) and regulatory elements annotations.
 
-This analysis should be considered as an explorative test to suggest the user 
+This analysis should be considered as an explorative test to suggest the user
 for additional analytic or experimental validations.
 
 ### Genome selection, navigation and plot inspection
@@ -1305,7 +1222,7 @@ main central window. Next, click the *Go* button to generate the genomic plot.
 
 <img src="GV_chr5_overview.png"
      alt="GV overview of chromosome 5 example genomic tracks"
-     width="80%"><br>**Figure 4.1:** *Chromosome 5 overview.* 
+     width="80%"><br>**Figure 4.1:** *Chromosome 5 overview.*
 
 In the Manhattan plot, we notice a pileup of significant SNPs close to the right
 chromosome end. We want to look in more detail at this region, so we use the
@@ -1328,54 +1245,54 @@ button.
 
 <img src="GV_chr5_zoom.png"
      alt="GV zoom of chromosome 5 example genomic tracks"
-     width="80%"><br>**Figure 4.2:** *Zoom-in of SLC34A1 gene locus.* 
+     width="80%"><br>**Figure 4.2:** *Zoom-in of SLC34A1 gene locus.*
 
 In the enlarged visualization focusing on *SLC34A1*, we note the presence of
 some epigenetic features, like regulatory elements, ATAC-seq
-peaks and the proximity to a 3D chromatin loop (HiC arch). The most evident 
+peaks and the proximity to a 3D chromatin loop (HiC arch). The most evident
 feature is the presence of an enhancer region inside of the SLC34A1 gene (marked in
-green) that overlaps with significant SNPs. Enhancers located inside genes can 
-act in place of a typical promoters for a specific isoform initiating 
-transcription itself or influencing splicing (Maqbool et al. 2020)[[2]](#ref2). 
-Despite not being a sufficient validation, if this is true for *SLC34A1* gene 
-we expect that the enhancer overlaps with the TSS of a shorter isoform. 
-With ***Genomic Viewer*** we can inspect transcript isoforms by checking the 
-*Expand transcripts* box in the right sidebar, which will automatically trigger 
+green) that overlaps with significant SNPs. Enhancers located inside genes can
+act in place of a typical promoters for a specific isoform initiating
+transcription itself or influencing splicing (Maqbool et al. 2020)[[2]](#ref2).
+Despite not being a sufficient validation, if this is true for *SLC34A1* gene
+we expect that the enhancer overlaps with the TSS of a shorter isoform.
+With ***Genomic Viewer*** we can inspect transcript isoforms by checking the
+*Expand transcripts* box in the right sidebar, which will automatically trigger
 the visualization of all isoforms.
 
 <img src="GV_tutorial_SLC34A1_exptransc.png"
      alt="GV expanded isoforms for SLC34A1 gene"
-     width="80%"><br>**Figure 4.3:** *Expanded transcript isoforms in SLC34A1 locus.* 
+     width="80%"><br>**Figure 4.3:** *Expanded transcript isoforms in SLC34A1 locus.*
 
-As we can see from the resulting plot, the hypothesis of this enhancer to work 
-as internal promoter is compatible with the presence of a short *SLC34A1* isoform 
+As we can see from the resulting plot, the hypothesis of this enhancer to work
+as internal promoter is compatible with the presence of a short *SLC34A1* isoform
 transcribed from there and its functionality is supported by the overlapping with
-open chromatin, as reported by the ATAC-seq peaks and profile tracks (Kidney 
+open chromatin, as reported by the ATAC-seq peaks and profile tracks (Kidney
 cortex 12 and 15).
 
-An additional feature that can be observed is the presence of a chromatin loop 
+An additional feature that can be observed is the presence of a chromatin loop
 (grey HiC arch) starting from the right flanking region of the visualized locus.
-As before, you can use the *drag and drop zoom bar* or *zoom buttons* to extend 
-the visualized window until the rightmost anchor of the loop and until additional 
+As before, you can use the *drag and drop zoom bar* or *zoom buttons* to extend
+the visualized window until the rightmost anchor of the loop and until additional
 loops on the left side of *SLC34A1* are displayed. Also in this case we saved
 for you the coordinates for a quick access. To select them, click the second entry
 in the *Load/edit coordinates* drop down menu.
 
 <img src="GV_tutorial_SLC34A1_TAD.png"
      alt="GV flanking region with TADs of SLC34A1 locus"
-     width="80%"><br>**Figure 4.4:** 
-     *TADs and sub-TADs associated to the SLC34A1 locus.*  
+     width="80%"><br>**Figure 4.4:**
+     *TADs and sub-TADs associated to the SLC34A1 locus.*
 
-After pressing the *Go* button, the resulting plot shows that the *SLC34A1* gene 
-and the enhancer we are evaluating (black arrow in the image above) are located 
-within the same topologically associated domain (TAD) and between different 
-sub-TADs (red triangles in HiC heatmap). This observation suggests that more genes 
+After pressing the *Go* button, the resulting plot shows that the *SLC34A1* gene
+and the enhancer we are evaluating (black arrow in the image above) are located
+within the same topologically associated domain (TAD) and between different
+sub-TADs (red triangles in HiC heatmap). This observation suggests that more genes
 within the TAD might be regulated by this enhancer under analysis (black arrow).
 
-Together, the observations retrieved through the use of ***Genomic Viewer*** 
-suggest that the identified SNPs, by affecting a regulatory element, 
-could potentially cause alterations in multiple genes inside the locus besides 
-*SLC34A1*. Further testing of this hypothesis is outside the aim of the present 
+Together, the observations retrieved through the use of ***Genomic Viewer***
+suggest that the identified SNPs, by affecting a regulatory element,
+could potentially cause alterations in multiple genes inside the locus besides
+*SLC34A1*. Further testing of this hypothesis is outside the aim of the present
 tutorial but serve as an example of how ***Genomic Viewer*** can support the user
 in hypothesis formulation and experimental design.
 
@@ -1408,7 +1325,7 @@ useful to:
 
 - Extract the dbSNP IDs and the alternative DNA bases in the two SNPs alleles
   from the GWAS table;
-  
+
 - Export the coordinates and IDs of regulatory elements category and ATAC-peaks
   that are found in the risk locus.
 
@@ -1420,21 +1337,21 @@ from the *Download* button below each table.
 
 For example, we can see that the 4 SNPs above the significance threshold have the
 following IDs: rs3812035, rs6420094, rs6862195, rs7447593. With these IDs, we
-can interrogate the literature and databases for reported information on their 
-effect on gene product integrity, CKD or other pathologies. According to a  
+can interrogate the literature and databases for reported information on their
+effect on gene product integrity, CKD or other pathologies. According to a
 [dbSNP](https://www.ncbi.nlm.nih.gov/snp/) search, all the relevant SNPs have
 functional consequences that do not affect the coding sequence, reinforcing the
-hypothesis of a potential regulatory elements-mediated effect. Of note, the 
-rs6420094 was already observed in association with diabetic kidney disease (DKD) 
-(Zhang et al 2023)[[4]](#ref4), while there is still no report for the others.  
+hypothesis of a potential regulatory elements-mediated effect. Of note, the
+rs6420094 was already observed in association with diabetic kidney disease (DKD)
+(Zhang et al 2023)[[4]](#ref4), while there is still no report for the others.
 
 On the other hand, having access to the exact coordinates of peaks and regulatory
-elements allows to gather details on the corresponding sequence, investigate the 
+elements allows to gather details on the corresponding sequence, investigate the
 presence of transcription factor binding motifs or design PCR primers or gRNAs
 for experimental testing.
 
-Deepening these aspects is out of the aim of this tutorial, but provides an example 
-on how to exploit ***Genomic Viewer***-derived information for further biological 
+Deepening these aspects is out of the aim of this tutorial, but provides an example
+on how to exploit ***Genomic Viewer***-derived information for further biological
 exploration.
 
 
@@ -1468,10 +1385,10 @@ biological question:
   transcription regulation when occurring in regulatory regions like promoters
   or enhancers.
 
-- The peak counts and overlap plots shows that the percentage enrichment in open 
-  chromatin regions (ATAC-seq peaks) and 3D chromatin interactions (HiC arches), 
+- The peak counts and overlap plots shows that the percentage enrichment in open
+  chromatin regions (ATAC-seq peaks) and 3D chromatin interactions (HiC arches),
   is comparable to that observed in the whole genome suggesting the importance of
-  the epigenetic regulation of this locus, which would have been underrepresented 
+  the epigenetic regulation of this locus, which would have been underrepresented
   in such elements otherwise.
 
 
@@ -1490,43 +1407,43 @@ interest facilitating biological interpretation and hypothesis building.
 In this example we investigated public data from the human kidney cortex and
 from patients with CKD to identify single nucleotide variants that may impact
 renal health. Looking at the Manhattan plot from a CKD GWA study on chromosome 5,
-revealed a locus of interest with significantly associated SNPs. A more detailed 
-investigation of this region indicates that at least 6 of the most significant 
-SNPs fall inside the *SLC34A1* gene. Of these, one was already reported in 
-association with DKD (rs6420094 - Zhang et al 2023)[[4]](#ref4). This gene 
-encodes for a renal‐specific sodium–phosphate cotransporter responsible for the 
-readsorption of filtered sodium and phosphate and is expressed in the proximal 
-tubule within the renal cortex (Fearn et al.  2018)[[3]](#ref3). The clinical 
-relevance of *SLC34A1* is supported by recent literature reporting its 
-downregulation in acute kidney injury (Wilflingseder et al.)[[5]](#ref5). 
-However SNPs proximity is not sufficient to infer causality, thus we integrated 
-epigenetic data from healthy individuals to obtain further cues on functional 
-aspects of the locus. 
-These data revealed that *SLC34A1* is in an open chromatin region, as demonstrated 
-from the overlap with ATAC-seq profiles and annotated peaks (Kidney cortex 12 
-and 15, ATAC peaks tracks) which also contains several regulatory elements. 
-In particular, there is an overlap between the SNPs of interest and an enhancer 
-element (Regulatory elements track, green) which from has a localization 
-compatible for acting as internal promoter for a shorter *SLC34A1* isoform (see 
-the expanded isoform example image). Enhancer elements can potentially regulate 
-several targets, indeed HiC data (HiC cortex matrix and HiC archs) show that 
-despite the enhancer of interest is not annotated as an anchor for high 
-frequency contacts (HiC archs vertex) is within the same TAD or sub-TAD, being 
-potentially interacting with multiple other genes. Knowing this is important to 
-still consider other genes to be affected by the identified SNPs. Validating all 
-the target genes that interact with the enhancer requires specificexperimental 
-designs, like enhancer sequence mutagenesis or CRISPRi followed by RT-qPCR or 
+revealed a locus of interest with significantly associated SNPs. A more detailed
+investigation of this region indicates that at least 6 of the most significant
+SNPs fall inside the *SLC34A1* gene. Of these, one was already reported in
+association with DKD (rs6420094 - Zhang et al 2023)[[4]](#ref4). This gene
+encodes for a renal‐specific sodium–phosphate cotransporter responsible for the
+readsorption of filtered sodium and phosphate and is expressed in the proximal
+tubule within the renal cortex (Fearn et al.  2018)[[3]](#ref3). The clinical
+relevance of *SLC34A1* is supported by recent literature reporting its
+downregulation in acute kidney injury (Wilflingseder et al.)[[5]](#ref5).
+However SNPs proximity is not sufficient to infer causality, thus we integrated
+epigenetic data from healthy individuals to obtain further cues on functional
+aspects of the locus.
+These data revealed that *SLC34A1* is in an open chromatin region, as demonstrated
+from the overlap with ATAC-seq profiles and annotated peaks (Kidney cortex 12
+and 15, ATAC peaks tracks) which also contains several regulatory elements.
+In particular, there is an overlap between the SNPs of interest and an enhancer
+element (Regulatory elements track, green) which from has a localization
+compatible for acting as internal promoter for a shorter *SLC34A1* isoform (see
+the expanded isoform example image). Enhancer elements can potentially regulate
+several targets, indeed HiC data (HiC cortex matrix and HiC archs) show that
+despite the enhancer of interest is not annotated as an anchor for high
+frequency contacts (HiC archs vertex) is within the same TAD or sub-TAD, being
+potentially interacting with multiple other genes. Knowing this is important to
+still consider other genes to be affected by the identified SNPs. Validating all
+the target genes that interact with the enhancer requires specificexperimental
+designs, like enhancer sequence mutagenesis or CRISPRi followed by RT-qPCR or
 RNAseq.
-Altogether, these observations indicate that the SNPs in the *SLC34A1* locus may 
-alter the function of epigenetic regulatory elements, which in turn can affect 
-the expression of the gene. The latter hypothesis can be demonstrated upon the 
-comparison of expression data (either RT-qPCR or RNA-seq) from individuals 
+Altogether, these observations indicate that the SNPs in the *SLC34A1* locus may
+alter the function of epigenetic regulatory elements, which in turn can affect
+the expression of the gene. The latter hypothesis can be demonstrated upon the
+comparison of expression data (either RT-qPCR or RNA-seq) from individuals
 affected by the SNPs or healthy. Unfortunately we do not have access to these data.
 
-In summary, this tutorial illustrates how to use ***Genomic Viewer*** through a 
-complete exploratory workflow —from genome navigation to data export and 
-interpretation— using to integrate genetic and epigenetic datasets to move from 
-raw association signals to biologically informed hypotheses and providing a 
+In summary, this tutorial illustrates how to use ***Genomic Viewer*** through a
+complete exploratory workflow —from genome navigation to data export and
+interpretation— using to integrate genetic and epigenetic datasets to move from
+raw association signals to biologically informed hypotheses and providing a
 practical starting point for downstream analytical or experimental validation.
 
 </details>
@@ -1566,19 +1483,19 @@ graphical actions provide alternative representations (e.g. different plot
 styles for a given data type), but these changes are applied globally to all
 loaded files of the same format, preventing mixed visualization outputs within
 a single track category. Performance and scalability further depend on
-the computer rendering performance and input file size, which may limit the 
-number of tracks or the genomic window that can be explored smoothly in a single 
+the computer rendering performance and input file size, which may limit the
+number of tracks or the genomic window that can be explored smoothly in a single
 session.
 
 Finally, ***Genomic Viewer*** currently supports a restricted set of reference
-genomes, with built-in annotations available for several versions of human and 
-mouse only. While the underlying design allows extension to additional organisms, 
+genomes, with built-in annotations available for several versions of human and
+mouse only. While the underlying design allows extension to additional organisms,
 such support is not yet implemented in the current release.
 
 Despite these limitations, ***Genomic Viewer*** is intended as a
 hypothesis-generation platform that helps users prioritize loci, variants, and
-regulatory elements, or identifying differential coverage sites, providing a 
-structured starting point for downstream computational analyses or targeted 
+regulatory elements, or identifying differential coverage sites, providing a
+structured starting point for downstream computational analyses or targeted
 experimental validation using specialized tools.
 
 </details>
@@ -1634,15 +1551,15 @@ Additional cytoband information was retrieved from:
 *1.*<a id="ref1"></a> Kramer NE, Davis ES, Wenger CD et al. Plotgardener:
 cultivating precise multi-panel figures in R. Bioinformatics 2022;38:2042–5.
 
-*2.*<a id="ref2"></a> Maqbool MA, Pioger L, El Aabidine AZ et al. Alternative 
-Enhancer Usage and Targeted Polycomb Marking Hallmark Promoter Choice during T 
+*2.*<a id="ref2"></a> Maqbool MA, Pioger L, El Aabidine AZ et al. Alternative
+Enhancer Usage and Targeted Polycomb Marking Hallmark Promoter Choice during T
 Cell Differentiation. Cell Reports 2020;32:108048.
 
 *3.*<a id="ref3"></a> Fearn A, Allison B, Rice SJ et al. Clinical, biochemical,
 and pathophysiological analysis of SLC34A1 mutations. Physiol Rep 2018;6:e13715.
 
-*4.*<a id="ref4"></a> Liu Y, Chen Y, Yang Q et al. Single nucleotide polymorphisms 
-in the GFR-related gene and the SNP-SNP interactions on the risk of diabetic 
+*4.*<a id="ref4"></a> Liu Y, Chen Y, Yang Q et al. Single nucleotide polymorphisms
+in the GFR-related gene and the SNP-SNP interactions on the risk of diabetic
 kidney disease in Chinese Han population. Acta Diabetol 2023;60:115–25.</a>
 
 *5.*<a id="ref5"></a> Wilflingseder J, Willi M, Lee HK et al. Enhancer and
