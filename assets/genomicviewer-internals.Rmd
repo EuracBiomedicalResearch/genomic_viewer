@@ -1,0 +1,597 @@
+---
+title: "Organization of Genomic Viewer files"
+author: "Sara Lago"
+date: "2026-02-25"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Genomic Viewer files organization
+
+------------------------------------------------------------------------
+
+## Table of Contents
+
+<details open>
+<summary>&nbsp;</summary>
+
+1.  [Dev Version](#dev-version)
+2.  [Docker Version](#docker-version) 
+3.  [GV Installer](#gv-installer)
+
+</details>
+
+------------------------------------------------------------------------
+
+## Dev Version {#dev-version}
+
+Simply get the git repository:
+
+`git clone git@github.com:EuracBiomedicalResearch/genomic_viewer.git`
+
+`cd genomic_viewer`
+
+### Files description {#files-description-local}
+
+The directory content is organized as follows:
+
+#### Main GV functions:
+
+- *GenomicViewer_app.R*: This is the Shiny code handling the ui and server 
+                          functions of the application. It also loads necessary
+                          R libraries and reads in the configuration file.
+                          
+- *plotgardener_function.R*: This is the function used to create the genomic 
+                             view plots displayed in the *Plot* navigation tab.
+                             
+- *shiny_read_table_function.R*: This is the function to read raw data tables to
+                                 be displayed in the *Data* navigation tab.
+                                 
+- *basic_statistics_genome_tracks_function.R*: Functions to generate 
+                                               basic statistics plots displayed 
+                                               in the *Stats* navigation tab.
+
+
+#### Configuration file:
+
+- *GenomicViewer_config.yml*: Pre-filled configuration file with whole data used
+                              in the tutorial (not subsetted to chr5).
+                              
+Set enironment variable `GV_DEVELOPMENT` to the absolute path of config file
+`GenomicViewer_config.yml`. This way, the app is aware that it is running in 
+development mode and not in a Docker container.
+
+Note 1: change `data.dir` to your local directory with the corresponding data.
+Contrary to to the Docker version, `GenomicViewer_config.yml` may be outside 
+this directory. This way, a directory like `dev-test` may contain only the 
+config file `GenomicViewer_config.yml`, which then points to some data directory
+via `data.dir` (e.g. `GV_installer_electron/assets/example_data` for testing 
+with the shipped data).
+
+Note 2: the keys `chrom.cen.dir` and `genes.hgnc.dir` are only required in the 
+development version as they are handled in a separate configuration file with
+default values and data pre-installed in the Docker container.
+
+
+#### R environment files:
+
+- *renv directory* and *renv.lock*: use these to restore the R environment with 
+                                  the correct version of all packages through the
+                                  command `renv::restore()`.
+                                  
+### Public web assets directory:
+
+- *www* directory: contains the GV logo to be accessed and displayed in the html
+                   version of the Shiny app.
+
+#### Genome Annotations:
+
+- *centromers* directory: Contains UCSC files with cytobands for all the GV 
+                          available reference genomes, the R scripts used to 
+                          retrieve the centromers, and resulting centromers and 
+                          the resulting centromers files used to create the 
+                          chromosome selection plot in GV app.
+
+- *hgnc symbols* directory: Contains R scripts used to obtained organized lists 
+                            of gene symbols used in the **Search by gene** menu 
+                            of GV interface, as well as the resulting files.
+                            
+- *T2T_txdb*: custom R package that provides the annotation information for T2T 
+ reference genome. This can be installed into R with
+ 
+ `devtools::install('T2T_txdb/TxDb.Hsapiens.UCSC.T2T.knownGene')`
+ 
+ and is available from the authors.
+              
+## Setting up GV files to work locally
+
+1. Download R version 4.4.3.
+
+2. Install Bioconductor 3.20:
+
+   `if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")`
+   `BiocManager::install(version = "3.20")`
+
+3. Restore all required R libraries through `renv`:
+    - set working directory to the directory where you have `renv.lock` and 
+    `renv` files, that's `Docker_files`. 
+    
+    - `setwd("Docker_files")`
+    
+    - Run `renv::activate()` and `renv::restore` to install packages.
+    
+    - Manually install the remaining packages: 
+    `install.packages('R.utils', repos = c(CRAN = 'https://cloud.r-project.org'))`
+    `install.packages('devtools', repos = c(CRAN = 'https://cloud.r-project.org'))`
+    
+    - Install the T2T ref genome package:
+    `devtools::install('T2T_txdb/TxDb.Hsapiens.UCSC.T2T.knownGene')`
+    
+4. Fill the configuration file with the data to be visualized. E.g. if you 
+   download from [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron/assets/example_data) 
+   the `example data` directory, your configuration file
+   `GenomicViewer_config.yml` should look like this:
+   
+```{varbatim, eval=F}
+default:
+  data.dir: "path/to/example_data/directory"
+
+  bw.dir: "GSE212908_RAW_ATAC_bigwig"
+  bw.file: ["GSM6560954_cortex_12_treat_pileup_chr5.bw",
+            "GSM6560956_cortex_15_treat_pileup_chr5.bw"]
+  bw.names: ["Kidney cortex 12", "Kidney cortex 15"]
+  # BEDPE files section.
+  bedpe.dir: "GSE212910_RAW_HiC_bedpe"
+  bedpe.file: "GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe"
+  bedpe.names: ["HiC arches"]
+  # BED files section.
+  bed.dir: "GSE212908_ATAC_peaks"
+  bed.file: "GSE212908_RAM012_013_015_peak_masterlist_chr5.bed"
+  bed.names: ["ATAC peaks"]
+  # HiC files section.
+  hic.dir: "GSE212910_RAW_HiC"
+  hic.file: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic"
+  hic.names: ["HiC cortex"]
+  # GWAS files section.
+  gwas.dir: "GWAScatalog_KidneyDisease"
+  gwas.file: "26831199-GCST003374-EFO_0003884.h.relocatedCol_chr5.tsv"
+  gwas.names: ["GWAS CKD"]
+  # Categorical BED files section.
+  cat.dir: ""
+  cat.file: "regulatory_elements_hg38_chr5.bed"
+  cat.names: "Regulatory Elements"
+  # Directory to file with chromosome and centromere coordinates, located in 
+  # Docker_files after cloning the repo.
+  chrom.cen.dir: "/path/to/genomic_viewer/Docker_files/centromers"
+  # Same for gene hgnc symbols and coordinates.
+  genes.hgnc.dir: "/path/to/genomic_viewer/Docker_files/hgnc_symbols"
+  # File with custom genomic region annotations for import - BED format:
+  # chr, start end, name. No header names.
+  reg.dir: ""
+  reg.file: "Example_region_table.bed"
+```
+
+What you have to modify in the configuration file are your local paths to:
+- `data.dir`
+
+- `chrom.cen.dir`
+
+- `genes.hgnc.dir`
+
+
+5. You are now ready to run the application. Check that the config file path is
+   correct:
+   
+   `stopifnot("File path wrong" = file.exists(Sys.getenv("GV_DEVELOPMENT")))`
+   
+   From the `GenomicViewer_app.r` file in RStudio click the `Run App` button in 
+   the top right corner. Libraries will be loaded and then the app is started.
+   Keep in mind that libraries are loaded only once, so startup time in the
+   Docker container will be longer.
+
+------------------------------------------------------------------------
+
+## Docker source code {#docker-version}
+
+The source code of ***Genomic Viewer*** application for Docker is available 
+through [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer)
+and is cloned as follows:
+
+`git clone git@github.com:EuracBiomedicalResearch/genomic_viewer.git`
+
+## Docker files
+
+In the following section you will find the instruction for setting up GV Docker
+container.
+
+### Files description Docker
+
+- *Dockerfile*: handles creation of the Docker image. Takes care of 
+                installing the docker base image with shiny and the required OS 
+                libraries, restores the correct R environment, installs T2T 
+                genome annotation package, copies all GV files in the correct 
+                position of the Docker container and exposes port 8180.
+
+  Note: to update the latest GV docker build in directory `genomic_viewer` use
+  
+  `docker build -t sarlago/shiny-docker-genomicviewer2 .`
+  
+  To publish the updated version execute
+  
+  `docker push sarlago/shiny-docker-genomicviewer2`.
+  
+- *Docker_files* directory: Source code for running the application and for 
+  creating the Docker image.
+                            
+Note: In this version there is an additional configuration file for the genome 
+annotation files which should not be modified by users for safety. 
+This is `GenomicViewer_config_gen.yml` file. The keys that are specified in this 
+file are absent in the Docker version of the `GenomicViewer_config.yml` file.
+
+## Setting up GV files for Docker
+
+The repository clone can be used to create the Docker container.
+
+1. Activate docker engine.
+
+2. Your terminal is in the base directory `genomic_viewer`.
+
+3. Build the container with `docker build -t docker_username/container_name .`
+   For testing it's not important to specify usable username and container 
+   names, for example `docker build --tag dev/gvtest .` will do the job.
+
+4. Publish the container to Docker Hub with
+   `docker push docker_usrname/container_name`.
+   This will automatically be assigned to the `latest` tag and overwrite the
+   previous published version unless you do not specify a different tag.
+   
+   At the moment GV is published in Docker Hub as 
+   `sarlago/shiny-docker-genomicviewer2`.
+
+## Running the Docker image in a container
+
+For testing we still need a directory that will be mounted inside the Docker
+container. In order to use our example data, we copy it to some directory, 
+here `test-data-docker` and place a config file in there. In order to simulate
+best the installation, we use the `example_data` and the config file from the
+installer:
+
+`cp -a GV_installer_electron/assets/example_data test-data-docker`
+
+and link the config file, so that we don't have to care about different copies
+during the development process:
+
+`ln GV_installer_electron/assets/GenomicViewer_config.yml test-data-docker/`
+
+The image should be ready (see above), run the image as a Docker container in 
+the base directory of the repository, `genomic_viewer` with the previously
+given user name and container name:
+
+`docker run --rm -p 8180:8180 -v "$PWD/test-data:/data" dev/gvtest`
+
+This will remove the Docker container after the app has finished (`--rm`),
+expose port 8180 to the host (`-p 8180:8180`), create a binding mount for the
+host directory `$PWD/test-data` that will be seen in the container as `/data`
+(`-v "$PWD/test-data:/data"`) for user `dev` (does not need to exist for 
+testing) and container `gvtest` (`dev/gvtest`).
+
+------------------------------------------------------------------------
+
+## GV Installer {#gv-installer}
+
+The GV Installer has been created using Electron framework. All the necessary 
+files are in the *GV_Installer_electron* directory on 
+[GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer). 
+
+### Installer Files Description
+
+The files required to create an Electron-based installer are the following:
+
+- *main.js*: creates the installer window, loads `index.html` and handles all the
+  installer events communicating with the `render.js` file. (backend)
+  
+- *renderer.js*: renders process logic, handles buttons and user messages, udating
+  dynamically the UI. (frontend)
+  
+- *preload.js*: secure bridge between main and renderer.
+
+- *index.html*: user interface defining the actual window content and structure.
+   
+- *package.json*: this is used for installer configuration, defining metadata 
+  and dependencies.
+  
+- *package-lock.json*: defines dependencies to ensure consistent builds
+  (generated automatically by Electron).
+  
+- *forge.config.json*: Electron Forge configuration that controls packaging and 
+  distribution behavior defining makers for the different OSs, plugins, icons 
+  and other building configurations.
+  
+- *assets* (directory): stores additional files that are handled by the installer
+  as external resources, like icons, example data files, runner scripts to launch 
+  GV and the create-desktop-shortcut package and the `GenomicViewer_config.yml` 
+  file.
+  
+Recommended files tree:
+
+```
+GV_installer_electron
+│       forge.config.js
+│       index.html
+│       main.js
+│       package-lock.json
+│       package.json
+│       preload.js
+│       renderer.js
+│
+├───assets
+│   │ 	GenomicViewer_config.yml
+│   │ 	GenomicViewer_linux.sh
+│   │ 	GenomicViewer_mac.sh
+│   │	  GenomicViewer_win.bat
+│   │	  GV_icon.icns
+│   │	  GV_icon.ico
+│   │	  GV_icon.png
+│   │	  GV_installer_logo.png
+│   │	  
+│   ├───create-desktop-shortcuts
+│   │   
+│   └───example_data
+│
+└───node_modules (only for local build, not GitHub Actions)     
+
+```
+
+### Local build of the installer
+
+You need to install `npm`, this automatically creates the `node_modules`
+directory that contains the actual code for Electron. All the specified
+dependencies are imported from there.
+
+To setup the `node_modules` run `npm install` from within the directory
+containing *package.json* and *package-lock.json*.
+
+Once the correct file tree is setup and `npm` has set up `node_modules` you can
+run the installer app for testing opening a terminal in the directory with
+electron files through:
+
+`npm run start`
+
+Or you can package the app to be distributed through:
+
+`npm run make`
+
+Note: The app package can only be built for the operating system currently 
+running. To build a cross-platform Electron app one solution is to use GitHub
+Actions.
+
+### Cross-platform building of the installer
+
+To build the installer in a cross-platform way through GitHub Actions you can
+commit to GitHub the requires the file tree as reported above. Inside
+`Electron_GV_installer` parent directory create `.github/workflows/build.yml` to
+specify which OS to used to rebuild the installer distributable package after
+any push.
+
+Tip: comment out the content of `on:` key to prevent unwanted rebuild before 
+pushing commits.
+
+The GitHub build workflow code should look like this:
+
+
+```{yml, eval = F}
+
+name: Build and Publish GenomicViewer installer Electron App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+  
+      - run: npm install
+      - run: npx electron-forge make --platform=linux --arch=x64
+      - run: ls -lR out/make/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64
+          path: out/make/
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - run: npm install
+      - run: npx electron-forge make --platform=win32 --arch=x64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: out/make/
+
+  build-macos-arm64:
+    runs-on: macos-latest  # Apple Silicon
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - run: npm install
+      - run: npx electron-forge make --platform=darwin --arch=arm64
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64
+          path: out/make/
+
+  publish:
+    needs: [build-linux, build-windows, build-macos-arm64]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ./dist
+
+      - run: npm ci
+      - run: npm run publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+
+### MacOS Installer
+
+Despite GitHub Actions allows to build the GV Installer app for macOS, modern
+macOS releases prevent it to run without a licence. We solved this issue by 
+using a simple launcher script in place of the ELectron Installer. The script is
+available through [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/Installer_Mac)
+and its usage is described in the [GV README](https://github.com/EuracBiomedicalResearch/genomic_viewer?tab=readme-ov-file#macos).
+
+### Self-contained AppImage building for non-root Linux users
+
+To build the non-root user AppImage for GV use 
+[*appimagetool*](https://github.com/AppImage/appimagetool/releases/tag/continuous)
+starting from the .deb GV package created either locally from a Linux machine or
+through GitHub Actions. The .deb package will already contain all the necessary 
+files.
+
+Below are the detailed instructions to build the GV AppImage:
+
+1. **Install appimagetool** 
+
+  Download the official binary from 
+  [GitHub release](https://github.com/AppImage/appimagetool/releases/tag/continuous).
+  
+  Make it is executable `chmod +x appimagetool-x86_64.AppImage`.
+  
+2. **Extract your GV app .deb package**
+
+  Assuming your .deb file is `genomicviewer-gui-installer_1.0.0_amd64.deb`.
+  Extract it to a directory e.g. 
+  
+  
+```{sh, eval = F}
+  mkdir deb-extract
+  dpkg-deb -x genomicviewer-gui-installer_1.0.0_amd64.deb
+```
+  
+3. **Create AppDir structure**
+
+Create the AppDir folder first and move the content of deb-extract to it:
+    
+```{sh, eval = F}
+mkdir -p GV.AppDir
+mv deb-extract/* GV.AppDir
+```
+    
+4. **Create an AppRun launcher file**
+
+Inside `GV.AppDir/` create an AppRun file with the following content:
+
+```{bash, eval = F}
+#!/bin/bash
+DIR="$(dirname "$(readlink -f "$0")")" 
+ 
+export PATH="$DIR/usr/bin:$PATH" 
+export LD_LIBRARY_PATH="$DIR/usr/lib:$LD_LIBRARY_PATH"
+ 
+# Execute the main application
+"$DIR/usr/bin/genomicviewer-gui-installer" "$@"
+```
+
+Make it executable:
+
+```{sh, eval = F}
+chmod +x GV.AppDir/AppRun
+```
+
+5. **Copy the .desktop file**
+
+Copy the `.desktop` file from the `.deb` into `GV.AppDir`:
+
+```{sh, eval = F}
+cp GV.AppDir/usr/share/applications/*.desktop GV.AppDir/genomicviewer-gui-installer.desktop
+
+```
+
+Then edit it so that its content looks as follows:
+
+```
+[Desktop Entry]
+Name=genomicviewer-gui-installer
+Comment=Shiny based app for the visualization and basic analysis of NGS data.
+GenericName=genomicviewer-gui-installer
+Exec=genomicviewer-gui-installer
+Icon=genomicviewer-gui-installer
+Type=Application
+Categories=GNOME;GTK;Utility;
+```
+
+6. **Copy the GV icon**
+
+The GV icon that is inside the originally extracted .deb package must be copied 
+in the `GV.AppDir` root
+
+```{sh, eval = F}
+cp GV.AppDir/usr/share/icons/pixmaps/genomicviewer-gui-installer.png \
+   GV.AppDir/genomicviewer-gui-installer.png
+```
+
+7. **Build AppImage using appimagetool**
+
+To build the self-contained AppImage using the downloaded binaries for 
+appimagetool run the following command from the `GV.AppDir` parent directory:
+
+```{sh, eval = F}
+ARCH=x86_64 /home/user/Appimagetool/appimagetool-x86_64.AppImage GV.AppDir
+```
+
+This produces:
+
+`genomicviewer-gui-installes-x86_64.AppImage`
+
+Which is your self-contained distributable GenomicViewer AppImage for Linux.
+
+You can run the image as follows:
+
+```{sh, eval = F}
+# make it executable
+chmod +x genomicviewer-gui-installer-x86_64.AppImage
+
+# run the app without root privileges
+./genomicviewer-gui-installer-x86_64.AppImage --no-sandbox
+```
+
+Note: the `--no-sandbox` option was likely required due to use of a virtual 
+machine. Try without, might also work.

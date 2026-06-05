@@ -1,0 +1,9 @@
+---
+
+default:
+    
+  # dir to file with chromosomes and centromeres coordinates
+  chrom.cen.dir: "centromers"
+  # dir to file with desired genome genes hgnc symbol and coordinates
+  genes.hgnc.dir: "hgnc_symbols"
+  
