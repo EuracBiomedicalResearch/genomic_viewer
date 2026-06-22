@@ -18,10 +18,11 @@ and analyzing genomic data hosted in a Docker container.
 1.  [Configuration](#configuration)
 2.  [File Formats](#file-formats)
 3.  [Features and Usage](#features-and-usage)
-4.  [Tutorial](#tutorial)
-5.  [Limitations](#limitations)
-6.  [Getting Help](#help)
-7.  [References and Links](#references-links)
+4.  [Sharing sessions](#sharing-sessions)
+5.  [Tutorial](#tutorial)
+6.  [Limitations](#limitations)
+7.  [Getting Help](#help)
+8.  [References and Links](#references-links)
 
 </details>
 
@@ -1148,6 +1149,92 @@ Viewer*** interface:
 
 ------------------------------------------------------------------------
 
+## Sharing Sessions
+
+<div>
+<details open>
+<summary>&nbsp;</summary>
+
+Many research projects exploiting NGS data analysis and visualization for 
+hypothesis generation also require a biological validation through complementary 
+experimental techniques. This might involve different researches from the same
+research group or even external laboratories. Thus, sharing dynamic working sessions 
+through which collaborators can easily access illustrative views, but also inspect 
+the data themselves, can strongly improve the communication between researchers. 
+Ultimately, this will facilitate the design of validation experiments and data 
+interpretation. 
+***Genomic Viewer*** is designed to support a secure, stable and easy transfer of 
+working session configuration and datasets. To reproduce a ***Genomic Viewer*** 
+session, collaborators need to have access to the 
+[configuration file](#configuration) and the data.
+
+### Sharing session configurations
+
+All of the session-related information, including loaded datasets and display 
+settings such as tracks order and label, are stored in the [configuration file](#configuration).
+
+Therefore, once the collaborators have access to the underlying data files, 
+sharing a session only requires sharing:
+
+- The session configuration file;
+
+- Any user-define region table containing custom coordinates corresponding to 
+  regions of interest for the collaborators. This also includes the reference 
+  genome version.
+  
+After receiving these files all the collaborators can run ***Genomic Viewer*** to 
+reproduce the same visualization environment, provided that they have access to 
+the referenced datasets.
+
+### Sharing genomic data tracks
+
+Genomic data tracks may contain unpublished or sensitive information, making it 
+unsafe to upload them to online servers and sharing through URL. If this is the 
+case we recommend sharing through institutional storage systems or trusted 
+file-sharing services such as network drives or other approved repositories. 
+This makes sure that only allowed users can access the data.
+In some cases, like if the shared data are already published and do not contain 
+sensitive data there is the possibility to share them through secure large-file 
+transfer services like [OneDrive](https://www.microsoft.com/it-it/microsoft-365/onedrive/online-cloud-storage?market=it), 
+[GoogleDrive](https://workspace.google.com/intl/it/products/drive/), 
+[WeTransfer](https://wetransfer.com/), [WeSendit](https://www.wesendit.com/) and 
+others.
+
+To reproduce a ***Genomic Viewer*** session, the shared data must be placed in a 
+directory structure that matches the organization specified in the 
+[configuration file](#configuration). The shared data directory can be placed in 
+any location on the recipient's computer, provided that it is accessible to 
+***Genomic Viewer***.
+This allows easy session reproducibility, indeed the paths specified in the 
+configuration file are relative rather than absolute. This improves the portability, 
+by allowing datasets to be stored in different locations on different systems 
+without the need to modify the configuration. Indeed, all paths are 
+resolved relative to the directory containing the configuration file and the 
+***Genomic Viewer*** executable. It also preserves the sender's privacy, 
+avoiding to expose information about the user's directory structure, usernames, 
+or institutional storage organization. 
+
+When the data are stored in a different directory than the one chosen upon 
+***Genomic Viewer*** installation, alternative options are supported:
+
+- Copy the ***Genomic Viewer*** executable (`GenomicViewer_win.bat` for Windows, 
+`GenomicViewer_linux.sh` for Linux) in the same directory together with the 
+configuration file you wold like to launch, and double click on it to run ***Genomic Viewer***.
+
+- Run ***Genomic Viewer*** directly form Docker following the 
+[Cross-platform Installer-free](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/main#installation) 
+instructions. From here you can directly specify the directory with the data from 
+any position on your computer and allow ***Genomic Viewer*** to access it.
+
+As long as the shared data directory preserves the expected folder structure, 
+it may be stored in any accessible location on the recipient's system.
+
+
+</details>
+</div>
+
+------------------------------------------------------------------------
+
 ## Tutorial
 
 <div>
@@ -1164,6 +1251,7 @@ In this tutorial you will learn how to:
 - Export a subset of the raw data;
 - Evaluate data based on the stats;
 - Employ the obtained information to design further experiments/analyses.
+- Safely share your session with collaborators.
 
 ### Loading usage example data
 
@@ -1431,7 +1519,7 @@ despite the enhancer of interest is not annotated as an anchor for high
 frequency contacts (HiC archs vertex) is within the same TAD or sub-TAD, being
 potentially interacting with multiple other genes. Knowing this is important to
 still consider other genes to be affected by the identified SNPs. Validating all
-the target genes that interact with the enhancer requires specificexperimental
+the target genes that interact with the enhancer requires specific experimental
 designs, like enhancer sequence mutagenesis or CRISPRi followed by RT-qPCR or
 RNAseq.
 Altogether, these observations indicate that the SNPs in the *SLC34A1* locus may
@@ -1440,11 +1528,35 @@ the expression of the gene. The latter hypothesis can be demonstrated upon the
 comparison of expression data (either RT-qPCR or RNA-seq) from individuals
 affected by the SNPs or healthy. Unfortunately we do not have access to these data.
 
+
+### Sharing the working session with collaborators
+
+***Genomic Viewer*** supports an easy session sharing procedure. This allows to 
+share the observations derived from the data presented in this tutorial (or 
+any working session) with a collaborator that might be interested in experimentally 
+validate the results or support their interpretation.
+
+To do so it is sufficient to share the [configuration file](#configuration) used 
+to launch the working session with the interested user.
+A custom region table that has been saved during the session with the genomic 
+coordinates of interesting genomic locations can also be shared. This will 
+facilitate the evaluation of the observed results from the recipient.
+These two files are the minimal requirements for the recipients to reproduce a 
+working session, provided that they have access to the referenced datasets and 
+that their location is accessible to ***Genomic Viewer***.
+
+A more detailed explanation on how to share working session configurations and 
+data is available in the [Sharing Session](#sharing-sessions) paragraph of this 
+manual.
+
+
 In summary, this tutorial illustrates how to use ***Genomic Viewer*** through a
-complete exploratory workflow —from genome navigation to data export and
-interpretation— using to integrate genetic and epigenetic datasets to move from
-raw association signals to biologically informed hypotheses and providing a
+complete exploratory workflow —from genome navigation to data export,
+interpretation and sharing— using to integrate genetic and epigenetic datasets 
+to move from raw association signals to biologically informed hypotheses and providing a
 practical starting point for downstream analytical or experimental validation.
+
+
 
 </details>
 </div>
