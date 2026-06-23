@@ -1149,7 +1149,7 @@ Viewer*** interface:
 
 ------------------------------------------------------------------------
 
-## Sharing Sessions
+## Sharing sessions
 
 <div>
 <details open>
@@ -1542,8 +1542,36 @@ A custom region table that has been saved during the session with the genomic
 coordinates of interesting genomic locations can also be shared. This will 
 facilitate the evaluation of the observed results from the recipient.
 These two files are the minimal requirements for the recipients to reproduce a 
-working session, provided that they have access to the referenced datasets and 
-that their location is accessible to ***Genomic Viewer***.
+working session, provided that they have access to the referenced datasets, 
+preserving the relative folder structure defined in the configuration file, and 
+that their location is accessible to ***Genomic Viewer***. 
+An example of the datasets relative folder organization that matches the 
+configuration file used in this tutorial is the following:
+
+```
+data
+|
+│   Example_region_table.bed
+│   GenomicViewer_config.yml
+│   regulatory_elements_hg38_chr5.bed
+│
+├───GSE212908_ATAC_peaks
+│       GSE212908_RAM012_013_015_peak_masterlist_chr5.bed
+│
+├───GSE212908_RAW_ATAC_bigwig
+│       GSM6560954_cortex_12_treat_pileup_chr5.bw
+│       GSM6560956_cortex_15_treat_pileup_chr5.bw
+│
+├───GSE212910_RAW_HiC
+│       GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic
+│
+├───GSE212910_RAW_HiC_bedpe
+│       GSM6560960_mustache_0.1_0.2_out.diffloops_in_cortex_2_chr5.bedpe
+│
+└───GWAScatalog_KidneyDisease
+        26831199-GCST003374-EFO_0003884.h.relocatedCol_chr5.tsv
+
+```
 
 A more detailed explanation on how to share working session configurations and 
 data is available in the [Sharing Session](#sharing-sessions) paragraph of this 
