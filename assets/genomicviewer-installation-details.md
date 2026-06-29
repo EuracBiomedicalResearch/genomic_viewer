@@ -43,11 +43,11 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   i) Go to the [releases](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases)
      page of the ***Genomic Viewer*** GitHub repository.
      
-  <img src="GV_github_release.png" width="80%"/>
+<img src="GV_github_release.png" width="80%"/>
      
   ii) Under assets click on the installer file specific to your OS to start its download.
   
-  <img src="GV_installer_win.png" width="80%"/>
+<img src="GV_installer_win.png" width="80%"/>
      
 
 3. Launch installer wizard:
@@ -60,12 +60,12 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   ii) Select `Start Installation` from the installation wizard and inspect the log 
       messages for any installation issue or required action. 
       
-  <img src="GV_installer_wizard.png" width="60%"/>
+<img src="GV_installer_wizard.png" width="60%"/>
       
   iii) The installer will open a file explorer from which you can choose the directory 
      in which to save the demo data, configuration file and ***GV*** launcher script.
      
-  <img src="GV_install_location.png" width="80%"/>
+<img src="GV_install_location.png" width="80%"/>
      
   iv) When installation is completed you can click on the `Finish` button to 
       close the installer wizard.
