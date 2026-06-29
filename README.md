@@ -84,6 +84,9 @@ Recommended actions for the user <em>before</em> installing ***Genomic
 Viewer*** and step-by-step instructions on how to get the
 application running.
 
+For a more detailed description of installation steps using ***Genomic Viewer*** 
+wizard refer to [this guide](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-installation-details.md).
+
 <br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Windows**</span>
