@@ -70,7 +70,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   iv) When installation is completed you can click on the `Finish` button to 
       close the installer wizard.
       
-  <img src="assets/GV_install_finish.png" width="60%"/>
+<img src="GV_install_finish.png" width="60%"/>
       
   vi) You can now start ***GV*** by double-click on its Desktop icon.
   
