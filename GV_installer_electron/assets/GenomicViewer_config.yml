@@ -48,3 +48,10 @@ default:
   # interest.
   reg.dir: ""
   reg.file: "Example_region_table.bed"
+  
+  # Comments to share with collaborators reproducing this working session
+  notes: "This is the <b>demo dataset</b> provided with Genomic Viewer, it is limited to 
+          data on: \n\n
+          - <b>chromosome 5</b>; \n
+          - of the <b>human reference genome hg38</b>. \n\n
+          Have fun using our app! :)"
