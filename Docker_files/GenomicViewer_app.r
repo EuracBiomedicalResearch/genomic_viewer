@@ -1,3 +1,4 @@
+Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Desktop/GV_demo/configuration_files/GenomicViewer_config_example.yml")
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
@@ -99,7 +100,7 @@ configComplete <- function(config)
                      "bedpe.file", "bedpe.names", "bed.dir", "bed.file",
                      "bed.names", "hic.dir", "hic.file", "hic.names", "gwas.dir",
                      "gwas.file", "gwas.names", "cat.dir", "cat.file", "cat.names",
-                     "reg.dir", "reg.file",
+                     "reg.dir", "reg.file", "notes",
                      # Hidden from the user, specified in container internal cfg.
                      "chrom.cen.dir", "genes.hgnc.dir")
   missing.keys <- setdiff(required.keys, names(config))
@@ -456,7 +457,29 @@ ui <- page_sidebar(
 )
 
 # Define SERVER logic ---------------------------------------------------
+
 server <- function(input, output, session){
+  
+  ##---------------------- Show startup message from user config notes
+  observe({
+    if (!is.null(config$notes) &&
+        nzchar(trimws(config$notes))) {
+          showModal(modalDialog(
+            title = "User notes:",
+            div(
+              style = "white-space: pre-wrap; text-align: center;",
+              HTML(config$notes)
+            ),
+            easyClose = FALSE,
+            footer = actionButton("notes_ok", "OK"),
+            sie = "l")
+            )
+        }
+  })
+  
+  observeEvent(input$notes_ok, {
+    removeModal()
+  })
 
   ##---------------------- Read reference genome related files
   # Genes hgnc symbol
