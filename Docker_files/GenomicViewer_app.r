@@ -1649,9 +1649,9 @@ server <- function(input, output, session){
         } else if (fmt == "svg") {
           svglite(file, width = 12, height = 8 )
         } else if (fmt == "png") {
-          png(file, width =3000, height=2300, res = 300 )
+          png(file, width =3200, height=2500, res = 300 )
         } else if (fmt == "jpg") {
-          jpeg(file, width =3000, height=2300, res = 300 )
+          jpeg(file, width =3200, height=2500, res = 300 )
         }
         plotgardener.shiny.function(bw.file = bw.file,
                                     hic.file = hic.file,
