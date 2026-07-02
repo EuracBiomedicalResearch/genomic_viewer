@@ -59,6 +59,9 @@ Software and Hardware
 -   macOS with Intel x64 or Apple M1 ARM64 and higher
 -   Linux (Debian-based or Red Hat-based)
 
+All the platforms with relative OS and software versions that we tested are 
+reported [here](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-tested-platforms.md).
+
 #### <span>**Hardware Recommendations**</span>
 
 -   Minimum RAM 4GB
