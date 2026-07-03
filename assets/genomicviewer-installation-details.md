@@ -15,12 +15,14 @@ and analyzing genomic data hosted in a Docker container.
 <summary>&nbsp;</summary>
 
 1. [Detailed installation through installation wizard](#detailed-installation-through-installation-wizard)
+2. [Detailed installation for macOS](#detailed-installation-for-macos)
 
 </details>
 
 ------------------------------------------------------------------------
 
-In the following you can find step-by-step instructions to install ***Genomic Viewer***.
+In the following guide you can find step-by-step instructions to install
+***Genomic Viewer***.
 If you encounter any problem, please report it by creating a 
 [GitHub issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue) 
 or contacting us [directly](mailto:sara.lago@eurac.edu).
@@ -33,9 +35,9 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
 1. Ensure you meet all the [prerequisites](README.md#installation) for a successful 
 ***Genomic Viewer (GV)*** installation. Here is a checklist:
 
-  - Docker is installed.
-  - WSL is enabled. 
-  - You have downloaded ***GV*** release for Windows (see below).
+  - Docker is installed. ✅
+  - WSL is enabled. ✅
+  - You have downloaded ***GV*** release for Windows (see below). ✅
   
   
 2. Download ***GV*** installer from GitHub:
@@ -43,11 +45,11 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   i) Go to the [releases](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases)
      page of the ***Genomic Viewer*** GitHub repository.
      
-<img src="GV_github_release.png" width="80%"/>
+<img src="GV_github_release.png" width="80%"/> # Replace this with correct image once we have the new release!!
      
   ii) Under assets click on the installer file specific to your OS to start its download.
   
-<img src="GV_installer_win.png" width="80%"/>
+<img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!!
      
 
 3. Launch installer wizard:
@@ -74,12 +76,67 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
       
   vi) You can now start ***GV*** by double-click on its Desktop icon.
   
-  
-  
+ 
 
 </details>
 
 ------------------------------------------------------------------------
 
+## Detailed installation for macOS
 
+<details open>
+<summary>&nbsp;</summary>
+
+1. Ensure you meet all the [prerequisites](README.md#installation) for a successful 
+***Genomic Viewer (GV)*** installation. Here is a checklist:
+
+  - Docker is installed. ✅
+  - You have downloaded ***GV*** release for macOS (see below). ✅
+  
+2. Download ***GV*** installer from GitHub:
+
+  i) Go to the [releases](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases)
+     page of the ***Genomic Viewer*** GitHub repository.
+
+<img src="GV_github_release.png" width="80%"/> # Replace this with correct image once we have the new release!!
+     
+  ii) Under assets click on the installer file specific to your OS to start its download.
+  
+<img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!!
+     
+
+3. Launch ***GV*** directly:
+
+  i) Once download has completed, extract the `genomicviewer-run-macos.zip` in 
+     the desired location.
+     
+  ii) Right click on `genomicviewer-run-macos` extracted directory and choose
+      `Services > New Terminal at Folder`.
+      
+      # WE NEED AN IMAGE HERE
+      
+  If you don't see this option, enable it:
+  
+  - Open `System Settings → Keyboard → Keyboard Shortcuts`.
+  - Go to `Services`.
+  - Under `Files and Folders`, enable `New Terminal at Folder` (and/or` New Terminal Tab at Folder`).
+  
+      # WE NEED AN IMAGE HERE
+  
+  iii) Type the following command in terminal `docker compose up`.
+       This will pull the docker image if not already present, or directly run
+       ***GV*** application.
+       
+       # WE NEED AN IMAGE HERE
+       
+  iv) Once loading is finished and the following link appears in Terminal 
+      `http:/localhost:8180`, do `ctrl+click` on it and ***GV*** application will
+      open in a new browser window.
+      
+      # WE NEED AN IMAGE HERE
+
+</details>
+
+
+------------------------------------------------------------------------
 
