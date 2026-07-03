@@ -87,8 +87,8 @@ Recommended actions for the user <em>before</em> installing ***Genomic
 Viewer*** and step-by-step instructions on how to get the
 application running.
 
-For a more detailed description of installation steps using ***Genomic Viewer*** 
-wizard refer to [this guide](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-installation-details.md).
+For a more detailed description of the recommended ***Genomic Viewer*** 
+installation steps refer to [this guide](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-installation-details.md).
 
 <br/><br/>
 
@@ -131,9 +131,9 @@ wizard refer to [this guide](https://github.com/EuracBiomedicalResearch/genomic_
 **Installation:**
 
 1. Extract the downloaded folder with configuration, example data and launcher file.
-2. Search and open a `Terminal` from `Spotlight`.
-3. Drag the `GenomicViewer-gui.run.sh` and the `data` folder in Terminal.
-4. Press Enter.
+2. Enter the extracted `genomicviewer-run-macos` directory.
+3. Open a Terminal from there and type `docker compose up`.
+4. Once loading finished `ctrl+click` on `http:/localhost:8180`.
 
 **Uninstallation:**
 
