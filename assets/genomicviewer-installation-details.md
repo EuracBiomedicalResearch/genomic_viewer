@@ -1,5 +1,5 @@
 
-# Genomic Viewer Installation Wizard
+# Genomic Viewer Installation Guide
 
 <img src="GV_docker_logo.png" width="150"/>
 
@@ -127,13 +127,15 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
        This will pull the docker image if not already present, or directly run
        ***GV*** application.
        
-       # WE NEED AN IMAGE HERE
+  <img src="GV_docker_compose.png" width="80%"/>
        
   iv) Once loading is finished and the following link appears in Terminal 
-      `http:/localhost:8180`, do `ctrl+click` on it and ***GV*** application will
-      open in a new browser window.
+      `http://0.0.0.0:8180`, copy and paste it in a browser window to use the 
+      ***GV*** application.
       
-      # WE NEED AN IMAGE HERE
+  <img src="GV_container_run.png" width="80%"/>
+  
+  <img src="GV_safari_window.png" width="80%"/>
 
 </details>
 
