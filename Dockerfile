@@ -17,10 +17,14 @@ RUN apt-get update \
  libssl-dev \
  libxml2-dev \
  libtiff-dev \
- libwebp-dev
+ libwebp-dev \
+ git \
+ libgit2-dev \
+ libuv1-dev 
 
 # Install renv
-RUN R -e "install.packages('renv', repos = c(CRAN = 'https://cloud.r-project.org'))"
+RUN R -e "install.packages('remotes', repos = c(CRAN = 'https://cloud.r-project.org'))"
+RUN R -e "remotes::install_version('renv', version = '1.1.5', repos = 'https://cloud.r-project.org')"
 
 
 # Copy Renv files
@@ -49,3 +53,5 @@ EXPOSE 8180
 
 # Run the R Shiny app
 CMD ["Rscript", "/shiny-app-GenomicViewer/GenomicViewer_app.r"]
+
+###---------------------------------------
