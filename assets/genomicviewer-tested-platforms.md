@@ -5,7 +5,7 @@ The table below reports all the operating systems (OS) and coupled Docker versio
 that were tested for compatibility with ***Genomic Viewer***.
 
 
-Last update: 02/07/2026
+Last update: 07/07/2026
 
 | Operating System	     | Docker Desktop |	Docker engine |	WSL  | WSL distribution |
 |------------------------|----------------|---------------|------|------------------|
@@ -15,7 +15,8 @@ Last update: 02/07/2026
 |------------------------|----------------|---------------|------|------------------|		
 | MacOS 15.7.3           |	v. 4.58.1	    | v. 29.1.5	    |  /   |        /         |
 | MacOS 26.2	           |  v. 4.58.1	    | v. 29.1.5	    |  /   |        /         |
-| MacOS 26.5.1           |       /        | v. 29.6.1     |  /   |        /         |
+| MacOS 26.2             |  v. 4.81.0     | v. 29.5.2     |  /   |        /         |
+| MacOS 26.5.1           |  v. 4.58.1     | v. 29.6.1     |  /   |        /         |
 |------------------------|----------------|---------------|------|------------------|
 | Ubuntu 25.10	         |      /   	    | v. 29.1.2	    |  /   |        /         |
 
