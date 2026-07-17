@@ -113,7 +113,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   ii) Right click on `genomicviewer-run-macos` extracted directory and choose
       `Services > New Terminal at Folder`.
       
-      # WE NEED AN IMAGE HERE
+<img src="GV_run_macOS.png" width="80%"/>
       
   If you don't see this option, enable it:
   
@@ -121,7 +121,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   - Go to `Services`.
   - Under `Files and Folders`, enable `New Terminal at Folder` (and/or` New Terminal Tab at Folder`).
   
-      # WE NEED AN IMAGE HERE
+<img src="GV_terminal_settings.png" width="80%"/>
   
   iii) Type the following command in terminal `docker compose up`.
        This will pull the docker image if not already present, or directly run
