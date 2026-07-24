@@ -47,10 +47,12 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
      
 <img src="GV_github_release.png" width="80%"/> # Replace this with correct image once we have the new release!!
      
+     
   ii) Under assets click on the installer file specific to your OS to start its download.
   
 <img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!!
      
+
 
 3. Launch installer wizard:
      
@@ -63,16 +65,19 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
       messages for any installation issue or required action. 
       
 <img src="GV_installer_wizard.png" width="60%"/>
+
       
   iii) The installer will open a file explorer from which you can choose the directory 
      in which to save the demo data, configuration file and ***GV*** launcher script.
      
 <img src="GV_install_location.png" width="80%"/>
+
      
   iv) When installation is completed you can click on the `Finish` button to 
       close the installer wizard.
       
 <img src="GV_install_finish.png" width="60%"/>
+
       
   vi) You can now start ***GV*** by double-click on its Desktop icon.
   
@@ -98,10 +103,11 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   i) Download [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
   
   ii) Instead of dragging `Docker icon file` to `Applications`, create your own 
-      `app` directory in a desired location. Next drag and drop `Docker icon file`
-      into your `app` directory.
+      `apps` directory in a desired location. Next drag and drop `Docker icon file`
+      into your `apps` directory.
       
 <img src="GV_docker_drag_macos.png" width="80%"/>
+
 
   iii) Start Docker and follow installation instructions. In the configuration
        page select `Use advanced settings` > `User` > 
@@ -116,10 +122,12 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
      page of the ***Genomic Viewer*** GitHub repository.
 
 <img src="GV_github_release.png" width="80%"/> # Replace this with correct image once we have the new release!!
+
      
   ii) Under assets click on the installer file specific to your OS to start its download.
   
 <img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!!
+
      
 
 3. Launch ***GV*** directly:
@@ -131,6 +139,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
       `Services > New Terminal at Folder`.
       
 <img src="GV_run_macOS.png" width="80%"/>
+
       
   If you don't see this option, enable it:
   
@@ -140,10 +149,13 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   
 <img src="GV_terminal_settings.png" width="80%"/>
 
+
   iii) If you are running ***GV*** without root privileges export Docker binaries 
        to `PATH` by typing:
        
-     ```export PATH="$HOME/.docker/bin:$PATH"```
+     ```
+     export PATH="$HOME/.docker/bin:$PATH"
+     ```
        
    Otherwise skip this step.
   
@@ -152,15 +164,19 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
        ***GV*** application.
        
   <img src="GV_docker_compose.png" width="80%"/>
+  
        
   v) Once loading is finished and the following link appears in Terminal 
       `http://0.0.0.0:8180`, copy and paste it in a browser window to use the 
       ***GV*** application.
       Alternatively, you can use `http://127.0.0.1:8180`.
       
+      
   <img src="GV_container_run.png" width="80%"/>
   
+  
   <img src="GV_safari_window.png" width="80%"/>
+  
 
 </details>
 
