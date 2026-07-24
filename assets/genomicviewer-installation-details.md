@@ -91,7 +91,24 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
 ***Genomic Viewer (GV)*** installation. Here is a checklist:
 
   - Docker is installed. ✅
-  - You have downloaded ***GV*** release for macOS (see below). ✅
+  - You have downloaded ***GV*** release for macOS (see step 2 below). ✅
+  
+  For users without root privileges Docker can be installed as follow:
+  
+  i) Download [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
+  
+  ii) Instead of dragging `Docker icon file` to `Applications`, create your own 
+      `app` directory in a desired location. Next drag and drop `Docker icon file`
+      into your `app` directory.
+      
+<img src="GV_docker_drag_macos.png" width="80%"/>
+
+  iii) Start Docker and follow installation instructions. In the configuration
+       page select `Use advanced settings` > `User` > 
+       `Automatically check configuration` > `Finish`.
+       
+<img src="GV_docker_configuration_noroot_macos.png" width="80%"/>
+
   
 2. Download ***GV*** installer from GitHub:
 
@@ -122,16 +139,24 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   - Under `Files and Folders`, enable `New Terminal at Folder` (and/or` New Terminal Tab at Folder`).
   
 <img src="GV_terminal_settings.png" width="80%"/>
+
+  iii) If you are running ***GV*** without root privileges export Docker binaries 
+       to `PATH` by typing:
+       
+     ```export PATH="$HOME/.docker/bin:$PATH"```
+       
+   Otherwise skip this step.
   
-  iii) Type the following command in terminal `docker compose up`.
+  iv) Type the following command in terminal `docker compose up`.
        This will pull the docker image if not already present, or directly run
        ***GV*** application.
        
   <img src="GV_docker_compose.png" width="80%"/>
        
-  iv) Once loading is finished and the following link appears in Terminal 
+  v) Once loading is finished and the following link appears in Terminal 
       `http://0.0.0.0:8180`, copy and paste it in a browser window to use the 
       ***GV*** application.
+      Alternatively, you can use `http://127.0.0.1:8180`.
       
   <img src="GV_container_run.png" width="80%"/>
   
