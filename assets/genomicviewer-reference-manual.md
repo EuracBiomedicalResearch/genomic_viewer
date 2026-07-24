@@ -5,6 +5,7 @@
 </div>
 
 **Version:** 1.1.0
+
 **Description:** Genomic Viewer is a cross-platform application for visualizing
 and analyzing genomic data hosted in a Docker container.
 
