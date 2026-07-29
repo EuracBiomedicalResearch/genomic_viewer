@@ -22,8 +22,8 @@ and analyzing genomic data hosted in a Docker container.
 4.  [Sharing sessions](#sharing-sessions)
 5.  [Tutorial](#tutorial)
 6.  [Limitations](#limitations)
-7.  [Getting Help](#help)
-8.  [References and Links](#references-links)
+7.  [Getting Help](#getting-help)
+8.  [References and Links](#references-and-links)
 
 </details>
 
@@ -141,7 +141,7 @@ below:
 
 1) The `data.dir` field accepts a quoted directory name. The first subdirectory
 must be `data`, but successive subdirectories can be specified
-(e.g. `"data/experiment_1/replicate_1"`) in order to allow separation of 
+(e.g. `"data/experiment_1/replicate_1"`) in order to allow separation of
 visualizations.
 
 
@@ -166,14 +166,14 @@ visualizations.
 
   - a single track name;
 
-  - a list of track names (e.g. `["sample1", "sample2"", ...]`).
+  - a list of track names (e.g. `["sample1", "sample2", ...]`).
 
   - an empty string `""` for no names, but `*.file` must be empty in this
     case, too.
 
 Track names are displayed in the order as they appear in `*.names` next to the
-data tracks specified by `*.file` and thus define pairs of track name 
-(`*.names`)/data file (`*.file`). In short, the _i_-th track specified in 
+data tracks specified by `*.file` and thus define pairs of track name
+(`*.names`)/data file (`*.file`). In short, the _i_-th track specified in
 `*.file` will be named with the _i_-th item listed in `*.names`.
 
 ### Error handling
@@ -212,10 +212,10 @@ If no data of a given type should be loaded, all corresponding fields must be
 defined but left empty.
 
 This is done by setting the two fields `*.file` and `*.names` to the empty
-string, `""`. For consistency, we recommend to set `*.dir` to the empty string, 
-too, even though this is not needed (it just means to search for any files in 
-the directory given by `data.dir`). Leaving out or commenting out sections is 
-not supported and will result in an error during config file parsing.
+string, `""`. For consistency, we recommend to set `*.dir` to the empty string,
+too, even though this is not needed (it just means to search for any files in
+the directory given by `data.dir`). Leaving out or commenting out sections is
+not supported and will result in an error during e parsing.
 
 ### Multiple sessions
 
@@ -326,6 +326,7 @@ in the [*Data* navigation tab](#data-subsetting).
 data to be organized and visualized.
 
 </details>
+</div>
 
 <div>
 <details open>
@@ -346,6 +347,7 @@ Viewer*** reads `.hic` files at different resolutions depending on the size
 of the requested genomic window to plot.
 
 </details>
+</div>
 
 <div>
 <details open>
@@ -410,7 +412,7 @@ requirements. If only plots will be generated, in order to save space and
 increase loading speed, we recommend to keep only the four required columns.
 
 </details>
-
+</div>
 
 <div>
 <details open>
@@ -430,8 +432,6 @@ index*](https://www.htslib.org/doc/samtools-index.html) function.  BAM files
 tend to be large files.
 
 </details>
-</div>
-</div>
 </div>
 
 ------------------------------------------------------------------------
@@ -507,7 +507,7 @@ generating any plot. The reference genome provides the desired coordinates to
 ensure that the values you enter in the GUI match the data. The reference
 genome can be selected from a built-in list available form a dropdown menu at
 the top of the left sidebar. The reference genome and all user-supplied data
-files (via the the [configuration file](#configuration)) have to match. At
+files (via the [configuration file](#configuration)) have to match. At
 ***Genomic Viewer*** startup the human hg19 (GRCh37) version of the reference
 genome is loaded by default.
 
@@ -1156,80 +1156,106 @@ Viewer*** interface:
 <details open>
 <summary>&nbsp;</summary>
 
-Many research projects exploiting NGS data analysis and visualization for 
-hypothesis generation also require a biological validation through complementary 
+Many research projects analyzing and visualizing NGS data for hypothesis
+generation also require a biological validation through complementary
 experimental techniques. This might involve different researches from the same
-research group or even external laboratories. Thus, sharing dynamic working sessions 
-through which collaborators can easily access illustrative views, but also inspect 
-the data themselves, can strongly improve the communication between researchers. 
-Ultimately, this will facilitate the design of validation experiments and data 
-interpretation. 
-***Genomic Viewer*** is designed to support a secure, stable and easy transfer of 
-working session configuration and datasets. To reproduce a ***Genomic Viewer*** 
-session, collaborators need to have access to the 
-[configuration file](#configuration) and the data.
+research group or even external laboratories. Sharing views on data with
+collaborators to inspect and explore loci of interest can strongly improve the
+communication between researchers, spark new ideas and hyptheses in an open
+discussion round.
+
+***Genomic Viewer*** is designed to support a secure, stable and easy transfer of
+working session configuration and datasets. To reproduce a ***Genomic Viewer***
+session, collaborators need to have access to the
+[configuration file](#configuration) and the data it refers to.
 
 ### Sharing session configurations
 
-All of the session-related information, including loaded datasets and display 
-settings such as tracks order and label, are stored in the [configuration file](#configuration).
+All of the session-related information, including loaded datasets and display
+settings such as track order and labels, are stored in the [configuration
+file](#configuration).
 
-Therefore, once the collaborators have access to the underlying data files, 
-sharing a session only requires sharing:
+Therefore, once a collaborator has access to the underlying data files, sharing
+a session only requires distributing
 
-- The session configuration file;
+- the session configuration file;
 
-- Any user-define region table containing custom coordinates corresponding to 
-  regions of interest for the collaborators. This also includes the reference 
-  genome version.
-  
-After receiving these files all the collaborators can run ***Genomic Viewer*** to 
-reproduce the same visualization environment, provided that they have access to 
-the referenced datasets.
+- any user-defined region table containing custom coordinates corresponding to
+  regions of interest for the collaborators. This table is generated on request
+  by ***Genomic Viewer*** and is then saved to a file.
 
-### Sharing genomic data tracks
+With these two files a collaborator then runs ***Genomic Viewer*** and obtains
+the same visualization as the originator. From this point on, further
+explorations of the dataset can be started.
 
-Genomic data tracks may contain unpublished or sensitive information, making it 
-unsafe to upload them to online servers and sharing through URL. If this is the 
-case we recommend sharing through institutional storage systems or trusted 
-file-sharing services such as network drives or other approved repositories. 
-This makes sure that only allowed users can access the data.
-In some cases, like if the shared data are already published and do not contain 
-sensitive data there is the possibility to share them through secure large-file 
-transfer services like [OneDrive](https://www.microsoft.com/it-it/microsoft-365/onedrive/online-cloud-storage?market=it), 
-[GoogleDrive](https://workspace.google.com/intl/it/products/drive/), 
-[WeTransfer](https://wetransfer.com/), [WeSendit](https://www.wesendit.com/) and 
-others.
 
-To reproduce a ***Genomic Viewer*** session, the shared data must be placed in a 
-directory structure that matches the organization specified in the 
-[configuration file](#configuration). The shared data directory can be placed in 
-any location on the recipient's computer, provided that it is accessible to 
-***Genomic Viewer***.
-This allows easy session reproducibility, indeed the paths specified in the 
-configuration file are relative rather than absolute. This improves the portability, 
-by allowing datasets to be stored in different locations on different systems 
-without the need to modify the configuration. Indeed, all paths are 
-resolved relative to the directory containing the configuration file and the 
-***Genomic Viewer*** executable. It also preserves the sender's privacy, 
-avoiding to expose information about the user's directory structure, usernames, 
-or institutional storage organization. 
+### Sharing (genomic) data tracks
 
-When the data are stored in a different directory than the one chosen upon 
-***Genomic Viewer*** installation, alternative options are supported:
+Human genomic data may be used to identify individuals and should be considered
+private data. Before sharing data with others, be aware that all legal matters
+are solved and that you are allowed to share these data with your partners.
 
-- Copy the ***Genomic Viewer*** executable (`GenomicViewer_win.bat` for Windows, 
-`GenomicViewer_linux.sh` for Linux) in the same directory together with the 
-configuration file you wold like to launch, and double click on it to run ***Genomic Viewer***.
+But even if datasets are not protected by law, they are frequently derived from
+experiments that have not yet been published, especially when collaborators
+share data to discuss new hyptheses and/or are in the process of writing up a
+manuscript for publication.
 
-- Run ***Genomic Viewer*** directly form Docker following the 
-[Cross-platform Installer-free](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/main#installation) 
-instructions. From here you can directly specify the directory with the data from 
-any position on your computer and allow ***Genomic Viewer*** to access it.
+Generally, we recommend to generate zip archives or tarballs with the track data
+directly from the folder used by ***Genomic Viewer***, avoiding problems when
+setting up the data directory on the collaborator's side. Zip archives can be
+protected by passwords, tarballs can be encrypted with GnuPG using symmetric
+cyphers. The data transmitter (together with the data maintainer) chooses the
+proper method depending on the desired level of security. The archive is then
+shared with partners using a file sharing service of their choice.
 
-As long as the shared data directory preserves the expected folder structure, 
-it may be stored in any accessible location on the recipient's system.
+To reproduce a ***Genomic Viewer*** session, the shared data must be placed in a
+directory structure that matches the organization specified in the
+[configuration file](#configuration). This has already been guaranteed if the
+files were archived as described above. The shared data directory can be placed
+in any location on the recipient's computer, provided that it is made accessible
+to ***Genomic Viewer***.  This allows easy session reproducibility, especially
+since the paths specified in the configuration file are relative rather than
+absolute and can therefore be put anywhere in the recipient's file system.
 
+More precisely, the startup script runs docker with the ***Genomic Viewer***
+image and supplies a single data path that is then mapped to `/data` inside the
+container (via `docker` command line option `-v`). By convention, the startup
+script assumes that on the host side, this data path is called `data` and is
+located in the same directory as the startup script itself. Therefore, we have
+two perspectives, one from the host and one from ***Genomic Viewer*** when run
+as a docker container (here on Linux):
+
+```
+    Host                                     Genomic Viewer
+    ====                                     ==============
+
+    (any directory on the host)              / (the container's root directory)
+    ├── GenomicViewer_linux.sh               └── data
+    └── data                                     ├── file-01.bed
+        ├── file-01.bed                          ├── file-02.bw
+        ├── file-02.bw                           ├── file-03.bedpe
+        ├── file-03.bedpe                        ├── file-04.tsv
+        ├── file-04.tsv                          ├── file-05.hic
+        ├── file-05.hic                          └── GenomicViewer_config.yml
+        └── GenomicViewer_config.yml
+```
+
+When data are stored in a different directory than the one chosen upon
+***Genomic Viewer*** installation, alternatives are as follows:
+
+- Copy the ***Genomic Viewer*** startup script (`GenomicViewer_win.bat` for
+  Windows, `GenomicViewer_linux.sh` for Linux, `GenomicViewer_mac.sh` for OSX)
+  to an empty directory and create directory `data` in it. Move the data files
+  and `GenomicViewer_config.yml` to `data` and run the startup script. When 
+  using the zip/tarball method from above, check if `data` is already a folder
+  in the archive and if so, unzip such that the directory hierarchy shown above 
+  is met.
+
+- Run ***Genomic Viewer*** directly form Docker following the [Cross-platform
+  Installer-free](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/main#installation)
+  instructions. From here you can directly specify the directory with the data
+  from any position on your computer and allow ***Genomic Viewer*** to access
+  it.
 
 </details>
 </div>
@@ -1329,8 +1355,9 @@ automatically update.
 Again, make sure that the *Plot* navigation tab is selected in the main central
 window. Next, click the *Go* button to render the visualization. Feel free to
 play with the different zoom options (either on the location bar or with the
-zoom buttons). The new visualization range can be saved by pressing the *Add*
-button.
+zoom buttons). The new visualization range can be added to the region of 
+interest list by pressing the *Add* button. See 
+[Load/edit coordinates](#loadedit-coordinates) for details.
 
 <img src="GV_chr5_zoom.png"
      alt="GV zoom of chromosome 5 example genomic tracks"
@@ -1532,22 +1559,46 @@ affected by the SNPs or healthy. Unfortunately we do not have access to these da
 
 ### Sharing the working session with collaborators
 
-***Genomic Viewer*** supports an easy session sharing procedure. This allows to 
-share the observations derived from the data presented in this tutorial (or 
-any working session) with a collaborator that might be interested in experimentally 
-validate the results or support their interpretation.
+***Genomic Viewer*** supports session sharing, which has already been utilized
+when installing the software on your computer.
 
-To do so it is sufficient to share the [configuration file](#configuration) used 
-to launch the working session with the interested user.
-A custom region table that has been saved during the session with the genomic 
-coordinates of interesting genomic locations can also be shared. This will 
-facilitate the evaluation of the observed results from the recipient.
-These two files are the minimal requirements for the recipients to reproduce a 
-working session, provided that they have access to the referenced datasets, 
-preserving the relative folder structure defined in the configuration file, and 
-that their location is accessible to ***Genomic Viewer***. 
-An example of the datasets relative folder organization that matches the 
-configuration file used in this tutorial is the following:
+Let's assume there has been found another region that is of interest. It's 
+located on chromosome 5, between 148Mbp and 150Mbp, there is a small GWAS 
+pileup that does not reach significance but is worth looking at. By the end, 
+we have zoomed in and aligned the view so that it's between 148,85Mbp and 
+149,05Mbp. In the *Load/edit coordinates* box, we add this region to the list
+of interest by pressing the *Add* button and giving it a name such as 
+`ARHGEF37-roi`. We save the new list as a file by
+clicking on the *Export* button, which generates a BED file, downloaded and
+stored by the browser in its download folder as `User_Defined_RegionTable.bed`.
+
+In the simplest case, this file can be passed on to a collaborator, who then 
+loads it with the *Upload* button in the *Load/edit coordinates* box. (For a 
+single entry it would likely be less complicated to pass on the coordinates in 
+an email, but for multiple loci of interest this mechanism is quite useful.)
+
+In a slightly advanced use case, let's assume the file 
+`User_Defined_RegionTable.bed` has been renamed to a more meaningful file name, 
+`guanine-exchange-factor.bed`, which has been placed in the `data` folder used
+by ***Genomic Viewer***. The region of interest entry in the config file 
+`GenomicViewer_config.yml`, `reg.file` is now given by
+
+```
+  reg.file: "guanine-exchange-factor.bed"
+```
+
+and when running ***Genomic Viewer***, we see entry `ARHGEF37-roi` in the
+*Load/edit coordinated* box dropdown menu *Select from menu*. Choosing this 
+updates the coordinates in the *Insert coordinates* box and pressing the *Go*
+button will produce a visualization as it was when the menu entry has been
+saved.
+
+A more detailed explanation on how to share working session configurations and
+data is available in the [Sharing Session](#sharing-sessions) section of this
+manual.
+
+For completeness, the directory hierarchy of `data` for this tutorial looks as
+follows (does not include `guanine-exchange-factor.bed`):
 
 ```
 data
@@ -1574,18 +1625,11 @@ data
 
 ```
 
-A more detailed explanation on how to share working session configurations and 
-data is available in the [Sharing Session](#sharing-sessions) paragraph of this 
-manual.
-
-
-In summary, this tutorial illustrates how to use ***Genomic Viewer*** through a
-complete exploratory workflow —from genome navigation to data export,
-interpretation and sharing— using to integrate genetic and epigenetic datasets 
-to move from raw association signals to biologically informed hypotheses and providing a
-practical starting point for downstream analytical or experimental validation.
-
-
+In summary, in this tutorial we have walked you through a complete exploratory
+workflow —from genome navigation to data export, interpretation and sharing—
+integrating genetic and epigenetic datasets to move from raw association
+signals to biologically informed hypotheses, providing a practical starting
+point for downstream analytical or experimental validation.
 
 </details>
 </div>
