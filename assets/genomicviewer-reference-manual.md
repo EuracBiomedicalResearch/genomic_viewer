@@ -1563,42 +1563,42 @@ affected by the SNPs or healthy. Unfortunately we do not have access to these da
 when installing the software on your computer.
 
 Let's assume there has been found another region that is of interest. It's 
-located on chromosome 5, between 148Mbp and 150Mbp, there is a small GWAS 
+located on chromosome 5, between 37Mbp and 43Mbp, there is a small GWAS 
 pileup that does not reach significance but is worth looking at. By the end, 
-we have zoomed in and aligned the view so that it's between 148,85Mbp and 
-149,05Mbp. In the *Load/edit coordinates* box, we add this region to the list
-of interest by pressing the *Add* button and giving it a name such as 
-`ARHGEF37-roi`. We save the new list as a file by
-clicking on the *Export* button, which generates a BED file, downloaded and
-stored by the browser in its download folder as `User_Defined_RegionTable.bed`.
+we have zoomed in and aligned the view so that it's a 1,5Mbp stretch between 
+38,5Mbp and 40Mbp. In the *Load/edit coordinates* box, we add this region to the
+list of interest by pressing the *Add* button and give it a name such as
+`DAB2-roi`. We save the new list as a file by clicking on the *Export*
+button, which generates a BED file, downloaded and stored by the browser in its
+download folder as `User_Defined_RegionTable.bed`.
 
 In the simplest case, this file can be passed on to a collaborator, who then 
 loads it with the *Upload* button in the *Load/edit coordinates* box. (For a 
-single entry it would likely be less complicated to pass on the coordinates in 
-an email, but for multiple loci of interest this mechanism is quite useful.)
+single entry it would likely be less complicated to pass on the coordinates or
+the gene name *DAB2* in an email, but for multiple, larger loci of interest this
+mechanism is quite useful.)
 
 In a slightly advanced use case, let's assume the file 
 `User_Defined_RegionTable.bed` has been renamed to a more meaningful file name, 
-`guanine-exchange-factor.bed`, which has been placed in the `data` folder used
+`slc34a1-dab2-roi.bed`, which has been placed in the `data` folder used
 by ***Genomic Viewer***. The region of interest entry in the config file 
 `GenomicViewer_config.yml`, `reg.file` is now given by
 
 ```
-  reg.file: "guanine-exchange-factor.bed"
+  reg.file: "slc34a1-dab2-roi.bed"
 ```
 
-and when running ***Genomic Viewer***, we see entry `ARHGEF37-roi` in the
-*Load/edit coordinated* box dropdown menu *Select from menu*. Choosing this 
-updates the coordinates in the *Insert coordinates* box and pressing the *Go*
-button will produce a visualization as it was when the menu entry has been
-saved.
+and when running ***Genomic Viewer***, we see entry `DAB2-roi` as the third
+entry in the *Load/edit coordinated* box dropdown menu *Select from menu*. 
+Choosing this updates the coordinates in the *Insert coordinates* box and
+pressing the *Go* button will produce a visualization as it was when the menu
+entry has been saved.
 
-A more detailed explanation on how to share working session configurations and
-data is available in the [Sharing Session](#sharing-sessions) section of this
-manual.
+A more detailed explanation on how to share session configurations and data is
+available in the [Sharing Session](#sharing-sessions) section of this manual.
 
 For completeness, the directory hierarchy of `data` for this tutorial looks as
-follows (does not include `guanine-exchange-factor.bed`):
+follows (does not include `slc34a1-dab2-roi.bed`):
 
 ```
 data
