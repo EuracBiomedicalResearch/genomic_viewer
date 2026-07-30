@@ -1,5 +1,3 @@
-#Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Desktop/GV_demo/file_format_test_data/GenomicViewer_config.yml")
-Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Desktop/GV_demo/configuration_files/GenomicViewer_config_example.yml")
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
