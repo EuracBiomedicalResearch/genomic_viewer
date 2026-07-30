@@ -41,12 +41,15 @@ RUN R -e "renv::restore()"
 RUN R -e "install.packages('R.utils', repos = c(CRAN = 'https://cloud.r-project.org'))"
 
 # Install from local T2T knowngenes package
-RUN R -e "install.packages('devtools', repos = c(CRAN = 'https://cloud.r-project.org'))"
+# Install remotes only, without upgrading dependencies
+RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org', dependencies = FALSE)"
+
 COPY Docker_files/T2T_txdb/ /shiny-app-GenomicViewer/T2T_txdb/
-RUN R -e "devtools::install('/shiny-app-GenomicViewer/T2T_txdb/TxDb.Hsapiens.UCSC.T2T.knownGene/inst/extdata/')"
+
+RUN R -e "suppressWarnings(remotes::install_local('/shiny-app-GenomicViewer/T2T_txdb/TxDb.Hsapiens.UCSC.T2T.knownGene', upgrade='never'))"
 
 # Copy the Shiny app files
-COPY Docker_files/ /shiny-app-GenomicViewer/
+COPY Docker_files/app/ /shiny-app-GenomicViewer/
 
 # Expose the application port
 EXPOSE 8180
