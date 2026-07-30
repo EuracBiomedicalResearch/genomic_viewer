@@ -133,7 +133,7 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
 1. Extract the downloaded folder with configuration, example data and launcher file.
 2. Enter the extracted `genomicviewer-run-macos` directory.
 3. Open a Terminal from there and type `docker compose up`.
-4. Once loading finished `ctrl+click` on `http:/localhost:8180`.
+4. Once loading finished `ctrl+click` on `http://localhost:8180`.
 
 **Uninstallation:**
 
