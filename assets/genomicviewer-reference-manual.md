@@ -1244,7 +1244,7 @@ When data are stored in a different directory than the one chosen upon
 ***Genomic Viewer*** installation, alternatives are as follows:
 
 - Copy the ***Genomic Viewer*** startup script (`GenomicViewer_win.bat` for
-  Windows, `GenomicViewer_linux.sh` for Linux, `GenomicViewer_mac.sh` for OSX)
+  Windows, `GenomicViewer_linux.sh` for Linux, `docker-compose.yml` for OSX)
   to an empty directory and create directory `data` in it. Move the data files
   and `GenomicViewer_config.yml` to `data` and run the startup script. When 
   using the zip/tarball method from above, check if `data` is already a folder
