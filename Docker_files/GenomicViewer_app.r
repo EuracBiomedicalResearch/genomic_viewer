@@ -1,7 +1,9 @@
+#Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Desktop/GV_demo/file_format_test_data/GenomicViewer_config.yml")
+Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Desktop/GV_demo/configuration_files/GenomicViewer_config_example.yml")
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
-
+options(warn = -1)
 QUIET <- suppressMessages
 
 #' Silently load libraries
@@ -113,6 +115,7 @@ configComplete <- function(config)
 }
 
 # Source script
+source("file_validation_function.r")
 source("plotgardener_function.r")
 source("shiny_read_table_function.R")
 source("basic_statistics_genome_tracks_function.r")
@@ -179,7 +182,7 @@ assertNrNamesEqualsFiles <- function(section, files, names)
          "`: number of files listed and their corresponding names differ")
 }
 
-## Read data from files listed in the config file.
+## Read data from files listed in the config file and check format.
 # Set a BigWig file
 bw.file <- listDataDir(config$data.dir, config$bw.dir, config$bw.file)
 assertNrNamesEqualsFiles("BigWig", bw.file, config$bw.names)
@@ -200,6 +203,22 @@ cat.file <- listDataDir(config$data.dir, config$cat.dir, config$cat.file)
 assertNrNamesEqualsFiles("Cat.BED", cat.file, config$cat.names)
 # Region Table file
 saved.coord.path <- listDataDir(config$data.dir, config$reg.dir, config$reg.file)
+
+## Validate file format
+files <- list(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file, saved.coord.path)
+validators <- list(validateBigWig, validateBedpe, validateBedOrBam, validateHic, validateGWAS, validateCategoricalBed, validateRegionFile)
+
+all.errors <- character()
+for(i in seq_along(files)){
+  all.errors <- c(all.errors, checkFiles(files[[i]], validators[[i]]))
+}
+
+if (length(all.errors) > 0) {
+  cat("\n========== FILE FORMAT ERROR ==========\n")
+  stop(paste(c("One or more input files are invalid:", all.errors), collapse = "\n"),
+    call. = FALSE
+  )
+}
 
 ## Now, after all the dealing with the config file, load the libraries.
 loadLibraries()
@@ -222,7 +241,7 @@ if( in.container() ) {
 }
 
 # Define UI -----------------------------------------------------
-ui <- page_sidebar(
+ui <- suppressWarnings(page_sidebar(
   sidebar = sidebar(
     # graphics tags
     style = "background-color:#f2f0eb; height: 100%;",
@@ -453,7 +472,7 @@ ui <- page_sidebar(
               )
               )
 
-)
+))
 
 # Define SERVER logic ---------------------------------------------------
 
@@ -470,8 +489,7 @@ server <- function(input, output, session){
               HTML(config$notes)
             ),
             easyClose = FALSE,
-            footer = actionButton("notes_ok", "OK"),
-            sie = "l")
+            footer = actionButton("notes_ok", "OK"))
             )
         }
   })
@@ -528,8 +546,19 @@ server <- function(input, output, session){
 
   ##---------------------- Establish reactive events
   reactiveChr <- eventReactive(input$go, {
-    return(input$chr)
+    if (is.null(input$chr) | input$chr == "") {
+      showModal(
+        modalDialog(
+          title = "Missing chromosome",
+          "Please, select a valid chromosome first.",
+          easyClose = TRUE,
+          footer = modalButton("OK")
+        )
+      )
+      return(NULL)
+    } else {return(input$chr)}
   })
+  
   ## Chr start
   reactiveChrstart <- eventReactive(input$go, {
     if (is.na(input$chrstart) | input$chrstart <= 0) { return(1) }
@@ -547,8 +576,11 @@ server <- function(input, output, session){
       return(input$chrend)
     }
   })
-  ## Update Chr start end when unwanted values are entered
+  ## Update Chr, start, end when unwanted values are entered
   observeEvent(input$go, {
+    # handle chr
+    chr <- reactiveChr()
+    req(chr)
     # handle start
     if (is.na(input$chrstart) | input$chrstart <= 0){
       updateNumericInput(session = getDefaultReactiveDomain(), "chrstart", value = 1)
@@ -567,7 +599,10 @@ server <- function(input, output, session){
 
   ########################## CARD PLOT
   ##---------------------- Output selected coordinates text:
-  output$sel.coord <- renderText({paste("chr", reactiveChr(), ": ", reactiveChrstart(), "-", reactiveChrend(), sep="")})
+  output$sel.coord <- renderText({
+    req(reactiveChr())
+    paste("chr", reactiveChr(), ": ", reactiveChrstart(), "-", reactiveChrend(), sep="")
+    })
   ##---------------------- Show/hide current reference genome as warning for the user:
   plot.ready <- reactiveVal(FALSE)
   show.ref.message <- reactiveVal(TRUE)
@@ -589,10 +624,12 @@ server <- function(input, output, session){
 
   ##---------------------- Output genomic view plot:
   tracks <- reactive({
-    req(plot.ready())
+    req(plot.ready(), reactiveChr())
     genes.hgnc <- genes.hgnc()
     req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 <= 2 |
          sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 >= 2 & (reactiveChrend() - reactiveChrstart()) <= 5e+05)
+    result <- tryCatch({
+        suppressWarnings(
     plotgardener.shiny.function(bw.file = bw.file,
                                 hic.file = hic.file,
                                 bed.file = bed.file,
@@ -616,7 +653,15 @@ server <- function(input, output, session){
                                 genome = gsub( " .*", "", input$ref.genome),
                                 cytoband = Cytoband(),
                                 ideogram = reactiveIdeogram())
+        )},
+    error = function(e) {
+      validate(
+        need(FALSE, "There are no data in this range. Try with different coordinates.")
+      )
+    })
+    result
   })
+    
 
   output$res <- renderSvgPanZoom({
     QUIET(
@@ -626,7 +671,7 @@ server <- function(input, output, session){
   })
 
   image <- reactive({
-    req(plot.ready())
+    req(plot.ready(), reactiveChr())
     genes.hgnc <- genes.hgnc()
     cond <- req(sum((file.size(c(bw.file, bedpe.file, bed.file, hic.file, gwas.file, cat.file))))/2^30 > 2 & (reactiveChrend() - reactiveChrstart()) > 5e+05)
     if (!cond) return(NULL)
@@ -790,7 +835,7 @@ server <- function(input, output, session){
   ######################################################## DATA TAB
 
   datasetTables <- reactive({
-
+                req(reactiveChr())
                 data.table <- shiny_read_table_function(bed.file = bed.file,
                                          bedpe.file = bedpe.file,
                                          cat.file = cat.file,
@@ -810,14 +855,13 @@ server <- function(input, output, session){
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('bed', i)]] <- renderTable({
-        tryCatch(head(datasetTables()[[1]][[i]], n = 15),error = function(e) {print("Press GO to visualize data")})
+        tryCatch(head(datasetTables()[[1]][[i]], n = 15),error = function(e) {data.frame(data = "Press GO to visualize data")})
       }, caption = config$bed.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
-
   })
 
-  # Rendering UI and outputtign tables dependent on user input.
+  # Rendering UI and outputting tables dependent on user input.
   output$view_bed <- renderUI({
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
@@ -828,6 +872,7 @@ server <- function(input, output, session){
 
   # Download peaks
   observeEvent(length(bed.file),{
+    req(reactiveChr())
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadBed", i)]] <- downloadHandler(
@@ -853,7 +898,7 @@ server <- function(input, output, session){
     x <- c(1:length(bedpe.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('bedpe', i)]] <- renderTable({
-        tryCatch(head(datasetTables()[[2]][[i]], n = 15),error = function(e) {print("Press GO to visualize data")})
+        tryCatch(head(datasetTables()[[2]][[i]], n = 15),error = function(e) {data.frame(data = "Press GO to visualize data")})
       }, caption = config$bedpe.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -870,6 +915,7 @@ server <- function(input, output, session){
 
   # Download arches
   observeEvent(length(bedpe.file),{
+    req(reactiveChr())
     x <- c(1:length(bedpe.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadBedpe", i)]] <- downloadHandler(
@@ -895,7 +941,7 @@ server <- function(input, output, session){
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('cat', i)]] <- renderTable({
-        tryCatch(head(datasetTables()[[3]][[i]], n = 15),error = function(e) {print("Press GO to visualize data")})
+        tryCatch(head(datasetTables()[[3]][[i]], n = 15),error = function(e) {data.frame(data = "Press GO to visualize data")})
       }, caption = config$cat.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -912,6 +958,7 @@ server <- function(input, output, session){
 
   # Download categorical peaks
   observeEvent(length(cat.file),{
+    req(reactiveChr())
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadCat", i)]] <- downloadHandler(
@@ -937,7 +984,7 @@ server <- function(input, output, session){
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0('gwas', i)]] <- renderTable({
-        tryCatch(head(datasetTables()[[4]][[i]], n = 15), error = function(e) {print("Press GO to visualize data")})
+        tryCatch(head(datasetTables()[[4]][[i]], n = 15), error = function(e) {data.frame(data = "Press GO to visualize data")})
       }, caption = config$gwas.names[i],
       caption.placement = getOption("xtable.caption.placement", "top"))
     })
@@ -954,6 +1001,7 @@ server <- function(input, output, session){
 
   # Download GWAS
   observeEvent(length(gwas.file),{
+    req(reactiveChr())
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadgwas", i)]] <- downloadHandler(
@@ -1032,14 +1080,14 @@ server <- function(input, output, session){
     output$upset <- renderPlot({
       if(!is.null(vals2$bed.file) & !is.null(vals2$bedpe.file) & length(vals2$bed.file) > 0 & length(vals2$bedpe.file) > 0 |
          !is.null(vals2$bed.file) & length(vals2$bed.file) > 1 | !is.null(vals2$bedpe.file) & length(vals2$bedpe.file) > 1){
-        peaks_intersection_venn_function(bed.file = vals2$bed.file,
+        QUIET(peaks_intersection_venn_function(bed.file = vals2$bed.file,
                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
                                        bedpe.file = vals2$bedpe.file,
                                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)],
                                        chr = vals2$chr,
                                        Start = vals2$start,
                                        End = vals2$end,
-                                      genome = gsub( " .*", "", input$ref.genome))
+                                      genome = gsub( " .*", "", input$ref.genome)))
       }
     }, res = 100)
 
@@ -1057,9 +1105,9 @@ server <- function(input, output, session){
 
     output$annotation <- renderPlot({
       if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
-        peaks.annotation.function(bed.file = vals3$bed.file,
+        QUIET(peaks.annotation.function(bed.file = vals3$bed.file,
                                   bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
-                                  genome = gsub( " .*", "", input$ref.genome))
+                                  genome = gsub( " .*", "", input$ref.genome)))
       }
     }, res = 100,
        height = function(){150*length(bed.file)})
@@ -1096,14 +1144,14 @@ server <- function(input, output, session){
       if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
         outfile2 <- tempfile(fileext='.png')
         png(outfile2, width = 900, height = 1200, res = 120)
-        circos.function(bedpe.file = vals6$bedpe.file,
+        QUIET(circos.function(bedpe.file = vals6$bedpe.file,
                         chromosome = vals6$chr,
                         genome = gsub( " .*", "", input$ref.genome),
                         zoom_start = vals6$start,
                         zoom_end = vals6$end,
                         genes.label = genes.hgnc,
                         bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)],
-                        cytoband.ext = Cytoband())
+                        cytoband.ext = Cytoband()))
         dev.off()
         list(src = outfile2,
              alt = "circos image")
@@ -1133,11 +1181,11 @@ server <- function(input, output, session){
     })
     output$categories.pie <- renderPlot({
       if(!is.null(vals4$cat.file) & length(vals4$cat.file) > 0){
-        categorical.pie.function(cat.file = vals4$cat.file,
+        QUIET(categorical.pie.function(cat.file = vals4$cat.file,
                                  cat.names = config$cat.names[which(file.size(cat.file) < 400e+06)],
                                  chr = vals4$chr,
                                  Start = vals4$start,
-                                 End = vals4$end)
+                                 End = vals4$end))
       }
     })
 
@@ -1157,14 +1205,14 @@ server <- function(input, output, session){
     })
     output$manhattan <- renderPlot({
       if(!is.null(vals5$gwas.file) & length(vals5$gwas.file) > 0){
-        manhattan.plot.function(gwas.file = vals5$gwas.file,
+        QUIET(manhattan.plot.function(gwas.file = vals5$gwas.file,
                               Chr = vals5$chr,
                               start = vals5$start,
                               end = vals5$end,
                               sign.p = 10e-8,
                               chr.len.df = chrom.cen.df(),
                               gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)],
-                              genome = gsub( " .*", "", input$ref.genome))
+                              genome = gsub( " .*", "", input$ref.genome)))
         }
       }, res = 100)
 
@@ -1657,10 +1705,11 @@ server <- function(input, output, session){
     # Actual download handler
     output$plot.save <- downloadHandler(
       filename = function() {
+        req(reactiveChr())
         paste("chr", reactiveChr(), "_",reactiveChrstart(), "-", reactiveChrend(), ".", chosen.format(), sep="")
       },
       content = function(file) {
-        req(chosen.format())
+        req(chosen.format(), reactiveChr())
         genes.hgnc <- genes.hgnc()
         fmt <- chosen.format()
         # Tell user the plot is saving
