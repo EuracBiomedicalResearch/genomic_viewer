@@ -59,8 +59,8 @@ Software and Hardware
 -   macOS with Intel x64 or Apple M1 ARM64 and higher
 -   Linux (Debian-based or Red Hat-based)
 
-All the platforms with relative OS and software versions that we tested are 
-reported [here](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-tested-platforms.md).
+A list of tested platforms is given 
+[here](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-tested-platforms.md).
 
 #### <span>**Hardware Recommendations**</span>
 
@@ -154,41 +154,61 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
     [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases).<br> **Note:**
     Linux installer provides both *.deb* package for Debian-based
     distributions and *.rpm* package for Red Hat-based distributions. A
-    self-contained app is also available for non-root users.
+    self-contained app image is also available for non-root users.
 
 **Installation:** <br>
+
 ***To install Genomic Viewer as root user:***
 
 1. Extract the `linux-64` installer file.
-2. Install the Genomic Viewer guided setup package by double-clicking on either
-   `genomicviewer-gui-installer-1.0.0_amd64.deb` or
-   `genomicviewer-gui-installer-1.0.0-1.x86_64.rpm` file, depending on your
-   linux distribution.
+
+2. Install the GUI installer for ***Genomic Viewer***:
+
+   - `genomicviewer-gui-installer-1.0.0_amd64.deb` (Debian-based systems) 
+
+   - `genomicviewer-gui-installer-1.0.0-1.x86_64.rpm` (Red Hat-based systems)
+   
 3. Launch the application setup by executing
    `genomicviewer-gui-installer` command in a terminal.
 
 ***To install Genomic Viewer as non-root user:***
 
-1. Start installation from the self-contained app image
+1. Be sure the app image has execution permission: 
+
+   - `chmod 755 genomicviewer-gui-installer-x86_64.AppImage`
+   
+   Start the installer from the self-contained app image
    `genomicviewer-gui-installer-x86_64.AppImage` by running
-   `./genomicviewer-gui-installer-x86_64.AppImage` or
-   `./genomicviewer-gui-installer-x86_64.AppImage --no-sandbox` based on your
-   Linux setup.
+   
+   - `./genomicviewer-gui-installer-x86_64.AppImage` or
+   
+   - `./genomicviewer-gui-installer-x86_64.AppImage --no-sandbox` 
+   
+   based on your Linux setup. Keep this file in case you want to uninstall the
+   application at some pointer later.
+   
 2. Follow the installer wizard instructions.
 
 **Uninstallation:**<br>
-***For Genomic Viewer installed as root user:***
-1. Launch `genomicviewer-gui-installer-1.0.0_amd64` or
-   `genomicviewer-gui-installer-1.0.0-1.x86_64` command in a terminal.
-2. Follow the *"Remove App Data"* instructions.
-3. Remove the application package by running 
-  `sudo apt remove genomicviewer-gui-installer` or 
-  `sudo dnf remove genomicviewer-gui-installer`.
 
+***For Genomic Viewer installed as root user:***
+
+1. Run `genomicviewer-gui-installer` command in a terminal.
+
+2. Follow the *"Remove App Data"* instructions.
+
+3. Remove the application package by running 
+
+  - `sudo apt remove genomicviewer-gui-installer` (Debian) 
+  
+  - `sudo dnf remove genomicviewer-gui-installer` (Red Hat)
 
 ***For Genomic Viewer installed as non-root user:***
+
 1. Run the self-contained app image `genomicviewer-gui-installer-x86_64.AppImage`.
+
 2. Follow the *"Remove App Data"* instructions.
+
 3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
 
@@ -201,10 +221,13 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
 [Github](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron/assets).
 
 **Setting up installer-free parameters:**
+
 1. Open Docker Desktop. Go to `Docker Hub` and search for 
 `sarlago/shiny-docker-genomicviewer2`. 
+
 2. Click on the corresponding image and then `Pull`. Once pulled, the image will
   appear under `Images`.
+
 3. Click the *Run* button ▶️ and under `Optional settings` enter the following
    parameters:
    - `Container name`, optional e.g. `GenomicViewer`;
@@ -217,8 +240,16 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
    
    <img src="assets/GV_docker_run.png" width="60%"/>
    
-4. Once the app is ready, click the link displayed in the Log  
-   `Listening on http://0.0.0.0:8180⁠`to open the app in your browser.
+4. Once the app is ready, click the link displayed in the Log 
+   `Listening on http://0.0.0.0:8180` to open the app in your browser.
+   This URL can be pasted to the web browser, too. All these URLs should work:
+   
+   - `http://0.0.0.0:8180`
+   
+   - `http://127.0.0.1:8180`
+   
+   - `http://localhost:8180`
+
 5. After the first setup you can directly start the app from docker `Containers`,
    entering the container and clicking *Run* ▶️.
 
