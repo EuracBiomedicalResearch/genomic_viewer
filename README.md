@@ -218,7 +218,7 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
 
 - Install Docker Desktop as described in the appropriate section above.
 - Download the `example_data` and `GenomicViewer_config.yml` file from 
-[Github](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/docker-genomicviewer/GV_installer_electron/assets).
+[Github](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/GV_installer_electron/assets).
 
 **Setting up installer-free parameters:**
 
@@ -289,7 +289,7 @@ entries.
 
 See [File Formats](assets/genomicviewer-reference-manual.md#file-formats) for
 information on the supported data formats in the [Configuration
-section](#configuration). Additional configuration options like track plots
+section](assets/genomicviewer-reference-manual.md#configuration). Additional configuration options like track plots
 alternatives, transcript or gene label annotation and chromosome display are
 available from the graphical interface and are thoroughly described in the
 [Features and Usage
@@ -348,7 +348,7 @@ section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 Further description of each panel is available at the <em>Central Panels</em>
 in the [Features and Usage
-section](./genomicviewer-reference-manual.md#features-and-usage) paragraph.
+section](assets/genomicviewer-reference-manual.md#features-and-usage) paragraph.
 
 <h4> <strong>6. Export results and coordinates</strong> </h4>
 
@@ -387,6 +387,7 @@ User Interface Overview
 </summary>
 
 <div>
+
 Brief description of the ***Genomic Viewer*** graphical interface structure.
 
 <h4><strong>Main Window</strong></h4>
