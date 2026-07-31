@@ -60,7 +60,7 @@ Software and Hardware
 -   Linux (Debian-based or Red Hat-based)
 
 A list of tested platforms is given 
-[here](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-tested-platforms.md).
+[here](assets/genomicviewer-tested-platforms.md).
 
 #### <span>**Hardware Recommendations**</span>
 
@@ -88,7 +88,7 @@ Viewer*** and step-by-step instructions on how to get the
 application running.
 
 For a more detailed description of the recommended ***Genomic Viewer*** 
-installation steps refer to [this guide](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/assets/genomicviewer-installation-details.md).
+installation steps refer to [this guide](assets/genomicviewer-installation-details.md).
 
 <br/><br/>
 
@@ -218,7 +218,7 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
 
 - Install Docker Desktop as described in the appropriate section above.
 - Download the `example_data` and `GenomicViewer_config.yml` file from 
-[Github](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/main/GV_installer_electron/assets).
+[Github](GV_installer_electron/assets).
 
 **Setting up installer-free parameters:**
 
