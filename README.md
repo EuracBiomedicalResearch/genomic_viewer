@@ -107,12 +107,12 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
 **Installation:**
 
 1. Extract the `windows-x64.zip` installer file.
-2. Start setup by double-click on `genomicviewer-gui-installer-1.0.0 Setup` file.
+2. Start setup by double-click on `genomicviewer-gui-installer-1.1.0 Setup` file.
 3. Follow the installer wizard instructions.
 
 **Uninstallation:**
 
-1. Start `genomicviewer-gui-installer-1.0.0 Setup` file.
+1. Start `genomicviewer-gui-installer-1.1.0 Setup` file.
 2. Follow the *"Remove App Data"* instructions to remove app-associated data. 
   (*Note: user's own data saved in the data folder are preserved*).
 3. Uninstall application from `Windows Start Menu > Settings > Apps > Uninstall`.
@@ -164,9 +164,9 @@ installation steps refer to [this guide](https://github.com/EuracBiomedicalResea
 
 2. Install the GUI installer for ***Genomic Viewer***:
 
-   - `genomicviewer-gui-installer-1.0.0_amd64.deb` (Debian-based systems) 
+   - `genomicviewer-gui-installer-1.1.0_amd64.deb` (Debian-based systems) 
 
-   - `genomicviewer-gui-installer-1.0.0-1.x86_64.rpm` (Red Hat-based systems)
+   - `genomicviewer-gui-installer-1.1.0-1.x86_64.rpm` (Red Hat-based systems)
    
 3. Launch the application setup by executing
    `genomicviewer-gui-installer` command in a terminal.
