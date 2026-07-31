@@ -1270,7 +1270,7 @@ When data are stored in a different directory than the one chosen upon
   is met.
 
 - Run ***Genomic Viewer*** directly form Docker following the [Cross-platform
-  Installer-free](../README.md#installation)
+  Installer-free](../README.md#cross-platform-installer-free)
   instructions. From here you can directly specify the directory with the data
   from any position on your computer and allow ***Genomic Viewer*** to access
   it.
