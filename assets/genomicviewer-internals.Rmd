@@ -1,10 +1,10 @@
 ---
 title: "GV_files_organization"
 author: "Sara Lago"
-date: "2026-02-25"
+date: "2026-07-31"
 output:
-  word_document: default
   html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -54,6 +54,7 @@ The directory content is organized as follows:
                                                basic statistics plots displayed 
                                                in the *Stats* navigation tab.
 
+- *file_validation_function.r* Input file sanitization.
 
 #### Configuration file:
 
@@ -204,6 +205,7 @@ default:
 ```
 
 What you have to modify in the configuration file are your local paths to:
+
 - `data.dir`
 
 - `chrom.cen.dir`
@@ -258,7 +260,7 @@ container.
 - *Docker_files directory*: contains all the files rquired for the app to work 
                             as listed for [Dev version](#file-description-local).
                             
-Note: In this version there is an addition configuration file for the genome 
+Note: In this version there is an additional configuration file for the genome 
 annotation files which should not be modified by users for safety. 
 This is `GenomicViewer_config_gen.yml` file. The keys that are specified in this 
 file are absent in the Docker version of the `GenomicViewer_config.yml` file.
@@ -330,7 +332,7 @@ After setting the correct folders/files tree, to create the Docker container you
 ## Dev vs Docker app.R {#dev-vs-docker}
 
 The `GenomicViewer_app.r` contains Shiny logic to make the application work. The
-Dev and Docker versions have few but key differences since the run through 
+Dev and Docker versions have few but key differences since they run through 
 different execution environments. In addition there are some differences motivated
 by practical reasons.
 
