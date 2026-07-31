@@ -100,6 +100,14 @@ default:
   # interest.
   reg.dir: ""
   reg.file: "Example_region_table.bed"
+  
+    # Comments to share with collaborators reproducing this working session
+  notes: "This is the <b>demo dataset</b> provided with Genomic Viewer, it is limited to 
+          data on: \n\n
+          - <b>chromosome 5</b>; \n
+          - of the <b>human reference genome hg38</b>. \n\n
+          Have fun using our app! :)"
+  
 ```
 
 ### Configuration file format and structure
@@ -129,6 +137,9 @@ Each group follows the same pattern:
 
 **Notes:** The `*.names` field is present for all file groups except for `reg.dir`
 and `reg.file`.
+
+Short notes or messages defined by the user can be shown at startup through the 
+`notes` key.
 
 A single occurrence of each key must always be present for each file group.
 Duplicated keys are not allowed and will throw an error during parsing.
@@ -175,6 +186,13 @@ Track names are displayed in the order as they appear in `*.names` next to the
 data tracks specified by `*.file` and thus define pairs of track name
 (`*.names`)/data file (`*.file`). In short, the _i_-th track specified in
 `*.file` will be named with the _i_-th item listed in `*.names`.
+
+5) The `notes` field accepts:
+
+  - plain text only;
+  
+  - HTML markup.
+  
 
 ### Error handling
 
