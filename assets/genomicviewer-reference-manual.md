@@ -39,7 +39,7 @@ be visualized. This is the only required input for starting a session.
 It defines which data are loaded and how they are visualized.
 
 During [***Genomic Viewer***
-installation](https://github.com/EuracBiomedicalResearch/genomic_viewer/blob/docker-genomicviewer/README.md#installation)
+installation](../README.md#installation)
 a pre-filled example *configuration file*, named `GenomicViewer_config.yml`, is
 saved automatically in a local folder of your choice, together with demo data.
 
@@ -1270,7 +1270,7 @@ When data are stored in a different directory than the one chosen upon
   is met.
 
 - Run ***Genomic Viewer*** directly form Docker following the [Cross-platform
-  Installer-free](https://github.com/EuracBiomedicalResearch/genomic_viewer/tree/main#installation)
+  Installer-free](../README.md#installation)
   instructions. From here you can directly specify the directory with the data
   from any position on your computer and allow ***Genomic Viewer*** to access
   it.
@@ -1303,13 +1303,13 @@ In this tutorial you will learn how to:
 The first step to run a ***Genomic Viewer*** session is to set up the
 [*configuration file*](#configuration). This is used to specify which files to
 upload. The data used in this tutorial are made available during [***Genomic
-Viewer*** installation](#installation) together with a ready-to-use
+Viewer*** installation](../README.md#cross-platform-installer-free) together with a ready-to-use
 configuration file. In this example we are analyzing publicly available data
 from the *Human Kidney cortex* and *Chronic Kidney Disease (CKD)* publications.
 
 *Note:* The dataset is limited to
 chromosome 5 to keep the installation lean. The whole datasets are specified in
-[References and Links](#references-links) and can be downloaded from there,
+[References and Links](#references-and-links) and can be downloaded from there,
 placed in the `./data` folder and visualized after updating the configuration
 file with the correct file paths and labels.
 
