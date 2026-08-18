@@ -345,31 +345,28 @@ validateBedpe <- function(path) {
 
   # Check coordinates are numeric
   numericCols <- c(2, 3, 5, 6)
+  nrNumeric <- length(numericCols)
   for (i in numericCols) {
     values <- suppressWarnings(as.numeric(bedpe[[i]]))
     if (any(is.na(values))) {
       errors <- c(errors,
                   paste("Column", i, "must be numeric."))
+      nrNumeric <- nrNumeric - 1
     }
   }
 
-  # Check coordinates
-  if (ncol(bedpe) >= 6) {
+  # Check coordinates. For this, we require all numeric columns be numeric.
+  if (ncol(bedpe) >= 6 && nrNumeric==length(numericCols)) {
     ## XXX all()??
-    if (is.numeric(bedpe[[2]]) & is.numeric(bedpe[[3]]) &
-        any(bedpe[[2]] > bedpe[[3]])) {
+    if (any(bedpe[[2]] > bedpe[[3]]))
       errors <- c(errors, E_BEDPE_1_START_END)
-    }
 
-    if (is.numeric(bedpe[[5]]) & is.numeric(bedpe[[6]]) &
-        any(bedpe[[5]] > bedpe[[6]])) {
+    if (any(bedpe[[5]] > bedpe[[6]]))
       errors <- c(errors, E_BEDPE_2_START_END)
-    }
 
-    if (is.numeric(bedpe[[2]]) & is.numeric(bedpe[[5]]) &
-        any(bedpe[[2]] > bedpe[[5]])) {
+    if (any(bedpe[[2]] > bedpe[[5]] | bedpe[[3]] > bedpe[[5]] |
+            bedpe[[2]] > bedpe[[6]] | bedpe[[3]] > bedpe[[6]]))
       errors <- c(errors, E_BEDPE_ORDER)
-    }
   }
   validationResult(errors)
 }

@@ -15,12 +15,12 @@ library(strawr)
 
 # Only requires `testthat` library! Just run:
 #
-# GV_TESTFILES=/path/to/tests Rscript tests/testthat/test-file_validation_function.R
+# GV_TESTFILES=/path/to/tests Rscript utest/test-file_validation_function.R
 #
 # from the Docker_file directory or, if in Rstudio, given the working directory
 # is also Docker_file and that `GV_TESTFILES` is set appropriately.
 #
-# test_file("tests/testthat/test-file_validation_function.R")
+# test_file("utest/test-file_validation_function.R")
 
 source(file.path(BASEDIR, "file_validation_function.r"))
 
@@ -116,10 +116,9 @@ test_that("BEDPE", {
   res <- validateBedpe(file.path(dirnm, "bedpe_invalid7.bedpe"))
   expect_false(res$valid)
   expect_match(res$errors, E_BEDPE_2_START_END)
-  ## XXX returns valid
   res <- validateBedpe(file.path(dirnm, "bedpe_invalid8.bedpe"))
-  #expect_false(res$valid)
-  #expect_match(res$errors, "BEDPE second interval has start greater than end.")
+  expect_false(res$valid)
+  expect_match(res$errors, E_BEDPE_ORDER)
 })
 
 test_that("HiC", {
