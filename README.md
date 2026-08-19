@@ -117,9 +117,9 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
   (*Note: user's own data saved in the data folder are preserved*).
 3. Uninstall application from `Windows Start Menu > Settings > Installed apps`, 
   search for `genomicviewer-gui-installer` then click `⋮ > Uninstall`.
-<br/><br/>
 4. Remove Docker image from `Docker Desktop > Images` the click the trash icon. 
 
+<br/><br/>
 
 #### <span style = "font-size: 1.2em;">**macOS**</span>
 
@@ -219,6 +219,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 4. Remove Docker image from `Docker Desktop > Images` the click the trash icon. 
 
+<br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Cross-platform Installer-free**</span>
 
