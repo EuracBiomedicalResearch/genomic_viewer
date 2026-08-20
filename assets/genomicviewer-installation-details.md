@@ -241,7 +241,7 @@ not use black background in the images, this impedes reading text.
   v) Once loading is finished and the following link appears in Terminal
       `http://0.0.0.0:8180`, copy and paste it in a browser window to use the
       ***Genomic Viewer*** application.
-      Alternatively, you can use `http://127.0.0.1:8180` or
+      If it does not work on your platform, you can use `http://127.0.0.1:8180` or
       `http://localhost:8180`
 
   <img src="GV_container_run.png" width="80%"/>
