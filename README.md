@@ -59,7 +59,7 @@ Software and Hardware
 -   macOS with Intel x64 or Apple M1 ARM64 and higher
 -   Linux (Debian-based or Red Hat-based)
 
-A list of tested platforms is given 
+A list of tested platforms is given
 [here](assets/genomicviewer-tested-platforms.md).
 
 #### <span>**Hardware Recommendations**</span>
@@ -87,7 +87,7 @@ Recommended actions for the user <em>before</em> installing ***Genomic
 Viewer*** and step-by-step instructions on how to get the
 application running.
 
-For a more detailed description of the recommended ***Genomic Viewer*** 
+For a more detailed description of the recommended ***Genomic Viewer***
 installation steps refer to [this guide](assets/genomicviewer-installation-details.md).
 
 <br/><br/>
@@ -107,17 +107,17 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 **Installation:**
 
 1. Extract the `windows-x64.zip` installer file.
-2. Start setup by double-click on `genomicviewer-gui-installer-1.1.0 Setup` file.
+2. Start setup by double-clicking on `genomicviewer-gui-installer-1.1.0 Setup` file.
 3. Follow the installer wizard instructions.
 
 **Uninstallation:**
 
 1. Start `genomicviewer-gui-installer-1.1.0 Setup` file.
-2. Follow the *"Remove App Data"* instructions to remove app-associated data. 
+2. Follow the *"Remove App Data"* instructions to remove app-associated data.
   (*Note: user's own data saved in the data folder are preserved*).
-3. Uninstall application from `Windows Start Menu > Settings > Installed apps`, 
+3. Uninstall application from `Windows Start Menu > Settings > Installed apps`,
   search for `genomicviewer-gui-installer` then click `⋮ > Uninstall`.
-4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
+4. Remove Docker image from `Docker Desktop > Images` by clicking the trash icon.
 
 <br/><br/>
 
@@ -168,29 +168,29 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 2. Install the GUI installer for ***Genomic Viewer***:
 
-   - `genomicviewer-gui-installer-1.1.0_amd64.deb` (Debian-based systems) 
+   - `genomicviewer-gui-installer-1.1.0_amd64.deb` (Debian-based systems)
 
    - `genomicviewer-gui-installer-1.1.0-1.x86_64.rpm` (Red Hat-based systems)
-   
+
 3. Launch the application setup by executing
    `genomicviewer-gui-installer` command in a terminal.
 
 ***To install Genomic Viewer as non-root user:***
 
-1. Be sure the app image has execution permission: 
+1. Be sure the app image has execution permission:
 
    - `chmod 755 genomicviewer-gui-installer-x86_64.AppImage`
-   
+
    Start the installer from the self-contained app image
    `genomicviewer-gui-installer-x86_64.AppImage` by running
-   
+
    - `./genomicviewer-gui-installer-x86_64.AppImage` or
-   
-   - `./genomicviewer-gui-installer-x86_64.AppImage --no-sandbox` 
-   
+
+   - `./genomicviewer-gui-installer-x86_64.AppImage --no-sandbox`
+
    based on your Linux setup. Keep this file in case you want to uninstall the
    application at some pointer later.
-   
+
 2. Follow the installer wizard instructions.
 
 **Uninstallation:**<br>
@@ -201,13 +201,13 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 2. Follow the *"Remove App Data"* instructions.
 
-3. Remove the application package by running 
+3. Remove the application package by running
 
-  - `sudo apt remove genomicviewer-gui-installer` (Debian) 
-  
+  - `sudo apt remove genomicviewer-gui-installer` (Debian)
+
   - `sudo dnf remove genomicviewer-gui-installer` (Red Hat)
-  
-4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
+
+4. Remove Docker image from `Docker Desktop > Images` by clicking the trash icon.
 
 ***For Genomic Viewer installed as non-root user:***
 
@@ -217,7 +217,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
-4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
+4. Remove Docker image from `Docker Desktop > Images` by clicking the trash icon.
 
 <br/><br/>
 
@@ -226,13 +226,13 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 **Prerequisites:**
 
 - Install Docker Desktop as described in the appropriate section above.
-- Download the `example_data` and `GenomicViewer_config.yml` file from 
+- Download the `example_data` and `GenomicViewer_config.yml` file from
 [Github](GV_installer_electron/assets).
 
 **Setting up installer-free parameters:**
 
-1. Open Docker Desktop. Go to `Docker Hub` and search for 
-`sarlago/shiny-docker-genomicviewer2`. 
+1. Open Docker Desktop. Go to `Docker Hub` and search for
+`sarlago/shiny-docker-genomicviewer2`.
 
 2. Click on the corresponding image and then `Pull`. Once pulled, the image will
   appear under `Images`.
@@ -240,34 +240,34 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 3. Click the *Run* button ▶️ and under `Optional settings` enter the following
    parameters:
    - `Container name`, optional e.g. `GenomicViewer`;
-   - `Ports` > `Host port`, leave the first field emty, type `8180` in the 
+   - `Ports` > `Host port`, leave the first field emty, type `8180` in the
       second field;
-   - `Volumes` > `Host path`, click the three dots and select the local folder 
+   - `Volumes` > `Host path`, click the three dots and select the local folder
       with your data and configuration file;
    - `Volumes` > `Container path`, type in `/data`;
    - click `Run`.
-   
+
    <img src="assets/GV_docker_run.png" width="60%"/>
-   
-4. Once the app is ready, click the link displayed in the Log 
+
+4. Once the app is ready, click the link displayed in the Log
    `Listening on http://0.0.0.0:8180` to open the app in your browser.
-   This URL can be pasted to the web browser, too. Depending on your platform, 
+   This URL can be pasted to the web browser, too. Depending on your platform,
    use one of the following URLs:
-   
+
    - `http://0.0.0.0:8180`
-   
+
    - `http://127.0.0.1:8180`
-   
+
    - `http://localhost:8180`
 
 5. After the first setup you can directly start the app from docker `Containers`,
    entering the container and clicking *Run* ▶️.
-   
+
 **Uninstallation:**
 
 1. Remove the app data following the platform specific instructions above.
 
-2. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
+2. Remove Docker image from `Docker Desktop > Images` by clicking the trash icon.
 
 </div>
 </details>
@@ -317,7 +317,7 @@ files with matching reference genome.
 
 <h4> <strong>2. Launch Genomic Viewer</strong> </h4>
 
-Launch ***Genomic Viewer*** with the desktop icon that was created upon 
+Launch ***Genomic Viewer*** with the desktop icon that was created upon
 installation.
 
 After loading all the required R packages ***Genomic Viewer*** interface will
@@ -440,7 +440,7 @@ can be searched and their coordinates will be transferred to the left sidebar
 for updating the genomic view. Again, it's imperative to choose the intended
 reference genome, as the chromosomes, gene IDs and the corresponding coordinates
 change accordingly. Furthermore, the bigwig data plotting style can be changed,
-one can decide between viewing gene or transcript isoforms and toggle the 
+one can decide between viewing gene or transcript isoforms and toggle the
 visibility of the chromosome ideogram.
 
 <h4><strong>Central Navigation Panels</strong></h4>
@@ -458,7 +458,7 @@ different panels showing
 
 Further details are available in the [Features and Usage section](#features-and-usage).
 
-![Figure 2. ***Genomic Viewer*** navigation panels, Plot, Data, and 
+![Figure 2. ***Genomic Viewer*** navigation panels, Plot, Data, and
 Stats.](assets/GV_navigation_panels.png)
 </div>
 </details>
