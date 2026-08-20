@@ -140,7 +140,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 **Uninstallation:**
 
 1. Drag the `genomicviewer-run-macos` folder to `Trash`.
-2. Remove Docker image from `Docker Desktop > Images` the click the trash icon.
+2. Remove Docker image from `Docker Desktop > Images` by clicking the trash icon.
 
 <br/><br/>
 
