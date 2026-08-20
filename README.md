@@ -117,7 +117,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
   (*Note: user's own data saved in the data folder are preserved*).
 3. Uninstall application from `Windows Start Menu > Settings > Installed apps`, 
   search for `genomicviewer-gui-installer` then click `⋮ > Uninstall`.
-4. Remove Docker image from `Docker Desktop > Images` the click the trash icon. 
+4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
 <br/><br/>
 
@@ -207,7 +207,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
   
   - `sudo dnf remove genomicviewer-gui-installer` (Red Hat)
   
-4. Remove Docker image from `Docker Desktop > Images` the click the trash icon. 
+4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
 ***For Genomic Viewer installed as non-root user:***
 
@@ -217,7 +217,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
-4. Remove Docker image from `Docker Desktop > Images` the click the trash icon. 
+4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
 <br/><br/>
 
@@ -251,7 +251,8 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
    
 4. Once the app is ready, click the link displayed in the Log 
    `Listening on http://0.0.0.0:8180` to open the app in your browser.
-   This URL can be pasted to the web browser, too. All these URLs should work:
+   This URL can be pasted to the web browser, too. Depending on your platform, 
+   use one of the following URLs:
    
    - `http://0.0.0.0:8180`
    
@@ -266,7 +267,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 1. Remove the app data following the platform specific instructions above.
 
-2. Remove Docker image from `Docker Desktop > Images` the click the trash icon. 
+2. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
 </div>
 </details>
