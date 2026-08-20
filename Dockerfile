@@ -31,7 +31,7 @@ RUN R -e "remotes::install_version('renv', version = '1.1.5', repos = 'https://c
 WORKDIR /shiny-app-GenomicViewer/
 RUN mkdir -p renv
 COPY Docker_files/renv.lock renv.lock
-COPY Docker_files/.Rprofile  .Rprofile
+COPY Docker_files/.Rprofile .Rprofile
 COPY Docker_files/renv/activate.R renv/activate.R
 COPY Docker_files/renv/settings.json renv/settings.json
 

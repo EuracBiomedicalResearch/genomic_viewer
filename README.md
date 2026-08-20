@@ -115,9 +115,11 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 1. Start `genomicviewer-gui-installer-1.1.0 Setup` file.
 2. Follow the *"Remove App Data"* instructions to remove app-associated data. 
   (*Note: user's own data saved in the data folder are preserved*).
-3. Uninstall application from `Windows Start Menu > Settings > Apps > Uninstall`.
-<br/><br/>
+3. Uninstall application from `Windows Start Menu > Settings > Installed apps`, 
+  search for `genomicviewer-gui-installer` then click `⋮ > Uninstall`.
+4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
+<br/><br/>
 
 #### <span style = "font-size: 1.2em;">**macOS**</span>
 
@@ -138,6 +140,8 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 **Uninstallation:**
 
 1. Drag the `genomicviewer-run-macos` folder to `Trash`.
+2. Remove Docker image from `Docker Desktop > Images` the click the trash icon.
+
 <br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Linux**</span>
@@ -202,6 +206,8 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
   - `sudo apt remove genomicviewer-gui-installer` (Debian) 
   
   - `sudo dnf remove genomicviewer-gui-installer` (Red Hat)
+  
+4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
 ***For Genomic Viewer installed as non-root user:***
 
@@ -211,6 +217,9 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 3. Remove `genomicviewer-gui-installer-x86_64.AppImage`.
 
+4. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
+
+<br/><br/>
 
 #### <span style = "font-size: 1.2em;">**Cross-platform Installer-free**</span>
 
@@ -242,7 +251,8 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
    
 4. Once the app is ready, click the link displayed in the Log 
    `Listening on http://0.0.0.0:8180` to open the app in your browser.
-   This URL can be pasted to the web browser, too. All these URLs should work:
+   This URL can be pasted to the web browser, too. Depending on your platform, 
+   use one of the following URLs:
    
    - `http://0.0.0.0:8180`
    
@@ -252,6 +262,12 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 5. After the first setup you can directly start the app from docker `Containers`,
    entering the container and clicking *Run* ▶️.
+   
+**Uninstallation:**
+
+1. Remove the app data following the platform specific instructions above.
+
+2. Remove Docker image from `Docker Desktop > Images`, then click the trash icon. 
 
 </div>
 </details>
