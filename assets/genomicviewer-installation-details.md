@@ -86,6 +86,8 @@ not use black background in the images, this impedes reading text.
   v) ***Genomic Viewer*** is now ready to be started by double-clicking on the
       desktop icon.
 
+  vi) Keep the installer file in case you want to remove the software later.
+
 </details>
 
 ## Linux
@@ -100,10 +102,28 @@ not use black background in the images, this impedes reading text.
 
   - Docker is installed. ✅
 
+  - [Rootless mode](https://docs.docker.com/engine/security/rootless/) has been
+    enabled by a sysadmin. ✅
+    
   - You have downloaded the latest ***Genomic Viewer*** release for Linux
     (see below). ✅
 
-2. Download ***Genomic Viewer*** installer from GitHub:
+2. Set up the Docker daemon such that it runs in your own namespace. This step
+   is required only once, so if in the future you upgrade to a newer version of
+   ***Genomic Viewer***, this step can be skipped. But for a first time ever
+   installation, run
+   
+   `dockerd-rootless-setuptool.sh install`
+   
+   In case the script `dockerd-rootless-setuptool.sh` is not found, you can
+   download this file from the docker web site and execute it:
+   
+   `curl -fsSL https://get.docker.com/rootless | sh`
+   
+   More details are given on Docker's 
+   [rootless mode](https://docs.docker.com/engine/security/rootless/) page. 
+
+3. Download ***Genomic Viewer*** installer from GitHub:
 
   i) Go to the [releases](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases)
      page of the ***Genomic Viewer*** GitHub repository.
@@ -112,31 +132,19 @@ not use black background in the images, this impedes reading text.
 # Replace this with correct image once we have the new release!! Also, please do
 not use black background in the images, this impedes reading text.
 
-  ii) Under `Assets` choose the appropriate installer for Linux and start
-      its download. If you intend to install the program as root user, choose
-      `linux-x64.zip`, and for non-root installation, download the
-      `./genomicviewer-gui-installer-x86_64.AppImage` file.
+  ii) Under `Assets` download file `genomicviewer-gui-installer-x86_64.AppImage`.
 
 <img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!! Avoid black background. This image can be reused with Linux, yeah!
 
-3. Install with the wizard:
+4. Install with the wizard:
 
-  i) Start installer
-
-  <!-- Same here: I recommend to have the .deb and .rpm files in folder
-    `linux-x64`. -->
-
-   - **As root user**: install the `.deb`/`.rpm` package, which puts the GUI
-     installer into `/usr/lib/genomicviewer-gui-installer`. If wanted, after
-     this step, one can already continue as non-root user. Start installer with
-     command `genomicviewer-gui-installer`.
-
-   - **As non-root user**: Take care the app image is executable
-     (`chmod 755` command) and start the installer with
+  i) Start installer. Be sure the app image is executable (`chmod 755` command) 
+     and run the installer with 
+     
      `./genomicviewer-gui-installer-x86_64.AppImage`
 
-  ii. Select `Start Installation` from the installation wizard and inspect the log
-      messages for any installation issue or required action.
+  ii. Select `Start Installation` from the installation wizard and inspect the 
+      log messages for any installation issue or required action.
 
 <img src="GV_installer_wizard.png" width="60%"/>
 
@@ -150,10 +158,18 @@ not use black background in the images, this impedes reading text.
 
   iv) After completing the installation, click `Finish` to close the installer.
 
-<img src="GV_install_finish.png" width="60%"/>
+<img src="GV_install_finish_linux.png" width="60%"/>
 
   v) ***Genomic Viewer*** is now ready to be started by double-clicking on the
-      desktop icon.
+     desktop icon. Gnome users are aware that Gnome does not offer icons on
+     the desktop. The program can be started by running the script
+      
+     `./GenomicViewer_linux.sh`
+     
+     in the chosen installation directory.
+
+  vi) Keep the installer file in case you want to remove the software later.
+  
 </details>
 
 

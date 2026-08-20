@@ -56,7 +56,7 @@ Software and Hardware
 #### <span>**Operating System**</span>
 
 -   Windows 10 or higher
--   macOS with Intel x64 or Apple M1 ARM64 and higher
+-   macOS with Intel x64 or Apple M1 ARM64
 -   Linux (Debian-based or Red Hat-based)
 
 A list of tested platforms is given
@@ -150,34 +150,24 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 
 -   Install either [Docker Desktop for
     Linux](https://docs.docker.com/desktop/setup/install/linux/) or [Docker
-    Engine](https://docs.docker.com/engine/install). <br> **Note:** Non-root
-    users can still use docker if [rootless
-    mode](https://docs.docker.com/engine/security/rootless/) is configured on
-    their system.
--   Download `linux-x64.zip` installer file for Linux from
-    [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases).<br> **Note:**
-    Linux installer provides both *.deb* package for Debian-based
-    distributions and *.rpm* package for Red Hat-based distributions. A
-    self-contained app image is also available for non-root users.
+    Engine](https://docs.docker.com/engine/install). 
+    <br> 
+    **Note:** We highly
+    recommend to run ***Genomic Viewer*** in [rootless mode]
+    (https://docs.docker.com/engine/security/rootless/). This requires a
+    one time intervention of a system administrator on that machine and then
+    each user who wants to run ***Genomic Viewer*** needs to set up the Docker
+    daemon in their own namespace by running 
+    <br>
+    `dockerd-rootless-setuptool.sh install` 
+    <br> 
+    once (see rootless mode link above for more details).
+-   Download `genomicviewer-gui-installer-x86_64.AppImage` installer file for 
+    Linux from [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases).<br>
 
 **Installation:** <br>
 
-***To install Genomic Viewer as root user:***
-
-1. Extract the `linux-64` installer file.
-
-2. Install the GUI installer for ***Genomic Viewer***:
-
-   - `genomicviewer-gui-installer-1.1.0_amd64.deb` (Debian-based systems)
-
-   - `genomicviewer-gui-installer-1.1.0-1.x86_64.rpm` (Red Hat-based systems)
-
-3. Launch the application setup by executing
-   `genomicviewer-gui-installer` command in a terminal.
-
-***To install Genomic Viewer as non-root user:***
-
-1. Be sure the app image has execution permission:
+1. Be sure the downloaded app image has execution permission:
 
    - `chmod 755 genomicviewer-gui-installer-x86_64.AppImage`
 
@@ -194,22 +184,6 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
 2. Follow the installer wizard instructions.
 
 **Uninstallation:**<br>
-
-***For Genomic Viewer installed as root user:***
-
-1. Run `genomicviewer-gui-installer` command in a terminal.
-
-2. Follow the *"Remove App Data"* instructions.
-
-3. Remove the application package by running
-
-  - `sudo apt remove genomicviewer-gui-installer` (Debian)
-
-  - `sudo dnf remove genomicviewer-gui-installer` (Red Hat)
-
-4. Remove Docker image from `Docker Desktop > Images` by clicking the trash icon.
-
-***For Genomic Viewer installed as non-root user:***
 
 1. Run the self-contained app image `genomicviewer-gui-installer-x86_64.AppImage`.
 
