@@ -47,13 +47,13 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
      page of the ***Genomic Viewer*** GitHub repository.
 
 <img src="GV_github_release.png" width="80%"/>
-# Replace this with correct image once we have the new release!! Also, please do
-not use black background in the images, this impedes reading text.
+
 
   ii) Under `Assets` choose the corresponding installer for Windows and start
       its download.
 
-<img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!! Avoid black background.
+<img src="GV_installer_down_win.png" width="80%"/>
+
 
 3. Launch installer wizard:
 
@@ -126,12 +126,12 @@ not use black background in the images, this impedes reading text.
      page of the ***Genomic Viewer*** GitHub repository.
 
 <img src="GV_github_release.png" width="80%"/>
-# Replace this with correct image once we have the new release!! Also, please do
-not use black background in the images, this impedes reading text.
+
 
   ii) Under `Assets` download file `genomicviewer-gui-installer-x86_64.AppImage`.
 
-<img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!! Avoid black background. This image can be reused with Linux, yeah!
+<img src="GV_installer_down_linux.png" width="80%"/> 
+
 
 4. Install with the wizard:
 
@@ -207,12 +207,12 @@ not use black background in the images, this impedes reading text.
   i) Go to the [releases](https://github.com/EuracBiomedicalResearch/genomic_viewer/releases)
      page of the ***Genomic Viewer*** GitHub repository.
 
-<img src="GV_github_release.png" width="80%"/> # Replace this with correct image once we have the new release!!
+<img src="GV_github_release.png" width="80%"/>
 
   ii) Under `Assets` choose the corresponding installer for macOS and start
       its download.
 
-<img src="GV_installer_win.png" width="80%"/> # Replace this with correct image once we have the new release!!
+<img src="GV_installer_down_macos.png" width="80%"/>
 
 
 3. Launch ***Genomic Viewer*** directly:
