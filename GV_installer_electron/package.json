@@ -1,7 +1,7 @@
 {
   "name": "genomicviewer-gui-installer",
   "product": "Genomic Viewer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Shiny based app for the visualization and basic analysis of NGS data.",
   "main": "main.js",
   "scripts": {
