@@ -62,7 +62,7 @@ not use black background in the images, this impedes reading text.
      `genomicviewer-gui-installer-1.1.0 Setup` to start the installation wizard.
      If the installer does not start, right-click it and select `Run as administrator`.
      
-<img src="GV_installer_win_admin.png" width="80%"/>
+<img src="GV_installer_win_admin.png" width="60%"/>
 
   ii) Select `Start Installation` from the installation wizard and inspect the
       log messages for any installation issue or required action.
