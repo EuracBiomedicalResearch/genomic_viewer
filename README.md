@@ -153,8 +153,7 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
     Engine](https://docs.docker.com/engine/install). 
     <br> 
     **Note:** We highly
-    recommend to run ***Genomic Viewer*** in [rootless mode]
-    (https://docs.docker.com/engine/security/rootless/). This requires a
+    recommend to run ***Genomic Viewer*** in [rootless mode](https://docs.docker.com/engine/security/rootless/). This requires a
     one time intervention of a system administrator on that machine and then
     each user who wants to run ***Genomic Viewer*** needs to set up the Docker
     daemon in their own namespace by running 
