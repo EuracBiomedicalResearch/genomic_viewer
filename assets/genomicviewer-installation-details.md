@@ -138,7 +138,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   i) Start installer. Be sure the app image is executable (`chmod 755` command) 
      and run the installer with 
      
-     `./genomicviewer-gui-installer-x86_64.AppImage`
+     ./genomicviewer-gui-installer-x86_64.AppImage
 
   ii. Select `Start Installation` from the installation wizard and inspect the 
       log messages for any installation issue or required action.
@@ -186,7 +186,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
   - You have downloaded ***Genomic Viewer*** release for macOS
     (see step 2 below). ✅
 
-  For users without root privileges Docker can be installed as follow:
+  For users without administrator privileges Docker can be installed as follows:
 
   i) Download [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
 
@@ -196,8 +196,8 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
 
 <img src="GV_docker_drag_macos.png" width="80%"/>
 
-  iii) Start Docker and follow installation instructions. In the configuration
-       page select `Use advanced settings` > `User` >
+  iii) Start Docker and follow the installation instructions. In the 
+       configuration page select `Use advanced settings` > `User` >
        `Automatically check configuration` > `Finish`.
 
 <img src="GV_docker_configuration_noroot_macos.png" width="80%"/>
@@ -244,7 +244,7 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
 
    Otherwise skip this step.
 
-  iv) Type the following command in terminal `docker compose up`.
+  iv) Type the following command in Terminal `docker compose up`.
        This will pull the docker image if not already present, or directly run
        ***Genomic Viewer*** application.
 
