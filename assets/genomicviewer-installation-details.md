@@ -161,7 +161,7 @@ not use black background in the images, this impedes reading text.
      desktop icon. Gnome users are aware that Gnome does not offer icons on
      the desktop. The program can be started by running the script
       
-    `./GenomicViewer_linux.sh`
+  `./GenomicViewer_linux.sh`
      
   in the chosen installation directory.
 
