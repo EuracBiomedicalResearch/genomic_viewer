@@ -32,9 +32,8 @@ or contacting us [directly](mailto:sara.lago@eurac.edu).
 <details open>
 <summary>&nbsp;</summary>
 
-<!-- Link 'prerequisites' does not work. Not even on Github. -->
 
-1. Ensure you meet all the [prerequisites](README.md#installation) for
+1. Ensure you meet all the [prerequisites](../README.md#installation) for
    ***Genomic Viewer*** installation. Here is a checklist:
 
   - Docker is installed. ✅
@@ -58,13 +57,12 @@ not use black background in the images, this impedes reading text.
 
 3. Launch installer wizard:
 
-  <!-- I recommend to have the Setup and related files directly in folder
-    `windows-x64`. Clicking two levels without any content is not user friendly.
-    -->
-
-  i) Once download has completed, unzip the file by `[right click] > Extract all`.
-     Go to `windows-x64 > squirrel.windows > x64` and double click on
-     `genomicviewer-gui-installer-1.0.0 Setup` to start the installation wizard.
+  i) Once download has completed, unzip the file by `[right-click] > Extract all`.
+     Go to `windows-x64` and double click on
+     `genomicviewer-gui-installer-1.1.0 Setup` to start the installation wizard.
+     If the installer does not start, right-click it and select `Run as administrator`.
+     
+<img src="GV_installer_win_admin.png" width="80%"/>
 
   ii) Select `Start Installation` from the installation wizard and inspect the
       log messages for any installation issue or required action.
@@ -95,9 +93,8 @@ not use black background in the images, this impedes reading text.
 <details open>
 <summary>&nbsp;</summary>
 
-<!-- Link 'prerequisites' does not work. Not even on Github. -->
 
-1. Ensure you meet all the [prerequisites](README.md#installation) for
+1. Ensure you meet all the [prerequisites](../README.md#installation) for
    ***Genomic Viewer*** installation. Here is a checklist:
 
   - Docker is installed. ✅
@@ -146,7 +143,7 @@ not use black background in the images, this impedes reading text.
   ii. Select `Start Installation` from the installation wizard and inspect the 
       log messages for any installation issue or required action.
 
-<img src="GV_installer_wizard.png" width="60%"/>
+<img src="GV_installer_wizard_linux.png" width="60%"/>
 
   iii) After a while (it pulls the Docker image first), the installer will open
        a file selection box. This will save the startup script for
@@ -154,7 +151,7 @@ not use black background in the images, this impedes reading text.
        location of the accompanying data and the config file. Either choose an
        existing directory or create a new one.
 
-<img src="GV_install_location.png" width="80%"/>
+<img src="GV_install_location_linux.png" width="80%"/>
 
   iv) After completing the installation, click `Finish` to close the installer.
 
@@ -164,9 +161,9 @@ not use black background in the images, this impedes reading text.
      desktop icon. Gnome users are aware that Gnome does not offer icons on
      the desktop. The program can be started by running the script
       
-     `./GenomicViewer_linux.sh`
+    `./GenomicViewer_linux.sh`
      
-     in the chosen installation directory.
+  in the chosen installation directory.
 
   vi) Keep the installer file in case you want to remove the software later.
   
@@ -180,9 +177,9 @@ not use black background in the images, this impedes reading text.
 <details open>
 <summary>&nbsp;</summary>
 
-<!-- Link 'prerequisites' does not work. Not even on Github. -->
-1. Ensure you meet all the [prerequisites](README.md#installation) for a successful
-***Genomic Viewer *** installation. Here is a checklist:
+
+1. Ensure you meet all the [prerequisites](../README.md#installation) for a successful
+***Genomic Viewer*** installation. Here is a checklist:
 
   - Docker is installed. ✅
 
