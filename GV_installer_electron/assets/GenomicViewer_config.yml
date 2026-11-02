@@ -16,6 +16,9 @@ default:
   # been set during installation and is mapped to this name, but subdirectories
   # can be created within "data".
   data.dir: "data"
+  
+  # Reference genome (choose one among: "hg19", "hg38", "T2T", "mm10", "mm39")
+  ref.genome: "hg38"
 
   # bigWig directory
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
@@ -32,7 +35,7 @@ default:
   bed.names: ["ATAC peaks"]
   # HiC files section.
   hic.dir: "GSE212910_RAW_HiC"
-  hic.file: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_50000.ginteractions.tsv.short.sorted.hic"
+  hic.file: "GSM7749626_Cortex_partitioned_donor5_DM_chr5_25000.ginteractions.tsv.short.sorted.hic"
   hic.names: ["HiC cortex"]
   # GWAS files section.
   gwas.dir: "GWAScatalog_KidneyDisease"
