@@ -150,23 +150,28 @@ Duplicated keys are not allowed and will throw an error during parsing.
 ### How to correctly specify the keys value
 
 Specifying the keys value in the correct format is fundamental to ensure your
-files are searched properly. The rules to fill each type of key are explained
-below:
+files are searched and displayed properly. The rules to fill each type of key 
+are explained below:
 
 1) The `data.dir` field accepts a quoted directory name. The first subdirectory
 must be `data`, but successive subdirectories can be specified
 (e.g. `"data/experiment_1/replicate_1"`) in order to allow separation of
 visualizations.
 
+2) The `ref.genome` field accept one of the built-in genomes available through 
+***Genomic Viewer***. It must be quoted and specified as one of the following: 
+"hg19", "hg38", "T2T", "mm10" or "mm39". This field only accepts one dingle entry 
+and cannot be empty.
 
-2) The `*.dir` field relative to file type groups accepts:
+
+3) The `*.dir` field relative to file type groups accepts:
 
   - a full directory name (e.g. `"RNAseq"`), paths with subdirectories are also
     allowed (e.g. `"RNAseq/untreated"`);
 
   - an empty string `""` for the base directory as given by `data.dir`.
 
-3) The `*.file` field accepts:
+4) The `*.file` field accepts:
 
   - a single full file name (e.g. `"RNAseq_sample1_rep1.bed"`);
 
@@ -176,7 +181,7 @@ visualizations.
   - an empty string `""` for no file. Then, the respective `*.names` field
     must also be an empty string.
 
-4) The `*.names` field accepts:
+5) The `*.names` field accepts:
 
   - a single track name;
 
@@ -190,7 +195,7 @@ data tracks specified by `*.file` and thus define pairs of track name
 (`*.names`)/data file (`*.file`). In short, the _i_-th track specified in
 `*.file` will be named with the _i_-th item listed in `*.names`.
 
-5) The `notes` field accepts:
+6) The `notes` field accepts:
 
   - plain text only;
   
