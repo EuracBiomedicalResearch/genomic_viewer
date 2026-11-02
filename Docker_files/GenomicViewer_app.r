@@ -95,8 +95,8 @@ configComplete <- function(config)
 {
   # Validate required keys in config file (including those copied from the
   # container version internal config file).
-  required.keys <- c("data.dir", "bw.dir", "bw.file", "bw.names", "bedpe.dir",
-                     "bedpe.file", "bedpe.names", "bed.dir", "bed.file",
+  required.keys <- c("ref.genome", "data.dir", "bw.dir", "bw.file", "bw.names", 
+                     "bedpe.dir", "bedpe.file", "bedpe.names", "bed.dir", "bed.file",
                      "bed.names", "hic.dir", "hic.file", "hic.names", "gwas.dir",
                      "gwas.file", "gwas.names", "cat.dir", "cat.file", "cat.names",
                      "reg.dir", "reg.file", "notes",
@@ -143,6 +143,34 @@ if( !dir.exists(rDir) )
 #   has to be empty if no .file is given.
 
 
+#' Verify reference genome is correctly specified and format it as required by GV.
+#' 
+#' It must be one among "hg19", "hg38", "T2T", "mm10", "mm39" 
+#' Only one entry is allowed and must not be empty.
+#' @param ref.genome Reference genome spcified as character string.
+#' @return Reference genome specified as character string. (cannot be empty)
+
+configRefGenome <- function(ref.genome){
+  
+accepted.ref <- c("hg19", "hg38", "T2T", "mm10", "mm39")
+gv.ref <- c("hg19 (GRCh37 - H. sapiens)",
+            "hg38 (GRCh38 - H. sapiens)",
+            "T2T (CHM13 - H. sapiens)",
+            "mm10 (GRCm38 - M. musculus)",
+            "mm39 (GRCm39 - M. musculus)")
+
+if( length(ref.genome)>1 )
+  stop("Key `ref.genome`: insert JUST ONE reference genome among hg19, hg38, T2T, 
+        mm10, mm39; not: ", ref.genome)
+if( !ref.genome %in% accepted.ref)
+    stop("Key `ref.genome`: reference genome must be one of hg19, hg38, T2T, mm10, 
+         mm39; not: ", ref.genome)
+RefGenome <- grep(ref.genome, gv.ref, value = TRUE)
+return(RefGenome)
+}
+
+
+
 #' Verify subdirectories and dedicated file names in there exist.
 #'
 #' In case `sub.dir` or `file.name` are empty strings, an empty list is
@@ -180,6 +208,10 @@ assertNrNamesEqualsFiles <- function(section, files, names)
          "`: number of files listed and their corresponding names differ")
 }
 
+
+## Read reference genome from configuration file
+RefGenome <- configRefGenome(config$ref.genome)
+
 ## Read data from files listed in the config file and check format.
 # Set a BigWig file
 bw.file <- listDataDir(config$data.dir, config$bw.dir, config$bw.file)
@@ -212,10 +244,10 @@ for(i in seq_along(files)){
 }
 
 if (length(all.errors) > 0) {
-  cat("\n========== FILE FORMAT ERROR ==========\n")
-  stop(paste(c("One or more input files are invalid:", all.errors), collapse = "\n"),
-    call. = FALSE
-  )
+  cat("\n========== FILE FORMAT ERROR ==========\n
+      One or more input files are invalid.")
+  writeLines(all.errors)
+  stop("\nPlease correct the invalid input files, close the console, and restart GV.", call. = FALSE)
 }
 
 ## Now, after all the dealing with the config file, load the libraries.
@@ -252,11 +284,16 @@ ui <- suppressWarnings(page_sidebar(
     span("", img(src = wwwPath, height = 50,
                  style = "margin-left:14%; margin-top:-50px" )),
       # Reference genome
-    selectInput("ref.genome", "Select reference genome", c("hg19 (GRCh37 - H. sapiens)",
-                                                             "hg38 (GRCh38 - H. sapiens)",
-                                                             "T2T (CHM13 - H. sapiens)",
-                                                             "mm10 (GRCm38 - M. musculus)",
-                                                             "mm39 (GRCm39 - M. musculus)"), selectize = F),
+    selectInput("ref.genome", 
+                "Select reference genome", 
+                c("hg19 (GRCh37 - H. sapiens)",
+                  "hg38 (GRCh38 - H. sapiens)",
+                  "T2T (CHM13 - H. sapiens)",
+                  "mm10 (GRCm38 - M. musculus)",
+                  "mm39 (GRCm39 - M. musculus)"), 
+                selectize = F, 
+                selected = RefGenome ),
+    
     card(tags$b("Insert coordinates:", style = "font-size: 90%; text-align:center"),
          # Chr
          tags$style(HTML(".selectize-dropdown-content {max-height: 100px !important;  /* ~5 items */
@@ -265,7 +302,7 @@ ui <- suppressWarnings(page_sidebar(
          )),
          div(style="display:flex; align-items:center; gap:8px; margin-top:-20px; margin-left:-7px;",
              tags$label("chr", style="margin:0; padding-bottom:15px; width:19%; text-align:right;"),
-             selectizeInput('chr', NULL, selected = "5", choices = c(as.character(seq(1:22)), "X", "Y"), multiple = F)
+             selectizeInput('chr', NULL, selected = NULL, choices = c(as.character(seq(1:22)), "X", "Y"), multiple = F)
          ),
          # coordinates
          div(style="display:flex; align-items:center; gap:8px; margin-top:-30px; margin-left:-7px;",
@@ -390,7 +427,7 @@ ui <- suppressWarnings(page_sidebar(
                         ),
                         # Zoom section
                         div(id = "stickyBottomPanel", style="display:flex; flex-direction:column; width:100%",
-                            plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x")), inline=T),
+                            plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"), delay = 15000), inline=T),
                             fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"),
                                      column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                                      column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
@@ -519,7 +556,12 @@ server <- function(input, output, session){
   ### For chromosome id drop down menu
   observeEvent(chrom.cen.df(), {
     chrom.cen.df <- chrom.cen.df()
-    updateSelectizeInput(session = getDefaultReactiveDomain(), "chr", selected = gsub("chr", "", chrom.cen.df$chr)[1], choices = gsub("chr", "", chrom.cen.df$chr))#, options = list(maxOptions = 12), server = TRUE)
+    if (input$chr %in% gsub("chr", "", chrom.cen.df$chr)){
+      selected.chr <- input$chr
+    } else {
+      selected.chr <-  gsub("chr", "", chrom.cen.df$chr)[1]
+    }
+    updateSelectizeInput(session = getDefaultReactiveDomain(), "chr", selected = selected.chr, choices = gsub("chr", "", chrom.cen.df$chr))#, options = list(maxOptions = 12), server = TRUE)
     #print(input$chr)
   })
 
@@ -1078,14 +1120,14 @@ server <- function(input, output, session){
     output$upset <- renderPlot({
       if(!is.null(vals2$bed.file) & !is.null(vals2$bedpe.file) & length(vals2$bed.file) > 0 & length(vals2$bedpe.file) > 0 |
          !is.null(vals2$bed.file) & length(vals2$bed.file) > 1 | !is.null(vals2$bedpe.file) & length(vals2$bedpe.file) > 1){
-        QUIET(peaks_intersection_venn_function(bed.file = vals2$bed.file,
+        QUIET(suppressWarnings(peaks_intersection_venn_function(bed.file = vals2$bed.file,
                                       bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
                                        bedpe.file = vals2$bedpe.file,
                                        bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)],
                                        chr = vals2$chr,
                                        Start = vals2$start,
                                        End = vals2$end,
-                                      genome = gsub( " .*", "", input$ref.genome)))
+                                      genome = gsub( " .*", "", input$ref.genome))))
       }
     }, res = 100)
 
@@ -1103,12 +1145,12 @@ server <- function(input, output, session){
 
     output$annotation <- renderPlot({
       if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
-        QUIET(peaks.annotation.function(bed.file = vals3$bed.file,
+        QUIET(suppressWarnings(peaks.annotation.function(bed.file = vals3$bed.file,
                                   bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
-                                  genome = gsub( " .*", "", input$ref.genome)))
+                                  genome = gsub( " .*", "", input$ref.genome))))
       }
     }, res = 100,
-       height = function(){150*length(bed.file)})
+       height = function(){180*length(bed.file)})
 
     ## For circos plot
     vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
