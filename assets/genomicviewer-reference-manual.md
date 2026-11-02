@@ -68,6 +68,9 @@ default:
   # been set during installation and is mapped to this name, but subdirectories
   # can be created within "data".
   data.dir: "data"
+  
+  # Reference genome (choose one among: "hg19", "hg38", "T2T", "mm10", "mm39")
+  ref.genome: "hg38"
 
   # bigWig directory
   bw.dir: "GSE212908_RAW_ATAC_bigwig"
@@ -526,8 +529,9 @@ ensure that the values you enter in the GUI match the data. The reference
 genome can be selected from a built-in list available form a dropdown menu at
 the top of the left sidebar. The reference genome and all user-supplied data
 files (via the [configuration file](#configuration)) have to match. At
-***Genomic Viewer*** startup the human hg19 (GRCh37) version of the reference
-genome is loaded by default.
+***Genomic Viewer*** startup the reference genome version that is specified through
+the configuration file is loaded by default, but can be changed at any time from
+the interface drop-down menu.
 
 <img src="GV_ref_genome.png" alt="GV select reference genome menu" width="25%">
 
@@ -538,6 +542,11 @@ output. When you change reference genome from the menu a message will appear in
 the main windows as a warning.
 
 <img src="GV_ref_change_message.png" alt="GV reference genome message" width="70%">
+
+Upon changing the reference genome version from the interface, the genomic 
+coordinates that were selected before are preserved, unless the pre-loaded 
+chromosome is absent from the newly selected reference genome. In this case it 
+is reset to chromosome 1.
 
 </details>
 </div>
@@ -1331,11 +1340,10 @@ for additional analytic or experimental validations.
 
 ### Genome selection, navigation and plot inspection
 
-Before starting to inspect the data tracks we have to select the correct
-reference genome. When ***Genomic Viewer*** is started it loads by default the
-human reference genome hg19 (GRCh37). However, the example data are mapped to
-the human reference genome hg38 (GRCh38). Therefore, we first select the
-appropriate reference genome from the dropdown menu in the left sidebar.
+When ***Genomic Viewer*** is started it loads by default the reference genome 
+that is specified in the configuration file. In the example data this corresponds 
+to the human reference genome hg38 (GRCh38). Therefore, it is not necessary to 
+change this option from the drop-down menu.
 
 <img src="GV_ref_genome.png" alt="GV reference genome selection" width="20%">
 
