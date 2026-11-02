@@ -303,9 +303,9 @@ selected reference genome. It is essential to choose the correct reference
 genome to avoid mislabeling of gene/transcript annotation tracks and
 coordinates. Load only data tracks mapped to the same reference genome, and
 choose the appropriate reference.  When you first launch the ***Genomic
-Viewer*** application, it automatically loads the default reference genome
-(currently hg19). For instructions on changing to another reference genome,
-refer to <em>Reference Genomes</em> paragraph in the
+Viewer*** application, it automatically loads the reference genome specified by 
+the configuration file with example data (hg38). For instructions on changing to 
+another reference genome, refer to <em>Reference Genomes</em> paragraph in the
 [Features and Usage section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>4. Navigate</strong> </h4>
@@ -362,8 +362,7 @@ collaborator has all underlying data files and then simply forward the
 installation's `data/` directory.
 
 Several configuration files can be stored separately to keep track of multiple
-working sessions. Just remember to select the proper reference genome in
-***Genomic Viewer***.
+working sessions.
 
 </div>
 </details>
@@ -396,14 +395,17 @@ The graphical layout of ***Genomic Viewer*** consists of three elements:
 ***Left sidebar***
 
 The left sidebar provides several functions for working with the reference
-genome and its navigation. First, it is essential to select the reference genome
-that matches all the data files defined in the configuration file. Coordinates
-can be entered manually (or are transferred and displayed from the gene search)
-or can be selected from a custom list. This list of coordinates can be modified
-over the course of a session and can be exported for later use in a follow-up
-session or for collaborative sharing. The left sidebar is also where the *Go*
-and *Save* buttons are located, which are used to update the genomic view
-plot and to export it in different file formats, respectively.
+genome and its navigation. First, it is essential to double-check the reference 
+genome that matches all the data files defined in the configuration file. At 
+start-up, the reference genome version that is specified in the configuration file 
+is automatically pre-loaded together with the genomic coordinates optionally saved 
+in auser defined region table. Additional coordinates can be entered manually 
+(or are transferred and displayed from the gene search) or can be selected from 
+a custom list. This list of coordinates can be modified over the course of a 
+session and can be exported for later use in a follow-up session or for collaborative 
+sharing. The left sidebar is also where the *Go* and *Save* buttons are located, 
+which are used to update the genomic view plot and to export it in different file 
+formats, respectively.
 
 ***Right sidebar***
 
