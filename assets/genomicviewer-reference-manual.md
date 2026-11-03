@@ -654,11 +654,11 @@ you have to search again for the gene in the menu.
 To trigger the generation of the plot or run an analysis, after choosing the
 gene of interest one must click the *Go* button.
 
-#### Zoom
+#### Zoom and pan
 
 The zoom panel located at the bottom of the plot navigation panel in the
 central window offers an alternative way for genome navigation. This is
-especially useful when investigate the flanking regions of a selected genomic
+especially useful to investigate the flanking regions of a selected genomic
 position or when narrowing down the region of interest. See also the
 [Tutorial](#tutorial).
 
@@ -678,6 +678,10 @@ There are two ways for using the zoom panel for navigation:
   zoom in and out 2, 5, or 10 times, respectively. The initially shown area
   will remain the center of zoomed region. Again, hitting the *Go* button will
   replot the newly selected genomic region.
+  
+In addition, the two **arrow buttons** at either sides of the drag and drop bar offer 
+the possibility to move along the genome by shifting the displayed genomic region 
+by 50% of the currently visible window in the corresponding direction.
 
 <img src="GV_zoom_bar.png" alt="GV navigation through zoom bar" width="80%">
 
