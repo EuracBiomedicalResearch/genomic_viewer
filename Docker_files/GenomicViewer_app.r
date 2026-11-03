@@ -428,10 +428,11 @@ ui <- suppressWarnings(page_sidebar(
                         ),
                         # Zoom section
                         div(id = "stickyBottomPanel", style="display:flex; flex-direction:column; width:100%",
-                            fluidRow(column(width = 1, actionButton("leftscroll", HTML("&laquo;"), width = "50%", height = "50%", style = "font-size: 95%; font-weight: 800; padding:0px 13px 0px 13px; line-height: 1; color: black; background-color: lightgrey; margin-top: -11px; margin-left: 22px; margin-right: 15px"), style = "padding: 0px 1px"),
-                                     column(width = 10, plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"), delay = 15000), inline=T)),
-                                     column(width = 1, actionButton("rightscroll", HTML("&raquo;"), width = "50%", height = "50%", style = "font-size: 95%; font-weight: 800; padding:0px 13px 0px 13px; line-height: 1; color: black; background-color: lightgrey; margin-top: -11px; margin-left: 15px; margin-right: 22px"), style = "padding: 0px 1px")
-                              ),
+                            fluidRow(column(width = 1, actionButton("leftscroll", HTML("&laquo;"), width = "50%", height = "50%", style = "font-size: 95%; font-weight: 800; padding:0px 13px 0px 13px; line-height: 1; color: black; background-color: lightgrey; margin-top: -11px; margin-left: 5px; margin-right: 15px"), style = "padding: 0px 1pxposition: relative; z-index: 2;"),
+                                     column(width = 10, div(plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"), delay = 15000), inline=T), style = "width: 115%; margin-left: -8%; position: relative;"),style = "padding: 0px; overflow: visible;"
+                            ),
+                                     column(width = 1, actionButton("rightscroll", HTML("&raquo;"), width = "50%", height = "50%", style = "font-size: 95%; font-weight: 800; padding:0px 13px 0px 13px; line-height: 1; color: black; background-color: lightgrey; margin-top: -11px; margin-left: 15px; margin-right: 5px"), style = "padding: 0px 1pxposition: relative; z-index: 2;")
+                            ),
                             fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"),
                                      column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                                      column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
@@ -759,7 +760,7 @@ server <- function(input, output, session){
   ##-------------------- Output zooming region plot:
 
   output$plot <- renderPlot({
-    x.ext <- (input$chrend - input$chrstart)*25/100
+    x.ext <- (input$chrend - input$chrstart)*25/125
    p <- ggplot() +
       geom_rect(aes(xmin = input$chrstart - x.ext, xmax = input$chrend + x.ext, ymin = 10, ymax = 11), fill = "grey") +
       geom_rect(aes(xmin = input$chrstart, xmax = input$chrend, ymin = 10, ymax = 11), fill = "salmon", colour = "darkred") +
@@ -768,11 +769,14 @@ server <- function(input, output, session){
             axis.ticks.x = element_line(),
             legend.position = "none",
             axis.title.x = element_text(face = "bold", size=15),
-            plot.margin = unit(c(0,0,0.25,0), "cm"))
+            plot.margin = unit(c(0,0,0.25,0), "cm"),
+            plot.background = element_rect(fill = "transparent", colour = NA),
+            panel.background = element_rect(fill = "transparent", colour = NA))
     p
   },
   width = "auto",
-  height = 35
+  height = 35,
+  bg = "transparent"
  )
 
   ##-------------------- Zooming when click on zoom buttons:
