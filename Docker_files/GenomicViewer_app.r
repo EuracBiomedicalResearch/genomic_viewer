@@ -428,7 +428,10 @@ ui <- suppressWarnings(page_sidebar(
                         ),
                         # Zoom section
                         div(id = "stickyBottomPanel", style="display:flex; flex-direction:column; width:100%",
-                            plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"), delay = 15000), inline=T),
+                            fluidRow(column(width = 1, actionButton("leftscroll", HTML("&laquo;"), width = "50%", height = "50%", style = "font-size: 95%; font-weight: 800; padding:0px 13px 0px 13px; line-height: 1; color: black; background-color: lightgrey; margin-top: -11px; margin-left: 22px; margin-right: 15px"), style = "padding: 0px 1px"),
+                                     column(width = 10, plotOutput("plot", brush = brushOpts(id = "plot_brush", direction = c("x"), delay = 15000), inline=T)),
+                                     column(width = 1, actionButton("rightscroll", HTML("&raquo;"), width = "50%", height = "50%", style = "font-size: 95%; font-weight: 800; padding:0px 13px 0px 13px; line-height: 1; color: black; background-color: lightgrey; margin-top: -11px; margin-left: 15px; margin-right: 22px"), style = "padding: 0px 1px")
+                              ),
                             fluidRow(column(width = 2, h6(tags$b("Zoom-out:")), style = "text-align:right"),
                                      column(width = 1, actionButton("z2out", "2x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
                                      column(width = 1,actionButton("z5out", "5x", width = "70%", style = "font-size: 75%; font-weight: 800; padding:3px 5px; color: black; background-color: lightgrey"), style = "padding: 3px 5px"),
@@ -862,6 +865,34 @@ server <- function(input, output, session){
      }) %>%  bindEvent(input$z10in)
 
 
+   ##-------------------- Zooming when click on left and right arrow buttons:
+   ########## LEFT
+   observe({
+     chrom.cen.df <- chrom.cen.df()
+     shift <- round(((input$chrend - input$chrstart)/2), 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart - shift)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend - shift)
+     # Modify if values lower than 1
+     if ((input$chrstart - shift) < 1){
+       s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1)
+      }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
+   }) %>%  bindEvent(input$leftscroll)
+   
+   ########## RIGHT
+   observe({
+     chrom.cen.df <- chrom.cen.df()
+     shift <- round(((input$chrend - input$chrstart)/2), 0)
+     s <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart + shift)
+     e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrend + shift)
+     # Modify if values greater than chr length
+     if ((input$chrstart + shift) > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
+       e <- updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))])
+     }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
+   }) %>%  bindEvent(input$rightscroll)
 
   ##-------------------- Update chr start end upon click on zoomed range
   observeEvent(input$plot_brush, {
