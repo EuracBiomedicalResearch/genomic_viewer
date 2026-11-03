@@ -1,3 +1,4 @@
+Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Documents/R scripts/Shiny/GenomicViewer/Docker_files_revision_2/files for installer/GenomicViewer_config_DEV.yml")
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
@@ -784,6 +785,8 @@ server <- function(input, output, session){
         s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
       if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
         e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
+      # Automatically trigger the Go button after 100 ms
+      shinyjs::delay(100, shinyjs::click("go"))
       }) %>%  bindEvent(input$z2out)
    ## Zoom out 5x
    observe({
@@ -796,6 +799,8 @@ server <- function(input, output, session){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
      }) %>%  bindEvent(input$z5out)
    ## Zoom out 10x
    observe({
@@ -808,7 +813,10 @@ server <- function(input, output, session){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = 1) }
      if ( input$chrend + zoom > chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]){
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = chrom.cen.df$chr.len[which(chrom.cen.df$chr == paste("chr", input$chr, sep=""))]) }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
      }) %>%  bindEvent(input$z10out)
+   
    ########## ZOOM-IN
    ## Zoom out 2x
    observe({
@@ -821,6 +829,8 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
      }) %>%  bindEvent(input$z2in)
    ## Zoom out 5x
    observe({
@@ -833,6 +843,8 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
      }) %>%  bindEvent(input$z5in)
    ## Zoom out 10x
    observe({
@@ -845,6 +857,8 @@ server <- function(input, output, session){
      if ((input$chrend - input$chrstart) <= 500){
        s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
        e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+     # Automatically trigger the Go button after 100 ms
+     shinyjs::delay(100, shinyjs::click("go"))
      }) %>%  bindEvent(input$z10in)
 
 
@@ -866,6 +880,8 @@ server <- function(input, output, session){
     if ((x$xmax - x$xmin) <= 500){
       s <-  updateNumericInput(getDefaultReactiveDomain(), "chrstart", value = input$chrstart)
       e <- updateNumericInput(getDefaultReactiveDomain(), "chrend", value = input$chrstart + 500) }
+    # Automatically trigger the Go button after 100 ms
+    shinyjs::delay(100, shinyjs::click("go"))
 
     session$resetBrush("plot_brush")
   })
