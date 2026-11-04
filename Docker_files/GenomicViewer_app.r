@@ -963,7 +963,6 @@ server <- function(input, output, session){
 
   # Download peaks
   observeEvent(length(bed.file),{
-    req(reactiveChr())
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadBed", i)]] <- downloadHandler(
@@ -975,6 +974,7 @@ server <- function(input, output, session){
   })
 
   output$bed_save <- renderUI({
+    req(datasetTables())
     x <- c(1:length(bed.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadBed", i), paste0("Download ", config$bed.names[i]))
@@ -1006,7 +1006,6 @@ server <- function(input, output, session){
 
   # Download arches
   observeEvent(length(bedpe.file),{
-    req(reactiveChr())
     x <- c(1:length(bedpe.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadBedpe", i)]] <- downloadHandler(
@@ -1018,6 +1017,7 @@ server <- function(input, output, session){
   })
 
   output$bedpe_save <- renderUI({
+    req(datasetTables())
     x <- c(1:length(bedpe.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadBedpe", i), paste0("Download ", config$bedpe.names[i]))
@@ -1049,7 +1049,6 @@ server <- function(input, output, session){
 
   # Download categorical peaks
   observeEvent(length(cat.file),{
-    req(reactiveChr())
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadCat", i)]] <- downloadHandler(
@@ -1061,6 +1060,7 @@ server <- function(input, output, session){
   })
 
   output$cat_save <- renderUI({
+    req(datasetTables())
     x <- c(1:length(cat.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadCat", i), paste0("Download ", config$cat.names[i]))
@@ -1092,7 +1092,6 @@ server <- function(input, output, session){
 
   # Download GWAS
   observeEvent(length(gwas.file),{
-    req(reactiveChr())
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       output[[paste0("downloadgwas", i)]] <- downloadHandler(
@@ -1104,6 +1103,7 @@ server <- function(input, output, session){
   })
 
   output$gwas_save <- renderUI({
+    req(datasetTables())
     x <- c(1:length(gwas.file))
     lapply(x[!x == 0], function(i) {
       downloadButton(paste0("downloadgwas", i), paste0("Download ", config$gwas.names[i]))
