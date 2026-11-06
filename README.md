@@ -1,7 +1,7 @@
 
 # Genomic Viewer
 
-<img src="assets/GV_installer_logo.png" width="225"/>
+<img src="assets/omniumGV.gif" width="225"/>
 
 **Version:** 1.1.0\
 **Description:** Genomic Viewer is a cross-platform application for visualizing
