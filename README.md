@@ -1,5 +1,5 @@
 
-# Genomic Viewer
+# Omnium Genomic Viewer
 
 <img src="assets/omniumGV.gif" width="225"/>
 
