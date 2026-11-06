@@ -3,9 +3,39 @@
 
 <img src="assets/omniumGV.gif" width="225"/>
 
-**Version:** 1.1.0\
-**Description:** Genomic Viewer is a cross-platform application for visualizing
+**Version:** 1.2.0\
+**Description:** Omnium Genomic Viewer is a cross-platform application for visualizing
 and analyzing genomic data hosted in a Docker container.
+
+------------------------------------------------------------------------
+
+## The Philosophy of Omnium Genomic Viewer
+
+<details open>
+<summary>&nbsp;</summary>
+
+The Latin word *Omnium* literally means **"of everyone"** or **"belonging to everyone"**. 
+It reflects the philosophy behind ***Omnium Genomic Viewer***, aiming to make 
+genomic data visualization accessible to everyone.
+
+
+We developed ***Omnium Genomic Viewer*** to allow researchers with different 
+backgrounds to effortlessly visualize diverse genomics, transcriptomics and 
+epigenomics data types, generate publication-ready figures, and access essential 
+descriptive statistics without spending valuable time on repetitive plotting and 
+data-processing tasks.
+
+
+***Omnium Genomic Viewer*** is also designed to foster scientific collaboration 
+while respecting data privacy.
+
+
+Most importantly, ***Omnium Genomic Viewer*** **is built on the belief that powerful 
+scientific tools should be accessible, intuitive and collaborative, allowing 
+researchers to focus less on the technical challenges of data visualization and 
+more on the biology behind the data.**
+
+</details>
 
 ------------------------------------------------------------------------
 
@@ -23,6 +53,7 @@ and analyzing genomic data hosted in a Docker container.
 
 </details>
 
+
 ------------------------------------------------------------------------
 
 ## Overview
@@ -30,12 +61,12 @@ and analyzing genomic data hosted in a Docker container.
 <details open>
 <summary>&nbsp;</summary>
 
-***Genomic Viewer*** is a graphical application for the visualization and
+***Omnium Genomic Viewer*** is a graphical application for the visualization and
 biological interpretation of next generation sequencing (NGS) data, focusing on
 easy data integration especially for users with little to no programming
 background. It combines multiple tools for genomic data exploration, filtering,
 and generation of publication-ready plots into a single, easy to use program.
-***Genomic Viewer*** has been designed to be of use for non-programmer users,
+***Omnium Genomic Viewer*** has been designed to be of use for non-programmer users,
 works offline, allows sessions sharing and performs some basic analyses for
 data inspection.
 
@@ -87,7 +118,7 @@ Recommended actions for the user <em>before</em> installing ***Genomic
 Viewer*** and step-by-step instructions on how to get the
 application running.
 
-For a more detailed description of the recommended ***Genomic Viewer***
+For a more detailed description of the recommended ***Omnium Genomic Viewer***
 installation steps refer to [this guide](assets/genomicviewer-installation-details.md).
 
 <br/><br/>
@@ -153,9 +184,9 @@ installation steps refer to [this guide](assets/genomicviewer-installation-detai
     Engine](https://docs.docker.com/engine/install). 
     <br> 
     **Note:** We highly
-    recommend to run ***Genomic Viewer*** in [rootless mode](https://docs.docker.com/engine/security/rootless/). This requires a
+    recommend to run ***Omnium Genomic Viewer*** in [rootless mode](https://docs.docker.com/engine/security/rootless/). This requires a
     one time intervention of a system administrator on that machine and then
-    each user who wants to run ***Genomic Viewer*** needs to set up the Docker
+    each user who wants to run ***Omnium Genomic Viewer*** needs to set up the Docker
     daemon in their own namespace by running 
     <br>
     `dockerd-rootless-setuptool.sh install` 
@@ -261,7 +292,7 @@ A short hands-on section showing a simple workflow.
 
 Data and their annotation are loaded through a configuration file named
 `GenomicViewer_config.yml` which is automatically saved in the `data/` folder
-during ***Genomic Viewer*** installation in the user selected
+during ***Omnium Genomic Viewer*** installation in the user selected
 location.
 
 A default configuration file is pre-filled and ready to use with information
@@ -284,21 +315,21 @@ available from the graphical interface and are thoroughly described in the
 [Features and Usage
 section](assets/genomicviewer-reference-manual.md#features-and-usage). Ensure
 that the data you want to load are saved in the `data/` directory that was
-created upon ***GenomicViewer*** installation. Pay attention to load only data
+created upon ***Omnium Genomic Viewer*** installation. Pay attention to load only data
 files with matching reference genome.
 
 
 <h4> <strong>2. Launch Genomic Viewer</strong> </h4>
 
-Launch ***Genomic Viewer*** with the desktop icon that was created upon
+Launch ***Omnium Genomic Viewer*** with the desktop icon that was created upon
 installation.
 
-After loading all the required R packages ***Genomic Viewer*** interface will
+After loading all the required R packages ***Omnium Genomic Viewer*** interface will
 open as a new tab in your default web browser.
 
 <h4> <strong>3. Select a reference genome</strong> </h4>
 
-***Genomic Viewer*** shows data aligned to the genomic coordinates of a
+***Omnium Genomic Viewer*** shows data aligned to the genomic coordinates of a
 selected reference genome. It is essential to choose the correct reference
 genome to avoid mislabeling of gene/transcript annotation tracks and
 coordinates. Load only data tracks mapped to the same reference genome, and
@@ -326,7 +357,7 @@ section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>5. Explore datasets</strong> </h4>
 
-***Genomic Viewer*** provides three different navigation tabs named
+***Omnium Genomic Viewer*** provides three different navigation tabs named
 <strong>Plot</strong>, <strong>Data</strong> and <strong>Stats</strong> to
 
 - extract and visualize genomic data of a selected region;
@@ -341,7 +372,7 @@ section](assets/genomicviewer-reference-manual.md#features-and-usage) paragraph.
 
 <h4> <strong>6. Export results and coordinates</strong> </h4>
 
-***Genomic Viewer*** allows to export and save different outputs generated
+***Omnium Genomic Viewer*** allows to export and save different outputs generated
 during a working session:
 
 - The genomic visualization can be exported as a high quality plot in different
@@ -356,7 +387,7 @@ Usage section](assets/genomicviewer-reference-manual.md#features-and-usage).
 
 <h4> <strong>7. Share your session</strong> </h4>
 
-Collaborative efforts are supported by ***Genomic Viewer***. Be sure the
+Collaborative efforts are supported by ***Omnium Genomic Viewer***. Be sure the
 collaborator has all underlying data files and then simply forward the
 `data/GenomicViewer_config.yml` to your partner to place it on their
 installation's `data/` directory.
@@ -376,11 +407,11 @@ User Interface Overview
 
 <div>
 
-Brief description of the ***Genomic Viewer*** graphical interface structure.
+Brief description of the ***Omnium Genomic Viewer*** graphical interface structure.
 
 <h4><strong>Main Window</strong></h4>
 
-The graphical layout of ***Genomic Viewer*** consists of three elements:
+The graphical layout of ***Omnium Genomic Viewer*** consists of three elements:
 
 - *left sidebar* - reference genome selection, coordinates (information and
   input) and buttons for updating and saving the view;
@@ -388,7 +419,7 @@ The graphical layout of ***Genomic Viewer*** consists of three elements:
   advanced graphics options;
 - *central panel* - for showing plots, data, and statistics.
 
-![Figure 1. ***Genomic Viewer*** main window.](assets/GV_main_window_sections.png)
+![Figure 1. ***Omnium Genomic Viewer*** main window.](assets/GV_main_window_sections.png)
 
 <h4><strong>Sidebars</strong></h4>
 
@@ -420,7 +451,7 @@ visibility of the chromosome ideogram.
 
 <h4><strong>Central Navigation Panels</strong></h4>
 
-The central area is the core of ***Genomic Viewer*** visualizing and summarizing
+The central area is the core of ***Omnium Genomic Viewer*** visualizing and summarizing
 previously selected genomic data. It allows the user to navigate across three
 different panels showing
 
@@ -433,7 +464,7 @@ different panels showing
 
 Further details are available in the [Features and Usage section](#features-and-usage).
 
-![Figure 2. ***Genomic Viewer*** navigation panels, Plot, Data, and
+![Figure 2. ***Omnium Genomic Viewer*** navigation panels, Plot, Data, and
 Stats.](assets/GV_navigation_panels.png)
 </div>
 </details>
@@ -448,7 +479,7 @@ Tutorial
 </summary>
 
 
-A complete **Tutorial** showing a usage example with the ***Genomic Viewer***
+A complete **Tutorial** showing a usage example with the ***Omnium Genomic Viewer***
 built-in test data is described in the
 [Tutorial](assets/genomicviewer-reference-manual.md#tutorial) section of the
 reference manual.
@@ -458,7 +489,7 @@ reference manual.
 
 ## Source Code
 
-***Genomic Viewer*** and its [Electron](https://www.electronjs.org/)-based
+***Omnium Genomic Viewer*** and its [Electron](https://www.electronjs.org/)-based
 ***GUI installer*** source code are freely available through
 [GitHub](https://github.com/EuracBiomedicalResearch/genomic_viewer) under the MIT Licence.
 </div>
