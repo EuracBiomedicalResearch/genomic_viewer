@@ -264,15 +264,89 @@ peaks.annotation.function <- function(bed.file, bed.names, genome){
   } else if (genome %in% c("mm10", "mm39")){
     org <- "Mmusculus"
   }
-anno.plot.list <- list()
-for (i in 1:length(bed.file)){
-  con <- read_delim(bed.file[i], delim = "\t", col_names = FALSE,
-                    col_select = c(1:3), show_col_types = FALSE)
-  bed3 <- tempfile("bed3.bed")
-  write_delim(con, file = bed3, delim = "\t", col_names = FALSE)
-    anno.p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome),
-                                       TxDb = get(paste("TxDb.", org, ".UCSC.", genome, ".knownGene", sep="")))
-  anno.plot.list[[i]] <- anno.p$plot
+  anno.plot.list <- list()
+  # connector lines coords
+connector_data <- data.frame(
+  x = c(1.45, 2.45, 3.45),
+  xend = c(3.8, 3.8, 3.8),
+  y = c(0.80, 0.90, 1),
+  yend = c(0.80, 0.90, 1)
+  )
+  # Labels at the end of the connector lines
+  label_data <- data.frame(
+    x = c(3.8, 3.8, 3.8),
+    y = c(0.80, 0.90, 1),
+    label = c(
+      "Gene Level",
+      "Genic/Intergenic",
+      "Exon level"
+    )
+  )
+  for (i in 1:length(bed.file)){
+    con <- read_delim(bed.file[i], delim = "\t", col_names = FALSE,
+                     col_select = c(1:3), show_col_types = FALSE)
+    bed3 <- tempfile("bed3.bed")
+    write_delim(con, file = bed3, delim = "\t", col_names = FALSE)
+    p <- genomicElementDistribution(import(bed3, format = "BED", genome = genome),
+                                          TxDb = get(paste("TxDb.", org, ".UCSC.", genome, ".knownGene", sep="")),
+                                          labels = list(geneLevel = c(promoter = "Promoter", 
+                                                                     geneDownstream = "Downstream",
+                                                                     geneBody = "Gene body", 
+                                                                     distalIntergenic = "Distal Intergenic"), 
+                                                       ExonIntron = c(exon = "Exon", 
+                                                                      intron = "Intron", 
+                                                                      intergenic = "Intergenic"), 
+                                                       Exons = c(utr5 = "5' UTR",
+                                                                 utr3 = "3' UTR", 
+                                                                 CDS = "CDS", 
+                                                                 otherExon = "Other exon"), 
+                                                       group = c(geneLevel = "Gene Level", 
+                                                                 promoterLevel = "Promoter Level", 
+                                                                 Exons = "Exon level", 
+                                                                 ExonIntron = "Genic/Intergenic")),
+                                         labelColors = c(promoter = "darkred", 
+                                                         geneDownstream = "red", 
+                                                         geneBody = "#D55E00", 
+                                                         distalIntergenic = "#E69F00", 
+                                                         exon = "#311B92", 
+                                                         intron = "#01579B",
+                                                         intergenic = "#748AA6", 
+                                                         utr5 = "#004D40", 
+                                                         utr3 = "#00897B", 
+                                                         CDS = "#43A047",
+                                                         otherExon = "#AED581")
+    )
+    anno.p <- p$plot
+    # Remove original label layer
+    anno.p$layers <- anno.p$layers[-2]
+    # Add custom lables and connectors
+    anno.p <- anno.p +
+      geom_segment(
+        data = connector_data,
+        aes(x = x, xend = xend, y = y, yend = yend),
+        inherit.aes = FALSE,
+        colour = "darkslategray",
+        linewidth = 0.8
+      ) +
+      geom_text(
+        data = label_data,
+        aes(x = x, y = y, label = label),
+        inherit.aes = FALSE,
+        hjust = c(0.5, 0.65, 0.5),
+        vjust = -0.6,
+        size = 4.5,
+        colour = "darkslategray"
+      ) +
+      coord_polar(theta = "y", clip = "off") +
+      theme(
+        aspect.ratio = 1,
+        plot.margin = margin(15, 15, 5, 18),
+        legend.position = "right",
+        legend.key.size = unit(0.6, "cm"),
+        legend.text = element_text(size = 12)
+      )
+    
+  anno.plot.list[[i]] <- anno.p
   unlink(bed3)
 }
 
@@ -684,7 +758,7 @@ circos.function <- function(bedpe.file, chromosome, genome, zoom_start, zoom_end
       track.index = 1, ylim = c(0,1), panel.fun=function(x, y) {
         circos.axis(h="top", major.at=brk.zoom, labels=round(brk.zoom/10^6, 1),
                     labels.cex=0.6, col=col_text, labels.col=col_text, lwd=0.7,
-                    labels.facing="clockwise")
+                    labels.facing="clockwise", direction = "inside")
       },
       bg.border=F)
     ## Add gene label annotation

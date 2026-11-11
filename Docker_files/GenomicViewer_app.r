@@ -1,4 +1,4 @@
-Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Documents/R scripts/Shiny/GenomicViewer/Docker_files_revision_2/files for installer/GenomicViewer_config_DEV.yml")
+
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
@@ -459,31 +459,56 @@ ui <- suppressWarnings(page_sidebar(
                       uiOutput("gwas_save")
                         ),
                # Panel with Basic Statistics of data ------------------------------------------------------------
+            tags$head(
+              tags$script(HTML("
+          document.addEventListener('bslib.card', function(event) {
+          const card = event.target.closest('.plot-card');
+          if (!card) return;
+          Shiny.setInputValue(
+             'annotation_fullscreen',
+              event.detail.fullScreen,
+              {priority: 'event'}
+               );
+          });"))
+             ),
+          tags$head(tags$style(HTML("
+            .plot-card .shiny-plot-output {
+             transition: height 0.2s ease;
+             }
+           .plot-card.plot-fullscreen .shiny-plot-output {
+             height: 85vh !important;
+            width: 100% !important;
+           }
+        "))
+                    ),
               nav_panel("Stats", class = "gap-2 p-3 border-0 align-items-top",
                 # print plots of peaks numbers
-                fluidRow(h6(tags$b("Peak counts")), tags$hr(), column(width = 6, plotOutput("peak.nr", height = 200) %>% withSpinner()),
-                column(width = 6, plotOutput("arches.nr", height = 200) %>% withSpinner()), verbatimTextOutput('warn.message1')),
+                fluidRow(h6(tags$b("Peak counts")), tags$hr(), 
+                        card(full_screen = T, class = "border-0 shadow-none plot-card", layout_columns(col_widths = c(6, 6),
+                          plotOutput("peak.nr", height = "auto") %>% withSpinner(),
+                          plotOutput("arches.nr", height = "auto") %>% withSpinner()), verbatimTextOutput('warn.message1'))
+                        ),
                 # GO button peaks nr
                 actionButton("run.stat1", "Run", width = "25%"),
                 # print upset plot for peaks intersections
-                fluidRow(plotOutput("upset", height = 400) %>% withSpinner(), verbatimTextOutput('warn.message2')),
+                fluidRow(card(full_screen = T, class = "border-0 shadow-none plot-card", plotOutput("upset", height = "auto") %>% withSpinner()), verbatimTextOutput('warn.message2')),
                 # GO button upset
                 actionButton("run.stat2", "Run", width = "25%"),
                 # print piechart with peaks annotation
-                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), plotOutput("annotation", height = "auto")  %>% withSpinner(), verbatimTextOutput('warn.message3')),
+                fluidRow(h6(tags$b("Peaks Annotation")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card", plotOutput("annotation", height = "auto")  %>% withSpinner()), verbatimTextOutput('warn.message3')),
                 # GO button annotation
                 actionButton("run.stat3", "Run", width = "25%"),
                 # print circos of 3D contacts
-                fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), imageOutput("circos", width = "auto", height = 600, inline = T) %>% withSpinner(), verbatimTextOutput('warn.message6')),
+                fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card", imageOutput("circos", width = "auto", height = 600, inline = T) %>% withSpinner()), verbatimTextOutput('warn.message6')),
                 #fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), plotOutput("circos", height = 600) %>% withSpinner(), verbatimTextOutput('warn.message6')),
                 # GO button circos
                 actionButton("run.stat6", "Run", width = "25%"),
                 # print circular hierarchy plot for categories
-                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), plotOutput("categories.pie", height = 350, width = 900) %>% withSpinner(), verbatimTextOutput('warn.message4')),
+                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card", plotOutput("categories.pie", height = 350, width = 900) %>% withSpinner()), verbatimTextOutput('warn.message4')),
                 # GO button circular hierarchy
                 actionButton("run.stat4", "Run", width = "25%"),
                 # print manhattan plot with whole chr and zoom-in
-                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), plotOutput("manhattan", height = 600) %>% withSpinner(), verbatimTextOutput('warn.message5')),
+                fluidRow(h6(tags$b("Manhattan plot")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card", plotOutput("manhattan", height = "auto") %>% withSpinner()), verbatimTextOutput('warn.message5')),
                 # GO button manhattan
                 actionButton("run.stat5", "Run", width = "25%")
                   )),
@@ -1136,7 +1161,11 @@ server <- function(input, output, session){
                                      End = vals$end,
                                      filetype = "bed")
       }
-    }, res = 100)
+    }, res = 100,
+    height = function() {
+      n <- length(bed.file)
+      if (isTRUE(input$annotation_fullscreen))  700 else 200
+    })
 
 
 
@@ -1151,7 +1180,11 @@ server <- function(input, output, session){
                                    End = vals$end,
                                    filetype = "bedpe")
       }
-    }, res = 100)
+    }, res = 100,
+    height = function() {
+      n <- length(bed.file)
+      if (isTRUE(input$annotation_fullscreen))  700 else 200
+    })
   ## For upset plot
     vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
 
@@ -1180,11 +1213,15 @@ server <- function(input, output, session){
                                        End = vals2$end,
                                       genome = gsub( " .*", "", input$ref.genome))))
       }
-    }, res = 100)
+    }, res = 100,
+    height = function() {
+      n <- length(bed.file)
+      if (isTRUE(input$annotation_fullscreen))  700 else 400
+    })
 
   ## For annotation plot
     vals3 <- reactiveValues(bed.file=NULL)
-
+    
     observeEvent(input$run.stat3, {
       vals3$bed.file <- bed.file[which(file.size(bed.file) <= 45e+06)]
       # Specifiy if data not plotted in warning message
@@ -1198,10 +1235,14 @@ server <- function(input, output, session){
       if(!is.null(vals3$bed.file) & length(vals3$bed.file) > 0){
         QUIET(suppressWarnings(peaks.annotation.function(bed.file = vals3$bed.file,
                                   bed.names = config$bed.names[which(file.size(bed.file) < 45e+06)],
-                                  genome = gsub( " .*", "", input$ref.genome))))
-      }
-    }, res = 100,
-       height = function(){180*length(bed.file)})
+                                  genome = gsub( " .*", "", input$ref.genome))))}
+ 
+    },
+    res = 85,
+    height = function() {
+      n <- length(bed.file)
+      if (isTRUE(input$annotation_fullscreen))  600 * ceiling(n / 2) else 300 * ceiling(n / 2)
+    })
 
     ## For circos plot
     vals6 <- reactiveValues(bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
@@ -1218,23 +1259,13 @@ server <- function(input, output, session){
       }
     })
 
-   # output$circos <- renderPlot({
-    #  if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
-     #   circos.function(bedpe.file = vals6$bedpe.file,
-      #                  chromosome = vals6$chr,
-       #                 genome = "hg38",
-        #                zoom_start = vals6$start,
-         #               zoom_end = vals6$end,
-          #              genes.label = genes.hgnc,
-           #             bedpe.names = config$bedpe.names[which(file.size(bedpe.file) < 45e+06)])
-  #    }
-   # }, res = 100)
-
     circos.image <- reactive({
       genes.hgnc <- genes.hgnc()
       if(!is.null(vals6$bedpe.file) & length(vals6$bedpe.file) > 0){
         outfile2 <- tempfile(fileext='.png')
-        png(outfile2, width = 900, height = 1200, res = 120)
+        h = function() {if (isTRUE(input$annotation_fullscreen)) 1200 else 800}
+        w = function() {if (isTRUE(input$annotation_fullscreen)) 900 else 600}
+        png(outfile2, width = w(), height = h(), res = 120)
         QUIET(circos.function(bedpe.file = vals6$bedpe.file,
                         chromosome = vals6$chr,
                         genome = gsub( " .*", "", input$ref.genome),
@@ -1305,7 +1336,11 @@ server <- function(input, output, session){
                               gwas.names =config$gwas.names[which(file.size(gwas.file) < 800e+06)],
                               genome = gsub( " .*", "", input$ref.genome)))
         }
-      }, res = 100)
+      }, res = 100,
+      height = function() {
+        n <- length(bed.file)
+        if (isTRUE(input$annotation_fullscreen))  800 else 600
+      })
 
 
 
