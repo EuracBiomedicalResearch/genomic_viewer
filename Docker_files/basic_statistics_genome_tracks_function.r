@@ -43,7 +43,7 @@ basic_statistics_genome_tracks <- function(bed.file, bed.names, chr, Start, End,
     theme_minimal() +
     theme(text = element_text(size = 10),
           axis.text.y = element_text(size = 10),
-          axis.text.x = element_text(size = 10),
+          axis.text.x = element_text(size = 10, angle = 20, vjust = 1.2, hjust = 1),
           strip.text.x = element_text(size = 10)) +
     geom_text(aes(label=peaks.nr), vjust=1.6, color="white", size=4) +
     facet_wrap( ~ category, , scales = "free")
@@ -548,16 +548,18 @@ manhattan.plot.function <- function(gwas.file, Chr, start, end, sign.p, chr.len.
   }
 }
 
-################### PIECHART OF CATEGORIES FOUND IN CATEGORICAL BED:
+################### BARPLOT OF CATEGORIES FOUND IN CATEGORICAL BED:
 
-# This function generates a circular packing plot with the categories reported in the categorical bed file and their percentage in the whole genome and in the selected range
+# This function is used to generate the barplot comparing the relative abundance 
+# of the categories found in the categorical bed file from total genome or the 
+# selected window
 
+# categorical.pie.function(cat.file = cat.file,
+#                          cat.names = config$cat.name,
+#                          chr = 5,
+#                          Start = 1,
+#                          End = 123000000)
 
-#library(ggraph)
-#library(igraph)
-#library(dplyr)
-#library(ggplot2)
-#library(ggpubr)
 categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
   ## Specifiy complete chromosome name
   chrom = paste("chr", chr, sep = "")
@@ -570,14 +572,15 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
     ##### For total genome
     # crate dataframe with hierarchy: cat.name, categories
     subgroup <- unique(cat.file.r$category)
-    group <- rep(cat.names[i], length(unique(cat.file.r$category)))
     # create dataframe with vertices names and size
     vertices.df <- as.data.frame(table(cat.file.r$category))
     # add the leaf vertex with tot size of the group
-    vertices.df <- rbind(vertices.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.r)))
+    #vertices.df <- rbind(vertices.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.r)))
     # generate column with percentages
-    vertices.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))$Freq, 100)
-
+    vertices.df$perc <- as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))$Freq
+    # Add group to be displayed as bars name
+    vertices.df$group <- c("total")
+    
     #### For selected region
     # filter the input table based on the selected region
     cat.file.sel <- dplyr::filter(cat.file.r, chr == chrom & start >= Start & end <= End)
@@ -587,57 +590,139 @@ categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
     # create datafrane with vertices names and size
     vertices.sel.df <- as.data.frame(table(cat.file.sel$category))
     # add the leaf vertex with tot size of the group
-    vertices.sel.df <- rbind(vertices.sel.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.sel)))
+    #vertices.sel.df <- rbind(vertices.sel.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.sel)))
     # generate column with percentages
-    vertices.sel.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.sel$category))*100, 0))$Freq, 100)
-
+    vertices.sel.df$perc <- as.data.frame(round(prop.table(table(cat.file.sel$category))*100, 0))$Freq
+    # Add group to be displayed as bars name
+    vertices.sel.df$group <- c("selected")
+    
+    
     # change colnames vertices
-    colnames(vertices.df) <- c("names", "size", "perc")
-    colnames(vertices.sel.df) <- c("names", "size", "perc")
-    # Merge groups and subgroups in a data frame
-    groups.df <- data.frame(group = group,
-                           subgroup = subgroup)
-    groups.sel.df <- data.frame(group = group.sel,
-                            subgroup = subgroup.sel)
-    # Generate a 'graph' object with the igraph library
-    mygraph <- graph_from_data_frame(groups.df, vertices=vertices.df)
-    mygraph.sel <- graph_from_data_frame(groups.sel.df, vertices=vertices.sel.df)
-    # Make the plot
-    p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) +
-      geom_node_circle(aes(fill = size), color = "white") +
-      geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
-      theme_void() +
-      theme(legend.position = "none",
-            plot.title = element_text(size = 16, face = "bold")) +
-      scale_fill_distiller(palette =  "Blues", direction = 1) +
-      ggtitle(label = "Total genome")
-    if (nrow(groups.sel.df) > 0){
-      p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) +
-        geom_node_circle(aes(fill = size), color = "white") +
-        geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
-        theme_void() +
-        theme(legend.position = "none",
-              plot.title = element_text(size = 16, face = "bold")) +
-        scale_fill_distiller(palette =  "PuOr", direction = 1) +
-        ggtitle(label = "Selected region")
-      p <- ggpubr::ggarrange(p1, p2, nrow = 1, ncol = 2)
-    } else {
-      p <- ggpubr::ggarrange(p1, nrow = 1, ncol = 2)
-    }
+    colnames(vertices.df) <- c("Categories", "Size", "Percentage", "Group")
+    colnames(vertices.sel.df) <- c("Categories", "Size", "Percentage", "Group")
+    
+    # Merge in a single df
+    gg.vertices.df <- rbind(vertices.df, vertices.sel.df)
+    # Create labs for total counts
+    totals <- data.frame(Group = unique(gg.vertices.df$Group),
+                        total = c(sum(vertices.df$Size), sum(vertices.sel.df$Size)))
+    
+    p <- ggplot(gg.vertices.df, aes(fill=Categories, y=Percentage, x=Group)) + 
+        geom_bar(position="stack", stat="identity") +
+        scale_fill_viridis(discrete = T) +
+        theme_minimal() +
+      ggtitle(cat.names[i]) +
+        theme(text = element_text(size = 12),
+            axis.text.y = element_text(size = 12),
+            axis.text.x = element_text(size = 12),
+            strip.text.x = element_text(size = 12),
+            plot.title = element_text(face = "bold.italic", size = 12)) +
+       geom_label(aes(label=paste0(Percentage, "%\n", Size)), position = position_stack(vjust = 0.5), color=rep(c(rep("white", nlevels(gg.vertices.df$Categories)-1), "black"),2), size=4, show.legend = F, lineheight = 0.8) +
+        geom_text(data = totals, aes(x = Group, y = 95, label = paste0("100%\n", total)), inherit.aes = FALSE, vjust = -1, size = 3.5, fontface = "bold", angle = -90, lineheight = 0.8) +
+        xlab("") +
+        scale_y_continuous(limits = c(-5, 112), breaks = seq(0, 100, by = 25)) +
+        coord_flip()
+    
+    # Add plot to list
     plots[[i]] <- p
   }
-
-  # define nr of columns for final plot
-  if(length(cat.file) <= 9){
-    n.col =  3
-    n.row = 2
-  } else {
-    n.col  =  6
-    n.row = 4
-  }
-  p.final <- ggpubr::ggarrange(plotlist=plots, nrow = n.row, ncol = n.col, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
-  print(p.final)			
+    # Define number of rows and columns depending on number of datasets to be plotted
+    n.row =  2
+    n.col = ceiling(length(cat.file)/2)
+    # arrange final plot
+   p.final <- ggpubr::ggarrange(plotlist=plots, nrow = n.row, ncol = n.col)
+   p.final
 }
+
+
+# This function generates a circular packing plot with the categories reported in the categorical bed file and their percentage in the whole genome and in the selected range
+
+
+#library(ggraph)
+#library(igraph)
+#library(dplyr)
+#library(ggplot2)
+#library(ggpubr)
+# categorical.pie.function <- function(cat.file, cat.names, chr, Start, End){
+#   ## Specifiy complete chromosome name
+#   chrom = paste("chr", chr, sep = "")
+#   plots <- list()
+#   for (i in 1:length(cat.file)){
+#     ## Prepara data for whole genome plotting
+#     # Read cat file
+#     cat.file.r <- read_delim(cat.file[i], "\t", col_names = TRUE,
+#                              show_col_types = FALSE)
+#     ##### For total genome
+#     # crate dataframe with hierarchy: cat.name, categories
+#     subgroup <- unique(cat.file.r$category)
+#     group <- rep(cat.names[i], length(unique(cat.file.r$category)))
+#     # create dataframe with vertices names and size
+#     vertices.df <- as.data.frame(table(cat.file.r$category))
+#     # add the leaf vertex with tot size of the group
+#     vertices.df <- rbind(vertices.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.r)))
+#     # generate column with percentages
+#     vertices.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.r$category))*100, 0))$Freq, 100)
+# 
+#     #### For selected region
+#     # filter the input table based on the selected region
+#     cat.file.sel <- dplyr::filter(cat.file.r, chr == chrom & start >= Start & end <= End)
+#     # crate dataframe with hierarchy: cat.name, categories
+#     subgroup.sel <- unique(cat.file.sel$category)
+#     group.sel <- rep(cat.names[i], length(unique(cat.file.sel$category)))
+#     # create datafrane with vertices names and size
+#     vertices.sel.df <- as.data.frame(table(cat.file.sel$category))
+#     # add the leaf vertex with tot size of the group
+#     vertices.sel.df <- rbind(vertices.sel.df, data.frame(Var1 = cat.names[i], Freq = nrow(cat.file.sel)))
+#     # generate column with percentages
+#     vertices.sel.df$perc <- c(as.data.frame(round(prop.table(table(cat.file.sel$category))*100, 0))$Freq, 100)
+# 
+#     # change colnames vertices
+#     colnames(vertices.df) <- c("names", "size", "perc")
+#     colnames(vertices.sel.df) <- c("names", "size", "perc")
+#     # Merge groups and subgroups in a data frame
+#     groups.df <- data.frame(group = group,
+#                            subgroup = subgroup)
+#     groups.sel.df <- data.frame(group = group.sel,
+#                             subgroup = subgroup.sel)
+#     # Generate a 'graph' object with the igraph library
+#     mygraph <- graph_from_data_frame(groups.df, vertices=vertices.df)
+#     mygraph.sel <- graph_from_data_frame(groups.sel.df, vertices=vertices.sel.df)
+#     # Make the plot
+#     p1 <- ggraph(mygraph, layout = 'circlepack', weight=size) +
+#       geom_node_circle(aes(fill = size), color = "white") +
+#       geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
+#       theme_void() +
+#       theme(legend.position = "none",
+#             plot.title = element_text(size = 16, face = "bold")) +
+#       scale_fill_distiller(palette =  "Blues", direction = 1) +
+#       ggtitle(label = "Total genome")
+#     if (nrow(groups.sel.df) > 0){
+#       p2 <- ggraph(mygraph.sel, layout = 'circlepack', weight=size) +
+#         geom_node_circle(aes(fill = size), color = "white") +
+#         geom_node_label(aes(label=paste(name, ": ", perc, "%", sep=""), filter = leaf), label.padding = unit(0.1, "lines"), size = 4, repel = TRUE, color = "grey21", fontface = "bold") +
+#         theme_void() +
+#         theme(legend.position = "none",
+#               plot.title = element_text(size = 16, face = "bold")) +
+#         scale_fill_distiller(palette =  "PuOr", direction = 1) +
+#         ggtitle(label = "Selected region")
+#       p <- ggpubr::ggarrange(p1, p2, nrow = 1, ncol = 2)
+#     } else {
+#       p <- ggpubr::ggarrange(p1, nrow = 1, ncol = 2)
+#     }
+#     plots[[i]] <- p
+#   }
+# 
+#   # define nr of columns for final plot
+#   if(length(cat.file) <= 9){
+#     n.col =  3
+#     n.row = 2
+#   } else {
+#     n.col  =  6
+#     n.row = 4
+#   }
+#   p.final <- ggpubr::ggarrange(plotlist=plots, nrow = n.row, ncol = n.col, labels = cat.names, label.y = 0.9, font.label = list(face = "italic", size = 12))
+#   print(p.final)			
+# }
 
 ################### CIRCOS PLOT FROM BEDPE FILE
 

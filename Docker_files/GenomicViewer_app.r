@@ -1,4 +1,3 @@
-
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
@@ -472,6 +471,12 @@ ui <- suppressWarnings(page_sidebar(
           });"))
              ),
           tags$head(tags$style(HTML("
+                .yscrolling-card > .card-body {
+      height: 100%;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      min-height: 0;
+    }
             .plot-card .shiny-plot-output {
              transition: height 0.2s ease;
              }
@@ -500,11 +505,10 @@ ui <- suppressWarnings(page_sidebar(
                 actionButton("run.stat3", "Run", width = "25%"),
                 # print circos of 3D contacts
                 fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card", imageOutput("circos", width = "auto", height = 600, inline = T) %>% withSpinner()), verbatimTextOutput('warn.message6')),
-                #fluidRow(h6(tags$b("Circos Plot 3D contacts")),tags$hr(), plotOutput("circos", height = 600) %>% withSpinner(), verbatimTextOutput('warn.message6')),
                 # GO button circos
                 actionButton("run.stat6", "Run", width = "25%"),
                 # print circular hierarchy plot for categories
-                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card", plotOutput("categories.pie", height = 350, width = 900) %>% withSpinner()), verbatimTextOutput('warn.message4')),
+                fluidRow(h6(tags$b("Categorical classification")),tags$hr(), card(full_screen = T, class = "border-0 shadow-none plot-card  .yscrolling-card", plotOutput("categories.pie", height = "auto", width = 550*ceiling(length(config$cat.file)/2)) %>% withSpinner()), verbatimTextOutput('warn.message4')),
                 # GO button circular hierarchy
                 actionButton("run.stat4", "Run", width = "25%"),
                 # print manhattan plot with whole chr and zoom-in
@@ -1163,8 +1167,8 @@ server <- function(input, output, session){
       }
     }, res = 100,
     height = function() {
-      n <- length(bed.file)
-      if (isTRUE(input$annotation_fullscreen))  700 else 200
+     # n <- length(bed.file)
+      if (isTRUE(input$annotation_fullscreen))  700 else 250
     })
 
 
@@ -1182,8 +1186,8 @@ server <- function(input, output, session){
       }
     }, res = 100,
     height = function() {
-      n <- length(bed.file)
-      if (isTRUE(input$annotation_fullscreen))  700 else 200
+      #n <- length(bedpe.file)
+      if (isTRUE(input$annotation_fullscreen))  700 else 250
     })
   ## For upset plot
     vals2 <- reactiveValues(bed.file=NULL, bedpe.file=NULL, chr = "1", start = 28000000, end = 28500000)
@@ -1215,7 +1219,7 @@ server <- function(input, output, session){
       }
     }, res = 100,
     height = function() {
-      n <- length(bed.file)
+     # n <- length(bed.file)
       if (isTRUE(input$annotation_fullscreen))  700 else 400
     })
 
@@ -1307,8 +1311,14 @@ server <- function(input, output, session){
                                  cat.names = config$cat.names[which(file.size(cat.file) < 400e+06)],
                                  chr = vals4$chr,
                                  Start = vals4$start,
-                                 End = vals4$end))
-      }
+                                 End = vals4$end))}
+      }, res = 100,
+      height = function() {
+        if (isTRUE(input$annotation_fullscreen)) 700 else 350
+    },
+    width = function() {
+      n <- length(cat.file)
+      if (isTRUE(input$annotation_fullscreen)) 700*ceiling(n/2) else 550*ceiling(n/2)
     })
 
     ## For Manhattan plot
