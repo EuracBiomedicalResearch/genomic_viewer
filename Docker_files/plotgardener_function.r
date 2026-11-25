@@ -247,11 +247,11 @@ plotgardener.shiny.function <- function(bw.file,
           just = c("right", "bottom"), params = params) )
 
         ## Add heatmap legend
-        annoHeatmapLegend(
+        QUIET( annoHeatmapLegend(
           plot = hicPlot, x = 6.5, y = paste(-1.8*conv,"b", sep=""),
           width = 0.10, height = 0.7, fontsize = 10*(conv+0.2),
           just = c("right", "top"), fontcolor = "black"
-        )
+        ) )
         ## Increment y coord
         y.coord <- y.coord+(3.2*conv)
       }
@@ -334,8 +334,8 @@ plotgardener.shiny.function <- function(bw.file,
      for (i in 1:length(bed.file)){
        if(end - start <= 10e+6){
          # bed signal
-         QUIET(
-           plotRanges(data = bed.file[i],
+        QUIET(
+        plotRanges(data = bed.file[i],
                       collapse = endsWith(bed.file[i], ".bed"),
                       fill = as.character(rep(paletteer_d("ggthemes::excel_Ion_Boardroom"), 5)[i]),
                       y = paste(0.75*conv, "b", sep=""), height = 0.75*conv,

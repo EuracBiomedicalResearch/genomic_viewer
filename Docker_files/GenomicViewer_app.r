@@ -1,3 +1,4 @@
+Sys.setenv(GV_DEVELOPMENT = "C:/Users/sarlago/Documents/R scripts/Shiny/GenomicViewer/Docker_files_revision_2/files for installer/GenomicViewer_config_DEV.yml")
 # -----------------------------------------------------------------------------
 # ----------------------------------- Main ------------------------------------
 # -----------------------------------------------------------------------------
@@ -117,6 +118,7 @@ source("file_validation_function.r")
 source("plotgardener_function.r")
 source("shiny_read_table_function.R")
 source("basic_statistics_genome_tracks_function.r")
+source("svg_interactivity_metadata.r")
 
 # Specify the application port
 options(shiny.host = "0.0.0.0")
@@ -401,6 +403,102 @@ ui <- suppressWarnings(page_sidebar(
     )),
 
   # Card
+  
+  ### TEST
+  tags$script(HTML("
+(function() {
+
+  function initializeSvgPopovers() {
+
+    document.querySelectorAll('.svg-pan-zoom_viewport').forEach(function(viewport) {
+
+      if (viewport.dataset.popoverInitialized === 'true') return;
+
+      viewport.dataset.popoverInitialized = 'true';
+
+      let popover = null;
+
+      viewport.addEventListener('mouseover', function(event) {
+
+        const target = event.target.closest('.interactive-hic');
+
+        if (!target || !viewport.contains(target)) return;
+
+        // Avoid recreating the popover when moving within the same element
+        if (target === viewport.currentTargetElement) return;
+
+        viewport.currentTargetElement = target;
+
+        if (popover) popover.remove();
+
+        popover = document.createElement('div');
+        popover.className = 'genomic-popover';
+
+        const heading = document.createElement('strong');
+        heading.textContent = target.getAttribute('data-title');
+
+        const body = document.createElement('div');
+        body.textContent = target.getAttribute('data-content');
+
+        popover.appendChild(heading);
+        popover.appendChild(body);
+
+        document.body.appendChild(popover);
+
+        popover.style.position = 'fixed';
+        popover.style.left = (event.clientX + 12) + 'px';
+        popover.style.top = (event.clientY + 12) + 'px';
+        popover.style.background = 'white';
+        popover.style.border = '1px solid #999';
+        popover.style.padding = '12px';
+        popover.style.borderRadius = '6px';
+        popover.style.zIndex = '999999';
+        popover.style.pointerEvents = 'none';
+        popover.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+
+      });
+
+      viewport.addEventListener('mousemove', function(event) {
+
+        if (popover && viewport.currentTargetElement) {
+          popover.style.left = (event.clientX + 12) + 'px';
+          popover.style.top = (event.clientY + 12) + 'px';
+        }
+
+      });
+
+      viewport.addEventListener('mouseout', function(event) {
+
+        const target = event.target.closest('.interactive-hic');
+
+        if (!target || !viewport.contains(target)) return;
+
+        if (event.relatedTarget && target.contains(event.relatedTarget)) return;
+
+        if (popover) {
+          popover.remove();
+          popover = null;
+        }
+
+        viewport.currentTargetElement = null;
+
+      });
+
+    });
+
+  }
+
+  $(document).on('shiny:value', function(event) {
+
+    if (event.name === 'res') {
+      setTimeout(initializeSvgPopovers, 300);
+    }
+
+  });
+
+})();
+")),
+  ### END OF TEST
   page_fillable(
     layout_columns(
       navset_card_underline(
@@ -735,14 +833,98 @@ server <- function(input, output, session){
     })
     result
   })
+  
+  ### TEST
+  popover.metadata <- reactive({
+    req(plot.ready(), reactiveChr())
+    ### Read tracks data with function defined for the Data tab
+    result <- shiny_read_table_function(
+      bed.file = bed.file,
+      bedpe.file = bedpe.file,
+      cat.file = cat.file,
+      gwas.file = gwas.file,
+      
+      chr = reactiveChr(),
+      Start = reactiveChrstart(),
+      End = reactiveChrend()
+    )
+    # Extract track-specific information
+    ### Extract data for track names
+    track.names <- c("bw" = config$bw.names,
+                     "bed" = config$bed.names,
+                     "cat" = config$cat.names,
+                     "bedpe" = config$bedpe.names,
+                     "gwas" = config$gwas.names)
+    # Exclude empty or NA names
+    track.names <- track.names[!is.na(track.names) & 
+                                 !track.names == "" & 
+                                 !track.names == " "]
+    ### Extract data for BED files
+    bed.tabs <- result[[1]]
+    bed.tabs <- lapply(bed.tabs, function(x) {
+      x <- x[order(x$start, x$end), ]
+      x
+    })
     
-
-  output$res <- renderSvgPanZoom({
-    QUIET(
-      svgPanZoom(svglite:::inlineSVG(tracks()),
-                 panEnabled = T, controlIconsEnabled = T, viewBox = T,
-                 width = "auto", height = "900px") )
+    ### Extract data for BEDPE files
+    bedpe.tabs <- result[[2]]
+    bedpe.tabs <- lapply(bedpe.tabs, function(x) {
+      x <- x[order(x$startA, x$endA), ]
+      x
+    })
+    
+    ### Extract data for CAT BED files
+    cat.tabs <- result[[3]]
+    cat.tabs <- lapply(cat.tabs, function(x) {
+      x <- x[order(x$start, x$end), ]
+      x
+    })
+    
+    ### Extract data for GWAS files
+    gwas.tabs <- result[[4]]
+    gwas.tabs <- lapply(gwas.tabs, function(x) {
+      x <- x[order(x$pos), ]
+      x
+    })
+    
+    
+    ### Combine data info in one list
+    popover.list <- list("track.names" = track.names, 
+                         "bed.tabs" = bed.tabs,
+                         "bedpe.tabs" = bedpe.tabs,
+                         "cat.tabs" = cat.tabs,
+                         "gwas.tabs" = gwas.tabs)
+    return(popover.list)
   })
+  
+ # Print main plot SVG with popovers 
+  output$res <- renderSvgPanZoom({
+    svg <- svglite:::inlineSVG(tracks())
+    svg <- add_popovers(
+      svg = svg,
+      popover_data = popover.metadata()
+    )
+    
+    QUIET(
+      svgPanZoom(
+        svg,
+        panEnabled = TRUE,
+        controlIconsEnabled = TRUE,
+        viewBox = TRUE,
+        width = "auto",
+        height = "900px"
+      )
+    )
+    
+  })
+  ### END OF TEST
+  
+  # output$res <- renderSvgPanZoom({
+  #   QUIET(
+  #     svgPanZoom(svg <- svglite:::inlineSVG(tracks()),
+  #                panEnabled = T, controlIconsEnabled = T, viewBox = T,
+  #                width = "auto", height = "900px") )
+  # })
 
   image <- reactive({
     req(plot.ready(), reactiveChr())
@@ -785,6 +967,7 @@ server <- function(input, output, session){
     req(image())
     image()
   }, deleteFile = F)
+  
 
   ##-------------------- Output zooming region plot:
 
